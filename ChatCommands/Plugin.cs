@@ -715,7 +715,7 @@ namespace ChatCommands
         public static void DisplayChatMessage(string chatMessage)
         {
             string formattedMessage = 
-                $"<color=#FF00FF>ChatCommands</color>: <color=#FFFF00>'{chatMessage}'</color>";
+                $"<color=#FF00FF>ChatCommands</color>: <color=#FFFF00>{chatMessage}</color>";
 
             HUDManager.Instance.ChatMessageHistory.Add(formattedMessage);
 
