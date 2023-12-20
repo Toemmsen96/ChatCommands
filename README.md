@@ -10,6 +10,6 @@ Commands to use:
 /tp <playername> -> teleport back to ship or if  stated to a player  
 /buy <item> <count> -> buy items from shop  
 /money -> enables infinite money cheat  
-/togglelights -> toggles lights of facility
+/togglelights -> toggles lights of facility  
 /help -> see what commands you can use  
 /morehelp -> more commands to use get listed  
