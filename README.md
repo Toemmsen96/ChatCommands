@@ -8,3 +8,6 @@ Commands to use:
 /speed -> toggles speed and jump hack for faster travelling
 /god -> toggles godmode
 /tp <playername> -> teleport back to ship or if  stated to a player
+/buy <item> <count> -> buy items from shop
+/money -> enables infinite money cheat
+/togglelights -> toggles lights of facility
