@@ -21,31 +21,21 @@ namespace ChatCommands
         private static ChatCommands instance;
         private static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
         public static Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>> levelEnemySpawns;
-
         public static Dictionary<SpawnableEnemyWithRarity, int> enemyRaritys;
-
         public static Dictionary<SpawnableEnemyWithRarity, AnimationCurve> enemyPropCurves;
-
         private static SelectableLevel currentLevel;
-
         private static EnemyVent[] currentLevelVents;
-
         private static RoundManager currentRound;
-
         private static SpawnableEnemyWithRarity jesterRef;
         private static ConfigEntry<string> PrefixSetting;
-
         private static bool noClipEnabled;
-
         private static bool enableGod;
         private static bool EnableInfiniteCredits = false;
         private static bool EnableInfiniteDeadline = false;
         private static int CustomDeadline = 3; 
         private static bool usingTerminal = false;
-
         private static PlayerControllerB playerRef;
         private static bool isHost;
-
         private static bool speedHack;
         private void Awake()
         {
@@ -64,7 +54,6 @@ namespace ChatCommands
             speedHack = false;
             enableGod = false;
             harmony.PatchAll(typeof(ChatCommands));
-
             mls.LogInfo((object)"Chat Commands loaded!");
         }
         private static void EnableNoClip()
@@ -170,48 +159,51 @@ namespace ChatCommands
             currentRound = RoundManager.Instance;
             if (!levelEnemySpawns.ContainsKey(newLevel))
             {
-                List<SpawnableEnemyWithRarity> list = new List<SpawnableEnemyWithRarity>();
-                foreach (SpawnableEnemyWithRarity enemy in newLevel.Enemies)
-                {
-                    list.Add(enemy);
-                }
-                levelEnemySpawns.Add(newLevel, list);
+                InitializeLevelEnemySpawns(newLevel);
             }
-            levelEnemySpawns.TryGetValue(newLevel, out var value);
-            newLevel.Enemies = value;
-            foreach (SpawnableEnemyWithRarity enemy2 in newLevel.Enemies)
-            {
-                mls.LogInfo((object)("Inside: " + enemy2.enemyType.enemyName));
-                if (!enemyRaritys.ContainsKey(enemy2))
-                {
-                    enemyRaritys.Add(enemy2, enemy2.rarity);
-                }
-                int value2 = 0;
-                enemyRaritys.TryGetValue(enemy2, out value2);
-                enemy2.rarity = value2;
-            }
-            foreach (SpawnableEnemyWithRarity outsideEnemy in newLevel.OutsideEnemies)
-            {
-                mls.LogInfo((object)("Outside: " + outsideEnemy.enemyType.enemyName));
-                if (!enemyRaritys.ContainsKey(outsideEnemy))
-                {
-                    enemyRaritys.Add(outsideEnemy, outsideEnemy.rarity);
-                }
-                int value3 = 0;
-                enemyRaritys.TryGetValue(outsideEnemy, out value3);
-                outsideEnemy.rarity = value3;
-            }
-            foreach (SpawnableEnemyWithRarity enemy3 in newLevel.Enemies)
-            {
-                if (!enemyPropCurves.ContainsKey(enemy3))
-                {
-                    enemyPropCurves.Add(enemy3, enemy3.enemyType.probabilityCurve);
-                }
-                AnimationCurve value4 = new AnimationCurve();
-                enemyPropCurves.TryGetValue(enemy3, out value4);
-                enemy3.enemyType.probabilityCurve = value4;
-            }     
+            UpdateEnemyRarity(newLevel.Enemies);
+            UpdateEnemyRarity(newLevel.OutsideEnemies);
+            UpdateEnemyProbabilityCurve(newLevel.Enemies);
             return true;
+        }
+
+        private static void InitializeLevelEnemySpawns(SelectableLevel newLevel)
+        {
+            List<SpawnableEnemyWithRarity> list = new List<SpawnableEnemyWithRarity>();
+            foreach (SpawnableEnemyWithRarity enemy in newLevel.Enemies)
+            {
+                list.Add(enemy);
+            }
+            levelEnemySpawns.Add(newLevel, list);
+        }
+
+        private static void UpdateEnemyRarity(List<SpawnableEnemyWithRarity> enemies)
+        {
+            foreach (SpawnableEnemyWithRarity enemy in enemies)
+            {
+                mls.LogInfo((object)("Inside: " + enemy.enemyType.enemyName));
+                if (!enemyRaritys.ContainsKey(enemy))
+                {
+                    enemyRaritys.Add(enemy, enemy.rarity);
+                }
+                int value = 0;
+                enemyRaritys.TryGetValue(enemy, out value);
+                enemy.rarity = value;
+            }
+        }
+
+        private static void UpdateEnemyProbabilityCurve(List<SpawnableEnemyWithRarity> enemies)
+        {
+            foreach (SpawnableEnemyWithRarity enemy in enemies)
+            {
+                if (!enemyPropCurves.ContainsKey(enemy))
+                {
+                    enemyPropCurves.Add(enemy, enemy.enemyType.probabilityCurve);
+                }
+                AnimationCurve value = new AnimationCurve();
+                enemyPropCurves.TryGetValue(enemy, out value);
+                enemy.enemyType.probabilityCurve = value;
+            }
         }
 
         [HarmonyPatch(typeof(RoundManager), "AdvanceHourAndSpawnNewBatchOfEnemies")]
@@ -638,24 +630,27 @@ namespace ChatCommands
             {
                 SelectableLevel newLevel = currentLevel;
                 text3 = "Enemies:";
-                text4 = "Inside: Girl, Lasso, Bunker Spider, Centipede, \nBlob, Flowerman, Spring, Crawler, Hoarding bug, \nJester, Puffer\nOutside: ForestGiant, MouthDog, Earth Leviathan, Baboon Bird";
+                //text4 = "Inside: Girl, Lasso, Bunker Spider, Centipede, \nBlob, Flowerman, Spring, Crawler, Hoarding bug, \nJester, Puffer\nOutside: ForestGiant, MouthDog, Earth Leviathan, Baboon Bird";
+                text4 = "Check chat for list of enemies";
                 levelEnemySpawns.TryGetValue(newLevel, out var value);
                 newLevel.Enemies = value;
+                private string enemyListToSend = "";
+                enemyListToSend += "Inside: ";
                 foreach (SpawnableEnemyWithRarity enemy2 in newLevel.Enemies)
                 {
                     mls.LogInfo((object)("Inside: " + enemy2.enemyType.enemyName));
-                    DisplayChatMessage(enemy2.enemyType.enemyName);
                     if (!enemyRaritys.ContainsKey(enemy2))
                     {
                         enemyRaritys.Add(enemy2, enemy2.rarity);
+                        enemyListToSend += enemy2.enemyType.enemyName + ", ";
                     }
                     int value2 = 0;
                     enemyRaritys.TryGetValue(enemy2, out value2);
                     enemy2.rarity = value2;
                 }
+                enemyListToSend += "\nOutside: ";
                 foreach (SpawnableEnemyWithRarity outsideEnemy in newLevel.OutsideEnemies)
                 {
-                    DisplayChatMessage(outsideEnemy.enemyType.enemyName);
                     mls.LogInfo((object)("Outside: " + outsideEnemy.enemyType.enemyName));
                     if (!enemyRaritys.ContainsKey(outsideEnemy))
                     {
@@ -665,12 +660,13 @@ namespace ChatCommands
                     enemyRaritys.TryGetValue(outsideEnemy, out value3);
                     outsideEnemy.rarity = value3;
                 }
+                DisplayChatMessage(enemyListToSend);
             }
             if (text.ToLower().Contains("money"))
             {
                 EnableInfiniteCredits = !EnableInfiniteCredits;
             }
-            if (text.ToLower().Contains("chatmessage"))
+            if (text.ToLower().Contains("testchat"))
             {
                 DisplayChatMessage("This is a test message");
             }
@@ -704,9 +700,7 @@ namespace ChatCommands
                     GameNetworkManager.Instance.localPlayerController.inSpecialInteractAnimation = false;
                     text3 = "Stopped using terminal";
                     text4 = " ";
-
                 }
-                
             }
             HUDManager.Instance.DisplayTip(text3, text4, false, false, "LC_Tip1");
         }
