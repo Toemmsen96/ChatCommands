@@ -26,13 +26,10 @@ namespace ChatCommands
         private static SelectableLevel currentLevel;
         private static EnemyVent[] currentLevelVents;
         private static RoundManager currentRound;
-        private static SpawnableEnemyWithRarity jesterRef;
         private static ConfigEntry<string> PrefixSetting;
-        private static bool noClipEnabled;
         private static bool enableGod;
         private static bool EnableInfiniteCredits = false;
-        private static bool EnableInfiniteDeadline = false;
-        private static int CustomDeadline = 3; 
+        private static int CustomDeadline = int.MinValue;
         private static bool usingTerminal = false;
         private static PlayerControllerB playerRef;
         private static bool isHost;
@@ -50,30 +47,13 @@ namespace ChatCommands
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
             levelEnemySpawns = new Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>>();
             enemyPropCurves = new Dictionary<SpawnableEnemyWithRarity, AnimationCurve>();
-            noClipEnabled = false;
             speedHack = false;
             enableGod = false;
             harmony.PatchAll(typeof(ChatCommands));
 
             mls.LogInfo((object)"Chat Commands loaded!");
         }
-        private static void EnableNoClip()
-        {
-            if (!isHost)
-            {
-                return;
-            }
-            noClipEnabled = !noClipEnabled;
-            mls.LogInfo((object)"noclip function called");
-            if (noClipEnabled)
-            {
-                Collider[] array = UnityEngine.Object.FindObjectsByType<Collider>((FindObjectsInactive)0, (FindObjectsSortMode)0);
-                for (int i = 0; i < array.Length; i++)
-                {
-                    array[i].enabled = false;
-                }
-            }
-        }
+
         [HarmonyPatch(typeof(PlayerControllerB), "Start")]
         [HarmonyPrefix]
         private static void getPlayerRef(ref PlayerControllerB __instance)
@@ -97,9 +77,9 @@ namespace ChatCommands
             {
                 ___jumpForce = 25f;
                 ___sprintMeter = 1f;
-                if(___isSprinting)___sprintMultiplier = 10f;
+                if (___isSprinting) ___sprintMultiplier = 10f;
             }
-            
+
         }
 
         private static void toggleSpeedHack()
@@ -113,7 +93,7 @@ namespace ChatCommands
 
         [HarmonyPatch(typeof(PlayerControllerB), "AllowPlayerDeath")]
         [HarmonyPrefix]
-        private static bool OverrideDeath()
+        private static bool overrideDeath()
         {
             if (isHost)
             {
@@ -124,7 +104,7 @@ namespace ChatCommands
 
         [HarmonyPatch(typeof(Terminal), "RunTerminalEvents")]
         [HarmonyPostfix]
-        private static void NeverLoseCredits(ref int ___groupCredits)
+        private static void infiniteCredits(ref int ___groupCredits)
         {
             if (isHost && EnableInfiniteCredits)
             {
@@ -133,17 +113,22 @@ namespace ChatCommands
         }
 
 
-        [HarmonyPatch(typeof(StartOfRound), "Start")]
-        [HarmonyPrefix]
-        private static bool patchDeadline()
+        [HarmonyPatch(typeof(TimeOfDay), "SetNewProfitQuota")]
+        [HarmonyPostfix]
+        private static void patchDeadline(TimeOfDay __instance)
         {
-            if (isHost && CustomDeadline != 0)
+
+            if (isHost && CustomDeadline != int.MinValue)
             {
-                TimeOfDay.Instance.quotaVariables.deadlineDaysAmount = CustomDeadline;
-                return true;
+                __instance.quotaVariables.deadlineDaysAmount = CustomDeadline;
+                __instance.timeUntilDeadline = (float)(__instance.quotaVariables.deadlineDaysAmount + CustomDeadline) * __instance.totalTime;
+
+                TimeOfDay.Instance.timeUntilDeadline = (int)(TimeOfDay.Instance.totalTime * (float)TimeOfDay.Instance.quotaVariables.deadlineDaysAmount);
+                TimeOfDay.Instance.SyncTimeClientRpc(__instance.globalTime, (int)__instance.timeUntilDeadline);
+                ((TMP_Text)StartOfRound.Instance.deadlineMonitorText).text = "DEADLINE:\n " + TimeOfDay.Instance.daysUntilDeadline;
             }
-            return false;
         }
+
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPrefix]
@@ -200,8 +185,15 @@ namespace ChatCommands
                 AnimationCurve value4 = new AnimationCurve();
                 enemyPropCurves.TryGetValue(enemy3, out value4);
                 enemy3.enemyType.probabilityCurve = value4;
-            }     
+            }
             return true;
+        }
+        [HarmonyPatch(typeof(RoundManager), "LoadNewLevel")]
+        [HarmonyPostfix]
+        private static void updateNewInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
+        {
+            currentLevel = ___currentLevel;
+            currentLevelVents = ___allEnemyVents;
         }
 
         [HarmonyPatch(typeof(RoundManager), "AdvanceHourAndSpawnNewBatchOfEnemies")]
@@ -217,12 +209,20 @@ namespace ChatCommands
         private static void ChatCommandsSubmitted(HUDManager __instance)
         {
             string text = __instance.chatTextField.text;
-            string text2 = "/";
-            mls.LogInfo((object)text);
-            if (text.ToLower().StartsWith(text2.ToLower()))
+
+            // Log the text to ensure it's not null
+            mls.LogInfo($"Received chat input: {text}");
+
+            // Check if text is not null and starts with "/"
+            if (!string.IsNullOrEmpty(text) && text.ToLower().StartsWith("/"))
             {
-                ProcessCommandInput(__instance.chatTextField.text);
+                ProcessCommandInput(text);
                 __instance.chatTextField.text = "";
+            }
+            else
+            {
+                // Log an error or handle the case where the text is not valid for commands
+                Debug.LogError("Invalid or null chat input.");
             }
         }
 
@@ -232,7 +232,7 @@ namespace ChatCommands
             {
                 return;
             }
-            mls.LogInfo((object)"Got to the main SpawnEnemy function");
+            mls.LogInfo("SpawnEnemy called...");
             if (inside)
             {
                 try
@@ -274,7 +274,7 @@ namespace ChatCommands
         private static void ProcessCommandInput(string text)
         {
             string text2 = "/";
-            mls.LogInfo((object)text);
+
             if (PrefixSetting.Value != "")
             {
                 text2 = PrefixSetting.Value;
@@ -283,8 +283,8 @@ namespace ChatCommands
             {
                 return;
             }
-            string text3 = "Default Title";
-            string text4 = "Default Body";
+            string text3 = "default";
+            string text4 = "unknown error";
             if (!isHost)
             {
                 text3 = "Command";
@@ -292,10 +292,18 @@ namespace ChatCommands
                 HUDManager.Instance.DisplayTip(text3, text4, false, false, "LC_Tip1");
                 return;
             }
+            
             if (text.ToLower().StartsWith(text2 + "spawn"))
             {
                 text3 = "Spawned Enemies";
                 string[] array = text.Split(new char[1] { ' ' });
+                if (currentLevel == null || levelEnemySpawns == null || currentLevel.Enemies == null)
+                {
+                    text3 = "Command";
+                    text4 = (currentLevel == null ? "Unable to send command since currentLevel is null." : "Unable to send command since levelEnemySpawns is null.");
+                    HUDManager.Instance.DisplayTip(text3, text4, true, false, "LC_Tip1");
+                    return;
+                }
                 if (array.Length == 2)
                 {
                     bool flag = false;
@@ -568,17 +576,10 @@ namespace ChatCommands
                 text4 = "/buy item - Buy an item \n /god - Toggle GodMode \n /speed - Toggle SpeedHack \n /togglelights - Toggle all lights inside building \n /spawn enemyName - Attempt to spawn an enemy \n /morehelp - see more commands";
             }
 
-            if (text.ToLower().Contains("noclip"))
-            {
-                //EnableNoClip();
-                text3 = "NoClip";
-                text4 = "NoClip set to: " + noClipEnabled;
-            }
-
             if (text.ToLower().Contains("deadline") || text.ToLower().Contains("dl"))
             {
                 string[] array5 = text.Split(new char[1] { ' ' });
-                if (array5.Length > 1 && !array5[1].Contains("0"))
+                if (array5.Length > 1)
                 {
                     if (int.TryParse(array5[1], out var result4))
                     {
@@ -586,15 +587,19 @@ namespace ChatCommands
                         text3 = "Deadline";
                         text4 = "Deadline set to: " + CustomDeadline;
                     }
+                    else
+                    {
+                        CustomDeadline = int.MinValue;
+                        text3 = "Deadline";
+                        text4 = "Deadline set to default";
+                    }
                 }
                 else
                 {
-                    CustomDeadline = 3;
+                    CustomDeadline = int.MinValue;
                     text3 = "Deadline";
-                    text4 = "Deadline set to: " + CustomDeadline;
+                    text4 = "Deadline set to default";
                 }
-                text3 = "Deadline";
-                text4 = "Deadline set to: " + CustomDeadline;
             }
             if (text.ToLower().Contains("tp"))
             {
@@ -629,38 +634,65 @@ namespace ChatCommands
                 string textToDisplay = "";
                 SelectableLevel newLevel = currentLevel;
                 text3 = "Enemies:";
-                text4 = "Inside: Girl, Lasso, Bunker Spider, Centipede, \nBlob, Flowerman, Spring, Crawler, Hoarding bug, \nJester, Puffer\nOutside: ForestGiant, MouthDog, Earth Leviathan, Baboon Bird";
-                levelEnemySpawns.TryGetValue(newLevel, out var value);
-                newLevel.Enemies = value;
-                textToDisplay += "<color=#FF00FF>Inside: </color><color=#FFFF00>";
-                foreach (SpawnableEnemyWithRarity enemy2 in newLevel.Enemies)
+                if (newLevel == null)
                 {
-                    mls.LogInfo((object)("Inside: " + enemy2.enemyType.enemyName));
-                    
-                    if (!enemyRaritys.ContainsKey(enemy2))
-                    {
-                        enemyRaritys.Add(enemy2, enemy2.rarity);
-                    }
-                    int value2 = 0;
-                    enemyRaritys.TryGetValue(enemy2, out value2);
-                    enemy2.rarity = value2;
-                    textToDisplay += enemy2.enemyType.enemyName + ", ";
+                    DisplayChatMessage("<color=#FF0000>ERROR: </color>Level is null.");
+                    Debug.LogError("newLevel is null.");
+                    return;
                 }
-                textToDisplay += "\n</color><color=#FF00FF>Outside: </color>";
-                foreach (SpawnableEnemyWithRarity outsideEnemy in newLevel.OutsideEnemies)
+
+                // Check if levelEnemySpawns is null
+                if (levelEnemySpawns == null)
                 {
-                    mls.LogInfo((object)("Outside: " + outsideEnemy.enemyType.enemyName));
-                    if (!enemyRaritys.ContainsKey(outsideEnemy))
-                    {
-                        enemyRaritys.Add(outsideEnemy, outsideEnemy.rarity);
-                    }
-                    int value3 = 0;
-                    enemyRaritys.TryGetValue(outsideEnemy, out value3);
-                    outsideEnemy.rarity = value3;
-                    textToDisplay += outsideEnemy.enemyType.enemyName + ", ";
+                    DisplayChatMessage("<color=#FF0000>ERROR: </color>levelEnemySpawns is null.");
+                    Debug.LogError("levelEnemySpawns is null.");
+                    return;
                 }
-                DisplayChatMessage(textToDisplay);
+
+                // Attempt to get value from dictionary, check for null
+                if (levelEnemySpawns.TryGetValue(newLevel, out var value))
+                {
+                    newLevel.Enemies = value;
+                    textToDisplay += "<color=#FF00FF>Inside: </color><color=#FFFF00>";
+                    text4 = "<color=#FF00FF>Inside: </color><color=#FFFF00>";
+
+                    if (newLevel.Enemies.Count == 0)
+                    {
+                        textToDisplay += "None";
+                        text4 += "None";
+                    }
+                    else
+                    {
+                        foreach (SpawnableEnemyWithRarity enemy2 in newLevel.Enemies)
+                        {
+                            mls.LogInfo((object)("Inside: " + enemy2.enemyType.enemyName));
+                            textToDisplay += enemy2.enemyType.enemyName + ", ";
+                            text4 += enemy2.enemyType.enemyName + ", ";
+                        }
+                    }
+
+                    textToDisplay += "\n</color><color=#FF00FF>Outside: </color>";
+                    text4 += "\n</color><color=#FF00FF>Outside: </color>";
+
+                    if (newLevel.OutsideEnemies.Count == 0)
+                    {
+                        textToDisplay += "None";
+                        text4 += "None";
+                    }
+                    else
+                    {
+                        foreach (SpawnableEnemyWithRarity outsideEnemy in newLevel.OutsideEnemies)
+                        {
+                            mls.LogInfo((object)("Outside: " + outsideEnemy.enemyType.enemyName));
+                            textToDisplay += outsideEnemy.enemyType.enemyName + ", ";
+                            text4 += outsideEnemy.enemyType.enemyName + ", ";
+                        }
+                    }
+
+                    DisplayChatMessage(textToDisplay);
+                }
             }
+
             if (text.ToLower().Contains("money"))
             {
                 EnableInfiniteCredits = !EnableInfiniteCredits;
@@ -701,7 +733,7 @@ namespace ChatCommands
                     text4 = " ";
 
                 }
-                
+
             }
             HUDManager.Instance.DisplayTip(text3, text4, false, false, "LC_Tip1");
         }
@@ -714,7 +746,7 @@ namespace ChatCommands
 
         public static void DisplayChatMessage(string chatMessage)
         {
-            string formattedMessage = 
+            string formattedMessage =
                 $"<color=#FF00FF>ChatCommands</color>: <color=#FFFF00>{chatMessage}</color>";
 
             HUDManager.Instance.ChatMessageHistory.Add(formattedMessage);
