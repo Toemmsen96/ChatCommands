@@ -8,6 +8,7 @@ using BepInEx.Configuration;
 using GameNetcodeStuff;
 using Unity.Netcode;
 using TMPro;
+using ChatCommands.Patches;
 
 namespace ChatCommands
 {
@@ -19,21 +20,21 @@ namespace ChatCommands
         private const string modVersion = "1.0.0";
         private readonly Harmony harmony = new Harmony(modGUID);
         private static ChatCommands instance;
-        private static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
+        internal static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
         public static Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>> levelEnemySpawns;
         public static Dictionary<SpawnableEnemyWithRarity, int> enemyRaritys;
         public static Dictionary<SpawnableEnemyWithRarity, AnimationCurve> enemyPropCurves;
-        private static SelectableLevel currentLevel;
-        private static EnemyVent[] currentLevelVents;
-        private static RoundManager currentRound;
+        internal static SelectableLevel currentLevel;
+        internal static EnemyVent[] currentLevelVents;
+        internal static RoundManager currentRound;
         private static ConfigEntry<string> PrefixSetting;
-        private static bool enableGod;
-        private static bool EnableInfiniteCredits = false;
-        private static int CustomDeadline = int.MinValue;
+        internal static bool enableGod;
+        internal static bool EnableInfiniteCredits = false;
+        internal static int CustomDeadline = int.MinValue;
         private static bool usingTerminal = false;
-        private static PlayerControllerB playerRef;
-        private static bool isHost;
-        private static bool speedHack;
+        internal static PlayerControllerB playerRef;
+        internal static bool isHost;
+        internal static bool speedHack;
         private void Awake()
         {
             if (instance == null)
@@ -50,16 +51,12 @@ namespace ChatCommands
             speedHack = false;
             enableGod = false;
             harmony.PatchAll(typeof(ChatCommands));
+            harmony.PatchAll(typeof(Patches.Patches));
 
             mls.LogInfo((object)"Chat Commands loaded!");
         }
 
-        [HarmonyPatch(typeof(PlayerControllerB), "Start")]
-        [HarmonyPrefix]
-        private static void getPlayerRef(ref PlayerControllerB __instance)
-        {
-            playerRef = __instance;
-        }
+        
         private static bool toggleGodMode()
         {
             if (isHost)
@@ -69,160 +66,12 @@ namespace ChatCommands
             return enableGod;
         }
 
-        [HarmonyPatch(typeof(PlayerControllerB), "Update")]
-        [HarmonyPostfix]
-        private static void speedHackFunc(ref float ___jumpForce, ref float ___sprintMeter, ref float ___sprintMultiplier, ref bool ___isSprinting)
-        {
-            if (speedHack)
-            {
-                ___jumpForce = 25f;
-                ___sprintMeter = 1f;
-                if (___isSprinting) ___sprintMultiplier = 10f;
-            }
-
-        }
-
         private static void toggleSpeedHack()
         {
             if (isHost)
             {
                 speedHack = !playerRef.isSpeedCheating;
                 playerRef.isSpeedCheating = speedHack;
-            }
-        }
-
-        [HarmonyPatch(typeof(PlayerControllerB), "AllowPlayerDeath")]
-        [HarmonyPrefix]
-        private static bool overrideDeath()
-        {
-            if (isHost)
-            {
-                return !enableGod;
-            }
-            return true;
-        }
-
-        [HarmonyPatch(typeof(Terminal), "RunTerminalEvents")]
-        [HarmonyPostfix]
-        private static void infiniteCredits(ref int ___groupCredits)
-        {
-            if (isHost && EnableInfiniteCredits)
-            {
-                ___groupCredits = 50000;
-            }
-        }
-
-
-        [HarmonyPatch(typeof(TimeOfDay), "SetNewProfitQuota")]
-        [HarmonyPostfix]
-        private static void patchDeadline(TimeOfDay __instance)
-        {
-
-            if (isHost && CustomDeadline != int.MinValue)
-            {
-                __instance.quotaVariables.deadlineDaysAmount = CustomDeadline;
-                __instance.timeUntilDeadline = (float)(__instance.quotaVariables.deadlineDaysAmount + CustomDeadline) * __instance.totalTime;
-
-                TimeOfDay.Instance.timeUntilDeadline = (int)(TimeOfDay.Instance.totalTime * (float)TimeOfDay.Instance.quotaVariables.deadlineDaysAmount);
-                TimeOfDay.Instance.SyncTimeClientRpc(__instance.globalTime, (int)__instance.timeUntilDeadline);
-                ((TMP_Text)StartOfRound.Instance.deadlineMonitorText).text = "DEADLINE:\n " + TimeOfDay.Instance.daysUntilDeadline;
-            }
-        }
-
-
-        [HarmonyPatch(typeof(RoundManager), "Start")]
-        [HarmonyPrefix]
-        private static void setIsHost()
-        {
-            mls.LogInfo((object)("Host Status: " + ((NetworkBehaviour)RoundManager.Instance).NetworkManager.IsHost));
-            isHost = ((NetworkBehaviour)RoundManager.Instance).NetworkManager.IsHost;
-        }
-
-        [HarmonyPatch(typeof(RoundManager), "LoadNewLevel")]
-        [HarmonyPrefix]
-        private static bool ModifyLevel(ref SelectableLevel newLevel)
-        {
-            currentRound = RoundManager.Instance;
-            if (!levelEnemySpawns.ContainsKey(newLevel))
-            {
-                List<SpawnableEnemyWithRarity> list = new List<SpawnableEnemyWithRarity>();
-                foreach (SpawnableEnemyWithRarity enemy in newLevel.Enemies)
-                {
-                    list.Add(enemy);
-                }
-                levelEnemySpawns.Add(newLevel, list);
-            }
-            levelEnemySpawns.TryGetValue(newLevel, out var value);
-            newLevel.Enemies = value;
-            foreach (SpawnableEnemyWithRarity enemy2 in newLevel.Enemies)
-            {
-                mls.LogInfo((object)("Inside: " + enemy2.enemyType.enemyName));
-                if (!enemyRaritys.ContainsKey(enemy2))
-                {
-                    enemyRaritys.Add(enemy2, enemy2.rarity);
-                }
-                int value2 = 0;
-                enemyRaritys.TryGetValue(enemy2, out value2);
-                enemy2.rarity = value2;
-            }
-            foreach (SpawnableEnemyWithRarity outsideEnemy in newLevel.OutsideEnemies)
-            {
-                mls.LogInfo((object)("Outside: " + outsideEnemy.enemyType.enemyName));
-                if (!enemyRaritys.ContainsKey(outsideEnemy))
-                {
-                    enemyRaritys.Add(outsideEnemy, outsideEnemy.rarity);
-                }
-                int value3 = 0;
-                enemyRaritys.TryGetValue(outsideEnemy, out value3);
-                outsideEnemy.rarity = value3;
-            }
-            foreach (SpawnableEnemyWithRarity enemy3 in newLevel.Enemies)
-            {
-                if (!enemyPropCurves.ContainsKey(enemy3))
-                {
-                    enemyPropCurves.Add(enemy3, enemy3.enemyType.probabilityCurve);
-                }
-                AnimationCurve value4 = new AnimationCurve();
-                enemyPropCurves.TryGetValue(enemy3, out value4);
-                enemy3.enemyType.probabilityCurve = value4;
-            }
-            return true;
-        }
-        [HarmonyPatch(typeof(RoundManager), "LoadNewLevel")]
-        [HarmonyPostfix]
-        private static void updateNewInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
-        {
-            currentLevel = ___currentLevel;
-            currentLevelVents = ___allEnemyVents;
-        }
-
-        [HarmonyPatch(typeof(RoundManager), "AdvanceHourAndSpawnNewBatchOfEnemies")]
-        [HarmonyPrefix]
-        private static void updateCurrentLevelInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
-        {
-            currentLevel = ___currentLevel;
-            currentLevelVents = ___allEnemyVents;
-        }
-
-        [HarmonyPatch(typeof(HUDManager), "SubmitChat_performed")]
-        [HarmonyPrefix]
-        private static void ChatCommandsSubmitted(HUDManager __instance)
-        {
-            string text = __instance.chatTextField.text;
-
-            // Log the text to ensure it's not null
-            mls.LogInfo($"Received chat input: {text}");
-
-            // Check if text is not null and starts with "/"
-            if (!string.IsNullOrEmpty(text) && text.ToLower().StartsWith("/"))
-            {
-                ProcessCommandInput(text);
-                __instance.chatTextField.text = "";
-            }
-            else
-            {
-                // Log an error or handle the case where the text is not valid for commands
-                Debug.LogError("Invalid or null chat input.");
             }
         }
 
@@ -257,21 +106,7 @@ namespace ChatCommands
             }
         }
 
-        [HarmonyPatch(typeof(RoundManager), "SpawnEnemyFromVent")]
-        [HarmonyPrefix]
-        private static void logSpawnEnemyFromVent()
-        {
-            mls.LogInfo((object)"Attempting to spawn an enemy");
-        }
-
-        [HarmonyPatch(typeof(RoundManager), "EnemyCannotBeSpawned")]
-        [HarmonyPrefix]
-        private static bool OverrideCannotSpawn()
-        {
-            return false;
-        }
-
-        private static void ProcessCommandInput(string text)
+        internal static void ProcessCommandInput(string text)
         {
             string text2 = "/";
 
@@ -284,7 +119,7 @@ namespace ChatCommands
                 return;
             }
             string text3 = "default";
-            string text4 = "unknown error";
+            string text4 = "ERR: unknown";
             if (!isHost)
             {
                 text3 = "Command";
@@ -389,7 +224,7 @@ namespace ChatCommands
                                     }
                                     catch
                                     {
-                                        mls.LogInfo((object)"Failed to spawn enemies, check your command.");
+                                        mls.LogInfo((object)"Outside Enemies: Failed to spawn enemies, check your command. If you spawned Inside Enemies, ignore this message");
                                     }
                                     if (flag2)
                                     {
