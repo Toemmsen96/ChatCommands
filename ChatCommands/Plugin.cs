@@ -21,31 +21,21 @@ namespace ChatCommands
         private static ChatCommands instance;
         private static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
         public static Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>> levelEnemySpawns;
-
         public static Dictionary<SpawnableEnemyWithRarity, int> enemyRaritys;
-
         public static Dictionary<SpawnableEnemyWithRarity, AnimationCurve> enemyPropCurves;
-
         private static SelectableLevel currentLevel;
-
         private static EnemyVent[] currentLevelVents;
-
         private static RoundManager currentRound;
-
         private static SpawnableEnemyWithRarity jesterRef;
         private static ConfigEntry<string> PrefixSetting;
-
         private static bool noClipEnabled;
-
         private static bool enableGod;
         private static bool EnableInfiniteCredits = false;
         private static bool EnableInfiniteDeadline = false;
         private static int CustomDeadline = 3; 
         private static bool usingTerminal = false;
-
         private static PlayerControllerB playerRef;
         private static bool isHost;
-
         private static bool speedHack;
         private void Awake()
         {
@@ -636,15 +626,17 @@ namespace ChatCommands
             }
             if (text.ToLower().Contains("enemies"))
             {
+                string textToDisplay = "";
                 SelectableLevel newLevel = currentLevel;
                 text3 = "Enemies:";
                 text4 = "Inside: Girl, Lasso, Bunker Spider, Centipede, \nBlob, Flowerman, Spring, Crawler, Hoarding bug, \nJester, Puffer\nOutside: ForestGiant, MouthDog, Earth Leviathan, Baboon Bird";
                 levelEnemySpawns.TryGetValue(newLevel, out var value);
                 newLevel.Enemies = value;
+                textToDisplay += "<color=#FF00FF>Inside: </color><color=#FFFF00>";
                 foreach (SpawnableEnemyWithRarity enemy2 in newLevel.Enemies)
                 {
                     mls.LogInfo((object)("Inside: " + enemy2.enemyType.enemyName));
-                    DisplayChatMessage(enemy2.enemyType.enemyName);
+                    
                     if (!enemyRaritys.ContainsKey(enemy2))
                     {
                         enemyRaritys.Add(enemy2, enemy2.rarity);
@@ -652,10 +644,11 @@ namespace ChatCommands
                     int value2 = 0;
                     enemyRaritys.TryGetValue(enemy2, out value2);
                     enemy2.rarity = value2;
+                    textToDisplay += enemy2.enemyType.enemyName + ", ";
                 }
+                textToDisplay += "\n</color><color=#FF00FF>Outside: </color>";
                 foreach (SpawnableEnemyWithRarity outsideEnemy in newLevel.OutsideEnemies)
                 {
-                    DisplayChatMessage(outsideEnemy.enemyType.enemyName);
                     mls.LogInfo((object)("Outside: " + outsideEnemy.enemyType.enemyName));
                     if (!enemyRaritys.ContainsKey(outsideEnemy))
                     {
@@ -664,7 +657,9 @@ namespace ChatCommands
                     int value3 = 0;
                     enemyRaritys.TryGetValue(outsideEnemy, out value3);
                     outsideEnemy.rarity = value3;
+                    textToDisplay += outsideEnemy.enemyType.enemyName + ", ";
                 }
+                DisplayChatMessage(textToDisplay);
             }
             if (text.ToLower().Contains("money"))
             {
