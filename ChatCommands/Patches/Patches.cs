@@ -26,7 +26,7 @@ namespace ChatCommands.Patches
 
         [HarmonyPatch(typeof(RoundManager), "SpawnEnemyFromVent")]
         [HarmonyPrefix]
-        private static void logSpawnEnemyFromVent()
+        private static void LogSpawnEnemyFromVent()
         {
             ChatCommands.mls.LogInfo((object)"Attempting to spawn an enemy");
         }
@@ -53,18 +53,30 @@ namespace ChatCommands.Patches
             }
         }
 
+        [HarmonyPatch(typeof(ShotgunItem), "ItemActivate")]
+        [HarmonyPrefix]
+        static void ItemActivateGunPatch(ref ShotgunItem __instance)
+        {
+            if (ChatCommands.EnableInfiniteAmmo)
+            {
+                __instance.shellsLoaded = 2;
+            }
+            
+        }
+
         [HarmonyPatch(typeof(RoundManager), "LoadNewLevel")]
         [HarmonyPostfix]
-        private static void updateNewInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
+        private static void UpdateNewInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
         {
             ChatCommands.currentLevel = ___currentLevel;
             ChatCommands.currentLevelVents = ___allEnemyVents;
+            HUDManager.Instance.chatTextField.characterLimit = 999;
         }
 
 
         [HarmonyPatch(typeof(RoundManager), "AdvanceHourAndSpawnNewBatchOfEnemies")]
         [HarmonyPrefix]
-        private static void updateCurrentLevelInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
+        private static void UpdateCurrentLevelInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
         {
             ChatCommands.currentLevel = ___currentLevel;
             ChatCommands.currentLevelVents = ___allEnemyVents;
@@ -94,8 +106,7 @@ namespace ChatCommands.Patches
                 {
                     ChatCommands.enemyRaritys.Add(enemy2, enemy2.rarity);
                 }
-                int value2 = 0;
-                ChatCommands.enemyRaritys.TryGetValue(enemy2, out value2);
+                ChatCommands.enemyRaritys.TryGetValue(enemy2, out int value2);
                 enemy2.rarity = value2;
             }
             foreach (SpawnableEnemyWithRarity outsideEnemy in newLevel.OutsideEnemies)
@@ -105,8 +116,7 @@ namespace ChatCommands.Patches
                 {
                     ChatCommands.enemyRaritys.Add(outsideEnemy, outsideEnemy.rarity);
                 }
-                int value3 = 0;
-                ChatCommands.enemyRaritys.TryGetValue(outsideEnemy, out value3);
+                ChatCommands.enemyRaritys.TryGetValue(outsideEnemy, out int value3);
                 outsideEnemy.rarity = value3;
             }
             foreach (SpawnableEnemyWithRarity enemy3 in newLevel.Enemies)
@@ -124,7 +134,7 @@ namespace ChatCommands.Patches
 
         [HarmonyPatch(typeof(TimeOfDay), "SetNewProfitQuota")]
         [HarmonyPostfix]
-        private static void patchDeadline(TimeOfDay __instance)
+        private static void PatchDeadline(TimeOfDay __instance)
         {
 
             if (ChatCommands.isHost && ChatCommands.CustomDeadline != int.MinValue)
@@ -141,7 +151,7 @@ namespace ChatCommands.Patches
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPrefix]
-        private static void setIsHost()
+        private static void SetIsHost()
         {
             ChatCommands.mls.LogInfo((object)("Host Status: " + ((NetworkBehaviour)RoundManager.Instance).NetworkManager.IsHost));
             ChatCommands.isHost = ((NetworkBehaviour)RoundManager.Instance).NetworkManager.IsHost;
@@ -149,7 +159,7 @@ namespace ChatCommands.Patches
 
         [HarmonyPatch(typeof(PlayerControllerB), "AllowPlayerDeath")]
         [HarmonyPrefix]
-        private static bool overrideDeath()
+        private static bool OverrideDeath()
         {
             if (ChatCommands.isHost)
             {
@@ -160,7 +170,7 @@ namespace ChatCommands.Patches
 
         [HarmonyPatch(typeof(Terminal), "RunTerminalEvents")]
         [HarmonyPostfix]
-        private static void infiniteCredits(ref int ___groupCredits)
+        private static void InfiniteCredits(ref int ___groupCredits)
         {
             if (ChatCommands.isHost && ChatCommands.EnableInfiniteCredits)
             {
@@ -170,7 +180,7 @@ namespace ChatCommands.Patches
 
         [HarmonyPatch(typeof(PlayerControllerB), "Update")]
         [HarmonyPostfix]
-        private static void speedHackFunc(ref float ___jumpForce, ref float ___sprintMeter, ref float ___sprintMultiplier, ref bool ___isSprinting)
+        private static void SpeedHackFunc(ref float ___jumpForce, ref float ___sprintMeter, ref float ___sprintMultiplier, ref bool ___isSprinting)
         {
             if (ChatCommands.speedHack)
             {
@@ -183,7 +193,7 @@ namespace ChatCommands.Patches
 
         [HarmonyPatch(typeof(PlayerControllerB), "Start")]
         [HarmonyPrefix]
-        private static void getPlayerRef(ref PlayerControllerB __instance)
+        private static void GetPlayerRef(ref PlayerControllerB __instance)
         {
             ChatCommands.playerRef = __instance;
         }

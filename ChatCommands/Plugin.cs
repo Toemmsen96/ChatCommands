@@ -9,6 +9,11 @@ using GameNetcodeStuff;
 using Unity.Netcode;
 using TMPro;
 using ChatCommands.Patches;
+using HarmonyLib.Tools;
+using System.Linq;
+using static Steamworks.InventoryItem;
+using System.Security;
+using System.Net;
 
 namespace ChatCommands
 {
@@ -27,6 +32,7 @@ namespace ChatCommands
         internal static SelectableLevel currentLevel;
         internal static EnemyVent[] currentLevelVents;
         internal static RoundManager currentRound;
+        internal static bool EnableInfiniteAmmo = false;
         private static ConfigEntry<string> PrefixSetting;
         internal static bool enableGod;
         internal static bool EnableInfiniteCredits = false;
@@ -56,8 +62,8 @@ namespace ChatCommands
             mls.LogInfo((object)"Chat Commands loaded!");
         }
 
-        
-        private static bool toggleGodMode()
+
+        private static bool ToggleGodMode()
         {
             if (isHost)
             {
@@ -66,7 +72,7 @@ namespace ChatCommands
             return enableGod;
         }
 
-        private static void toggleSpeedHack()
+        private static void ToggleSpeedHack()
         {
             if (isHost)
             {
@@ -75,13 +81,44 @@ namespace ChatCommands
             }
         }
 
-        private static void SpawnEnemy(SpawnableEnemyWithRarity enemy, int amount, bool inside)
+        private static void SpawnEnemy(SpawnableEnemyWithRarity enemy, int amount, bool inside, Vector3 location)
         {
             if (!isHost)
             {
                 return;
             }
-            mls.LogInfo("SpawnEnemy called...");
+            if (location.x != 0f && location.y != 0f && location.z != 0f && inside)
+            {
+                try
+                {
+                    for (int i = 0; i < amount; i++)
+                    {
+                        currentRound.SpawnEnemyOnServer(location, currentLevel.Enemies.IndexOf(enemy));
+                    }
+                    return;
+                }
+                catch
+                {
+                    mls.LogInfo((object)"Failed to spawn enemies, check your command.");
+                    return;
+                }
+            }
+            if(location.x != 0f && location.y != 0f && location.z != 0f && !inside)
+            {
+                try
+                {
+                    for (int i = 0; i < amount; i++)
+                    {
+                        UnityEngine.Object.Instantiate<GameObject>(currentLevel.OutsideEnemies[currentLevel.OutsideEnemies.IndexOf(enemy)].enemyType.enemyPrefab, location, Quaternion.Euler(Vector3.zero)).gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
+                    }
+                    return;
+                }
+                catch
+                {
+                    mls.LogInfo((object)"Failed to spawn enemies, check your command.");
+                    return;
+                }
+            }
             if (inside)
             {
                 try
@@ -108,38 +145,99 @@ namespace ChatCommands
 
         internal static void ProcessCommandInput(string text)
         {
-            string text2 = "/";
+            string prefix = "/";
 
             if (PrefixSetting.Value != "")
             {
-                text2 = PrefixSetting.Value;
+                prefix = PrefixSetting.Value;
             }
-            if (!text.ToLower().StartsWith(text2.ToLower()))
+            if (!text.ToLower().StartsWith(prefix.ToLower()))
             {
                 return;
             }
-            string text3 = "default";
-            string text4 = "ERR: unknown";
+            string msgtitle = "default";
+            string msgbody = "<color=#FF0000>ERR</color>: unknown";
             if (!isHost)
             {
-                text3 = "Command";
-                text4 = "Unable to send command since you are not host.";
-                HUDManager.Instance.DisplayTip(text3, text4, false, false, "LC_Tip1");
+                msgtitle = "Command";
+                msgbody = "Unable to send command since you are not host.";
+                HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
                 return;
             }
-            
-            if (text.ToLower().StartsWith(text2 + "spawn"))
+            string command = text.Substring(prefix.Length);
+
+            if (command.ToLower().StartsWith("spawnenemy") || command.ToLower().StartsWith("spweny"))
             {
-                text3 = "Spawned Enemies";
-                string[] array = text.Split(new char[1] { ' ' });
+                msgtitle = "Spawned Enemies";
+                string[] array = text.Split(' ');
                 if (currentLevel == null || levelEnemySpawns == null || currentLevel.Enemies == null)
                 {
-                    text3 = "Command";
-                    text4 = (currentLevel == null ? "Unable to send command since currentLevel is null." : "Unable to send command since levelEnemySpawns is null.");
-                    HUDManager.Instance.DisplayTip(text3, text4, true, false, "LC_Tip1");
+                    msgtitle = "Command";
+                    msgbody = (currentLevel == null ? "Unable to send command since currentLevel is null." : "Unable to send command since levelEnemySpawns is null.");
+                    HUDManager.Instance.DisplayTip(msgtitle, msgbody, true, false, "LC_Tip1");
                     return;
                 }
-                if (array.Length == 2)
+                if (array.Length < 2)
+                {
+                    msgtitle = "Command Error";
+                    msgbody = "Missing Arguments For Spawn\n'/spawnenemy <name> (amount=<amount>) (state=<state>) (position={random, @me, @<playername>})";
+                    HUDManager.Instance.DisplayTip(msgtitle, msgbody, true, false, "LC_Tip1");
+                    mls.LogWarning("Missing Arguments For Spawn\n'/spawnenemy <name> (amount=<amount>) (state=<state>) (position={random, @me, @<playername>})");
+                    return;
+                }
+                int amount = 1;
+                string vstate = "alive";
+                Vector3 position = Vector3.zero;
+                string sposition = "random";
+                var args = array.Skip(2);
+
+                foreach (string arg in args)
+                {
+                    string[] darg = arg.Split('=');
+                    switch (darg[0])
+                    {
+                        case "a":
+                        case "amount":
+                            amount = int.Parse(darg[1]);
+                            mls.LogInfo($"{amount}");
+                            break;
+                        case "s":
+                        case "state":
+                            vstate = darg[1];
+                            mls.LogInfo(vstate);
+                            break;
+                        case "p":
+                        case "position":
+                            sposition = darg[1];
+                            mls.LogInfo(sposition);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (sposition.StartsWith("@"))
+                {
+                    if (sposition == "@me") position = ((NetworkBehaviour)currentRound.playersManager.localPlayerController).transform.position;
+                    else
+                    {
+                        string pstring = sposition.Substring(1);
+                        foreach (PlayerControllerB player in currentRound.playersManager.allPlayerScripts)
+                        {
+                            if (player.name == pstring)
+                            {
+                                position = ((NetworkBehaviour)player).transform.position;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else if (sposition != "random")
+                {
+                    mls.LogWarning("Position Invalid, Using Default 'random'");
+                    sposition = "random";
+                }
+                if (array.Length > 1)
                 {
                     bool flag = false;
                     string text5 = "";
@@ -151,14 +249,21 @@ namespace ChatCommands
                             {
                                 flag = true;
                                 text5 = enemy.enemyType.enemyName;
-                                SpawnEnemy(enemy, 1, inside: true);
+                                if (sposition == "random")
+                                {
+                                    SpawnEnemy(enemy, amount, inside: true, location: new Vector3(0f, 0f, 0f));
+                                }
+                                else
+                                {
+                                    SpawnEnemy(enemy, amount, inside: true, location: position);
+                                }
                                 mls.LogInfo((object)("Spawned " + enemy.enemyType.enemyName));
                             }
                             catch
                             {
                                 mls.LogInfo((object)"Could not spawn enemy");
                             }
-                            text4 = "Spawned: " + text5;
+                            msgbody = "Spawned: " + text5;
                             break;
                         }
                     }
@@ -174,7 +279,14 @@ namespace ChatCommands
                                     text5 = outsideEnemy.enemyType.enemyName;
                                     mls.LogInfo((object)outsideEnemy.enemyType.enemyName);
                                     mls.LogInfo((object)("The index of " + outsideEnemy.enemyType.enemyName + " is " + currentLevel.OutsideEnemies.IndexOf(outsideEnemy)));
-                                    SpawnEnemy(outsideEnemy, 1, inside: false);
+                                    if (sposition == "random")
+                                    {
+                                        SpawnEnemy(outsideEnemy, amount, inside: false, location: new Vector3(0f, 0f, 0f));
+                                    }
+                                    else
+                                    {
+                                        SpawnEnemy(outsideEnemy, amount, inside: false, location: position);
+                                    }
                                     mls.LogInfo((object)("Spawned " + outsideEnemy.enemyType.enemyName));
                                 }
                                 catch (Exception ex)
@@ -182,69 +294,146 @@ namespace ChatCommands
                                     mls.LogInfo((object)"Could not spawn enemy");
                                     mls.LogInfo((object)("The game tossed an error: " + ex.Message));
                                 }
-                                text4 = "Spawned: " + text5;
+                                msgbody = "Spawned "+ amount + " " + text5 + (amount>1?"s":"");
                                 break;
                             }
                         }
                     }
                 }
-                if (array.Length > 2)
+            }
+            if(command.ToLower().StartsWith("spawnscrap") || text.ToLower().StartsWith("spwscr"))
+            {
+                string[] segments = (text.Substring(1)).Split(' ');
+                if (segments.Length < 2)
                 {
-                    bool flag2 = false;
-                    if (int.TryParse(array[2], out var result))
+                    mls.LogWarning("Missing Arguments For Spawn\n'/spawnscrap <name> (amount=<amount>) (position={random, @me, @<playername>})");
+                    msgtitle = "Command Error";
+                    msgbody = "Missing Arguments For Spawn\n'/spawnscrap <name> (amount=<amount>) (position={random, @me, @<playername>})";
+                    HUDManager.Instance.DisplayTip(msgtitle, msgbody, true, false, "LC_Tip1");
+                    return;
+                }
+                string toSpawn = segments[1];
+                int amount = 1;
+                string vstate = "alive";
+                Vector3 position = Vector3.zero;
+                string sposition = "random";
+                var args = segments.Skip(2);
+
+                foreach (string arg in args)
+                {
+                    string[] darg = arg.Split('=');
+                    switch (darg[0])
                     {
-                        string text6 = "";
-                        foreach (SpawnableEnemyWithRarity enemy2 in currentLevel.Enemies)
-                        {
-                            if (enemy2.enemyType.enemyName.ToLower().Contains(array[1].ToLower()))
-                            {
-                                flag2 = true;
-                                text6 = enemy2.enemyType.enemyName;
-                                SpawnEnemy(enemy2, result, inside: true);
-                                if (flag2)
-                                {
-                                    text4 = "Spawned " + result + " " + text6 + "s";
-                                    break;
-                                }
-                            }
-                        }
-                        if (!flag2)
-                        {
-                            foreach (SpawnableEnemyWithRarity outsideEnemy2 in currentLevel.OutsideEnemies)
-                            {
-                                if (outsideEnemy2.enemyType.enemyName.ToLower().Contains(array[1].ToLower()))
-                                {
-                                    flag2 = true;
-                                    text6 = outsideEnemy2.enemyType.enemyName;
-                                    try
-                                    {
-                                        mls.LogInfo((object)("The index of " + outsideEnemy2.enemyType.enemyName + " is " + currentLevel.OutsideEnemies.IndexOf(outsideEnemy2)));
-                                        SpawnEnemy(outsideEnemy2, result, inside: false);
-                                        mls.LogInfo((object)("Spawned another " + outsideEnemy2.enemyType.enemyName));
-                                    }
-                                    catch
-                                    {
-                                        mls.LogInfo((object)"Outside Enemies: Failed to spawn enemies, check your command. If you spawned Inside Enemies, ignore this message");
-                                    }
-                                    if (flag2)
-                                    {
-                                        text4 = "Spawned " + result + " " + text6 + "s";
-                                        break;
-                                    }
-                                }
-                            }
-                        }
+                        case "a":
+                        case "amount":
+                            amount = int.Parse(darg[1]);
+                            mls.LogInfo($"{amount}");
+                            break;
+                        case "s":
+                        case "state":
+                            vstate = darg[1];
+                            mls.LogInfo(vstate);
+                            break;
+                        case "p":
+                        case "position":
+                            sposition = darg[1];
+                            mls.LogInfo(sposition);
+                            break;
+                        default:
+                            break;
                     }
+                }
+
+
+                if (sposition.StartsWith("@"))
+                {
+                    if (sposition == "@me") position = ((NetworkBehaviour)currentRound.playersManager.localPlayerController).transform.position;
                     else
                     {
-                        mls.LogInfo((object)"Failed to spawn enemies, check your command.");
+                        string pstring = sposition.Substring(1);
+                        foreach (PlayerControllerB player in currentRound.playersManager.allPlayerScripts)
+                        {
+                            if (player.name == pstring)
+                            {
+                                position = ((NetworkBehaviour)player).transform.position;
+                                break;
+                            }
+                        }
                     }
-                    mls.LogInfo((object)("Length of input array: " + array.Length));
+
+                }
+                else if (sposition != "random")
+                {
+                    mls.LogWarning("Position Invalid, Using Default 'random'");
+                    sposition = "random";
+                }
+                if (toSpawn == "gun")
+                {
+                    for (int i = 0; i < currentRound.currentLevel.Enemies.Count(); i++)
+                    {
+                        if (currentRound.currentLevel.Enemies[i].enemyType.name == "Nutcracker")
+                        {
+                            GameObject nutcra = UnityEngine.Object.Instantiate(currentRound.currentLevel.Enemies[i].enemyType.enemyPrefab, new Vector3(float.MinValue,float.MinValue,float.MinValue), Quaternion.identity);
+                            NutcrackerEnemyAI nutcracomponent = nutcra.GetComponent<NutcrackerEnemyAI>();
+
+                            mls.LogInfo("Spawning " + amount + " gun" + (amount > 1 ? "s" : ""));
+
+                            for (int j = 0; j < amount; j++)
+                            {
+                                GameObject gameObject = UnityEngine.Object.Instantiate(nutcracomponent.gunPrefab, position, Quaternion.identity, currentRound.spawnedScrapContainer);
+                                GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
+                                component.startFallingPosition = position;
+                                component.targetFloorPosition = component.GetItemFloorPosition(position);
+                                component.SetScrapValue(1000);
+                                component.NetworkObject.Spawn();
+                            }
+                            msgtitle = "Spawned gun";
+                            msgbody = "Spawned " + amount + " gun" + (amount > 1 ? "s" : "");
+                            break;
+
+                        }
+                    }
+                }
+
+                int len = currentRound.currentLevel.spawnableScrap.Count();
+                for (int i = 0; i < len; i++)
+                {
+                    Item scrap = currentRound.currentLevel.spawnableScrap[i].spawnableItem;
+                    if (scrap.spawnPrefab.name.ToLower() == toSpawn)
+                    {
+                        GameObject objToSpawn = scrap.spawnPrefab;
+                        bool ra = sposition == "random";
+                        RandomScrapSpawn[] source;
+                        List<RandomScrapSpawn> list4 = null;
+                        if (ra)
+                        {
+                            source = UnityEngine.Object.FindObjectsOfType<RandomScrapSpawn>();
+                            list4 = ((scrap.spawnPositionTypes != null && scrap.spawnPositionTypes.Count != 0) ? source.Where((RandomScrapSpawn x) => scrap.spawnPositionTypes.Contains(x.spawnableItems) && !x.spawnUsed).ToList() : source.ToList());
+                        }
+
+                        mls.LogInfo("Spawning " + amount + " " + objToSpawn.name + (amount > 1 ? "s" : ""));
+                        for (int j = 0; j < amount; j++)
+                        {
+                            if (ra)
+                            {
+                                RandomScrapSpawn randomScrapSpawn = list4[currentRound.AnomalyRandom.Next(0, list4.Count)];
+                                position = currentRound.GetRandomNavMeshPositionInRadiusSpherical(randomScrapSpawn.transform.position, randomScrapSpawn.itemSpawnRange, currentRound.navHit) + Vector3.up * scrap.verticalOffset;
+                            }
+                            GameObject gameObject = UnityEngine.Object.Instantiate(objToSpawn, position, Quaternion.identity, currentRound.spawnedScrapContainer);
+                            GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
+                            component.startFallingPosition = position;
+                            component.targetFloorPosition = component.GetItemFloorPosition(position);
+                            component.SetScrapValue(1000);
+                            component.NetworkObject.Spawn();
+                        }
+                        break;
+                    }
                 }
             }
-            if (text.ToLower().StartsWith(text2 + "weather"))
+
+            if (command.ToLower().StartsWith(prefix + "weather"))
             {
-                text3 = "Weather Change";
+                msgtitle = "Weather Change";
                 string[] array2 = text.Split(new char[1] { ' ' });
                 if (array2.Length > 1)
                 {
@@ -278,32 +467,32 @@ namespace ChatCommands
                         currentRound.timeScript.currentLevelWeather = (LevelWeatherType)(-1);
                         mls.LogInfo((object)("tried to change the weather to " + array2[1]));
                     }
-                    text4 = "tried to change the weather to " + array2[1];
+                    msgbody = "tried to change the weather to " + array2[1];
                 }
             }
-            if (text.ToLower().StartsWith(text2 + "togglelights"))
+            if (command.ToLower().StartsWith("togglelights"))
             {
                 BreakerBox val = UnityEngine.Object.FindObjectOfType<BreakerBox>();
                 if ((UnityEngine.Object)(object)val != (UnityEngine.Object)null)
                 {
-                    text3 = "Light Change";
+                    msgtitle = "Light Change";
                     if (val.isPowerOn)
                     {
                         currentRound.TurnBreakerSwitchesOff();
                         currentRound.TurnOnAllLights(false);
                         val.isPowerOn = false;
-                        text4 = "Turned the lights off";
+                        msgbody = "Turned the lights off";
                     }
                     else
                     {
                         currentRound.PowerSwitchOnClientRpc();
-                        text4 = "Turned the lights on";
+                        msgbody = "Turned the lights on";
                     }
                 }
             }
-            if (text.ToLower().StartsWith(text2 + "buy"))
+            if (command.ToLower().StartsWith("buy"))
             {
-                text3 = "Item Buying";
+                msgtitle = "Item Buying";
                 Terminal val2 = UnityEngine.Object.FindObjectOfType<Terminal>();
                 if ((UnityEngine.Object)(object)val2 != (UnityEngine.Object)null)
                 {
@@ -349,7 +538,7 @@ namespace ChatCommands
                                         list2.Add(dictionary[item]);
                                     }
                                     val2.BuyItemsServerRpc(list2.ToArray(), val2.groupCredits, 0);
-                                    text4 = "Bought " + result2 + " " + item + "s";
+                                    msgbody = "Bought " + result2 + " " + item + "s";
                                     break;
                                 }
                             }
@@ -369,7 +558,7 @@ namespace ChatCommands
                                     flag4 = true;
                                     int[] array4 = new int[1] { dictionary[item2] };
                                     val2.BuyItemsServerRpc(array4, val2.groupCredits, 0);
-                                    text4 = "Bought " + 1 + " " + item2;
+                                    msgbody = "Bought " + 1 + " " + item2;
                                 }
                             }
                             if (!flag4)
@@ -383,35 +572,62 @@ namespace ChatCommands
                             }
                             int[] array5 = new int[1] { result3 };
                             val2.BuyItemsServerRpc(array5, val2.groupCredits, 0);
-                            text4 = "Bought item with ID [" + result3 + "]";
+                            msgbody = "Bought item with ID [" + result3 + "]";
                         }
                     }
                 }
             }
-            if (text.ToLower().Contains("god"))
+            if (command.ToLower().Contains("god"))
             {
-                enableGod = !enableGod;
-                text3 = "God Mode";
-                text4 = "God Mode set to: " + enableGod;
+                ToggleGodMode();
+                msgtitle = "God Mode";
+                msgbody = "God Mode set to: " + enableGod;
             }
-            if (text.ToLower().Contains("speed"))
+            if (command.ToLower().Contains("speed"))
             {
-                toggleSpeedHack();
-                text4 = "Speed hack set to: " + speedHack;
-                text3 = "Speed hack";
+                ToggleSpeedHack();
+                msgbody = "Speed hack set to: " + speedHack;
+                msgtitle = "Speed hack";
             }
-            if (text.ToLower().Contains("morehelp"))
+            if (command.ToLower().StartsWith("morehelp"))
             {
-                text3 = "More Commands";
-                text4 = "/tp - Teleports you to the terminal in your ship, keeping all items on you! \n /enemies - See all enemies available to spawn. \n /weather weatherName - Attempt to change weather \n ";
+                msgtitle = "More Commands";
+                msgbody = "/enemies - See all enemies available to spawn. \n /weather weatherName - Attempt to change weather \n /cheats - list cheat commands";
+                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
             }
-            if (text.ToLower().Contains("help") && !text.ToLower().Contains("morehelp"))
+            if (command.ToLower().StartsWith("help"))
             {
-                text3 = "Commands";
-                text4 = "/buy item - Buy an item \n /god - Toggle GodMode \n /speed - Toggle SpeedHack \n /togglelights - Toggle all lights inside building \n /spawn enemyName - Attempt to spawn an enemy \n /morehelp - see more commands";
+                msgtitle = "Available Commands";
+                msgbody = "/buy item - Buy an item \n /togglelights - Toggle lights inside building \n /spawn - help for spawning \n /morehelp - see more commands \n /credits - List credits";
+                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
+            }
+            if (command.ToLower().Contains("credits"))
+            {
+                msgtitle = "Credits";
+                msgbody = "ChatCommands by Toemmsen96 and Chrigi";
+                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
+            }
+            if (command.ToLower().Contains("cheats"))
+            {
+                msgtitle = "Cheats";
+                msgbody = "/god - Toggle GodMode \n /speed - Toggle SpeedHack \n /togglelights - Toggle lights inside building \n /tp - Teleports you to the terminal in your ship, keeping all items on you! \n /tp <playername> teleports you to that player";
+                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
+            }
+            if (command.ToLower().StartsWith("spawn") && !command.ToLower().StartsWith("spawnenemy") && !command.ToLower().StartsWith("spawnscrap"))
+            {
+                msgtitle = "How To";
+                msgbody = "Spawn an enemy: /spawnenemy or /spweny\n" +
+                        "Spawn scrap items: /spawnscrap or /spwscr\n" +
+                        "after that put the name of what you want to spawn\n" +
+                        "options: a=<num> or amount=<num> for how many to spawn\n" +
+                        "p=<pos> or position=<pos> for position where to spawn\n" +
+                        "<pos> can be either @me for your coordinates, @playername for coords of player with specific name or random";
+                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
             }
 
-            if (text.ToLower().Contains("deadline") || text.ToLower().Contains("dl"))
+
+
+            if (command.ToLower().StartsWith("deadline") || command.ToLower().StartsWith("dl"))
             {
                 string[] array5 = text.Split(new char[1] { ' ' });
                 if (array5.Length > 1)
@@ -419,24 +635,24 @@ namespace ChatCommands
                     if (int.TryParse(array5[1], out var result4))
                     {
                         CustomDeadline = result4;
-                        text3 = "Deadline";
-                        text4 = "Deadline set to: " + CustomDeadline;
+                        msgtitle = "Deadline";
+                        msgbody = "Deadline set to: " + CustomDeadline;
                     }
                     else
                     {
                         CustomDeadline = int.MinValue;
-                        text3 = "Deadline";
-                        text4 = "Deadline set to default";
+                        msgtitle = "Deadline";
+                        msgbody = "Deadline set to default";
                     }
                 }
                 else
                 {
                     CustomDeadline = int.MinValue;
-                    text3 = "Deadline";
-                    text4 = "Deadline set to default";
+                    msgtitle = "Deadline";
+                    msgbody = "Deadline set to default";
                 }
             }
-            if (text.ToLower().Contains("tp"))
+            if (command.ToLower().StartsWith("tp"))
             {
                 string[] array6 = text.Split(new char[1] { ' ' });
                 if (array6.Length > 1)
@@ -450,25 +666,29 @@ namespace ChatCommands
                             GameNetworkManager.Instance.localPlayerController.beamUpParticle.Play();
                             GameNetworkManager.Instance.localPlayerController.beamOutBuildupParticle.Play();
                             GameNetworkManager.Instance.localPlayerController.TeleportPlayer(((Component)val3).transform.position, false, 0f, false, true);
+                            msgtitle = "Teleported";
+                            msgbody = "Teleported to Player:" + val3.playerUsername;
                         }
                     }
                 }
                 else
                 {
                     Terminal val4 = FindObjectOfType<Terminal>();
-                    if ((object)val4 != null)
+                    if (val4 != null)
                     {
                         GameNetworkManager.Instance.localPlayerController.beamUpParticle.Play();
                         GameNetworkManager.Instance.localPlayerController.beamOutBuildupParticle.Play();
                         GameNetworkManager.Instance.localPlayerController.TeleportPlayer(((Component)val4).transform.position, false, 0f, false, true);
+                        msgtitle = "Teleported";
+                        msgbody = "Teleported to Terminal";
                     }
                 }
             }
-            if (text.ToLower().Contains("enemies"))
+            if (command.ToLower().Contains("enemies"))
             {
                 string textToDisplay = "";
                 SelectableLevel newLevel = currentLevel;
-                text3 = "Enemies:";
+                msgtitle = "Enemies:";
                 if (newLevel == null)
                 {
                     DisplayChatMessage("<color=#FF0000>ERROR: </color>Level is null.");
@@ -489,12 +709,12 @@ namespace ChatCommands
                 {
                     newLevel.Enemies = value;
                     textToDisplay += "<color=#FF00FF>Inside: </color><color=#FFFF00>";
-                    text4 = "<color=#FF00FF>Inside: </color><color=#FFFF00>";
+                    msgbody = "<color=#FF00FF>Inside: </color><color=#FFFF00>";
 
                     if (newLevel.Enemies.Count == 0)
                     {
                         textToDisplay += "None";
-                        text4 += "None";
+                        msgbody += "None";
                     }
                     else
                     {
@@ -502,17 +722,17 @@ namespace ChatCommands
                         {
                             mls.LogInfo((object)("Inside: " + enemy2.enemyType.enemyName));
                             textToDisplay += enemy2.enemyType.enemyName + ", ";
-                            text4 += enemy2.enemyType.enemyName + ", ";
+                            msgbody += enemy2.enemyType.enemyName + ", ";
                         }
                     }
 
                     textToDisplay += "\n</color><color=#FF00FF>Outside: </color>";
-                    text4 += "\n</color><color=#FF00FF>Outside: </color>";
+                    msgbody += "\n</color><color=#FF00FF>Outside: </color>";
 
                     if (newLevel.OutsideEnemies.Count == 0)
                     {
                         textToDisplay += "None";
-                        text4 += "None";
+                        msgbody += "None";
                     }
                     else
                     {
@@ -520,7 +740,7 @@ namespace ChatCommands
                         {
                             mls.LogInfo((object)("Outside: " + outsideEnemy.enemyType.enemyName));
                             textToDisplay += outsideEnemy.enemyType.enemyName + ", ";
-                            text4 += outsideEnemy.enemyType.enemyName + ", ";
+                            msgbody += outsideEnemy.enemyType.enemyName + ", ";
                         }
                     }
 
@@ -528,23 +748,41 @@ namespace ChatCommands
                 }
             }
 
-            if (text.ToLower().Contains("money"))
+            if (command.ToLower().Contains("money"))
             {
                 EnableInfiniteCredits = !EnableInfiniteCredits;
             }
-            if (text.ToLower().Contains("chatmessage"))
+            if (command.ToLower().Contains("chatmessage"))
             {
                 DisplayChatMessage("This is a test message");
             }
-            if (text.ToLower().Contains("term"))
+            if (text.ToLower().Contains("getscrap"))
+            {
+                int len = currentRound.currentLevel.spawnableScrap.Count();
+                string output = currentRound.currentLevel.spawnableScrap[0].spawnableItem.spawnPrefab.name;
+                for (int i = 1; i < len; i++)
+                {
+                    output += ", ";
+                    output += currentRound.currentLevel.spawnableScrap[i].spawnableItem.spawnPrefab.name;
+                }
+                //HUDManager.Instance.DisplayTip("Spawnable Scrap", output);
+                DisplayChatMessage("Spawnable Scrap: " + output);
+            }
+            if(text.ToLower().Contains("infammo") || command.ToLower().Contains("ammo"))
+            {
+                EnableInfiniteAmmo = !EnableInfiniteAmmo;
+                msgtitle = "Infinite Ammo";
+                msgbody = "Infinite Ammo: "+ EnableInfiniteAmmo;
+            }
+            if (command.ToLower().Contains("term"))
             {
                 usingTerminal = !usingTerminal;
                 if (usingTerminal)
                 {
-                    text3 = "Began Using Terminal";
-                    text4 = " ";
+                    msgtitle = "Began Using Terminal";
+                    msgbody = " ";
                     Terminal val5 = FindObjectOfType<Terminal>();
-                    if ((object)val5 == null)
+                    if (val5 == null)
                     {
                         return;
                     }
@@ -558,19 +796,19 @@ namespace ChatCommands
                 else
                 {
                     Terminal val5 = FindObjectOfType<Terminal>();
-                    if ((object)val5 == null)
+                    if (val5 == null)
                     {
                         return;
                     }
                     val5.QuitTerminal();
                     GameNetworkManager.Instance.localPlayerController.inSpecialInteractAnimation = false;
-                    text3 = "Stopped using terminal";
-                    text4 = " ";
+                    msgtitle = "Stopped using terminal";
+                    msgbody = " ";
 
                 }
 
             }
-            HUDManager.Instance.DisplayTip(text3, text4, false, false, "LC_Tip1");
+            HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
         }
         public static void ProcessCommand(string commandInput)
         {
