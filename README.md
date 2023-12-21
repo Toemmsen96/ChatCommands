@@ -10,6 +10,8 @@ Commands to use:
 /tp <playername> -> teleport back to ship or if  stated to a player  
 /buy <item> <count> -> buy items from shop  
 /money -> enables infinite money cheat  
-/togglelights -> toggles lights of facility
+/togglelights -> toggles lights of facility  
 /help -> see what commands you can use  
 /morehelp -> more commands to use get listed  
+/dl <days> or /deadline <days> -> set amount of days until deadline, gets applied after quota is reached and new one is presented, so reaching the quota once is required. leaving blank after the command will reset to default  
+/term -> use Terminal from anywhere. On exiting input you need to type /term again to enable walking again  
