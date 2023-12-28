@@ -301,7 +301,7 @@ namespace ChatCommands
                     }
                 }
             }
-            if(command.ToLower().StartsWith("spawnscrap") || text.ToLower().StartsWith("spwscr"))
+            if(command.ToLower().StartsWith("spawnscrap") || command.ToLower().StartsWith("spwscr"))
             {
                 string[] segments = (text.Substring(1)).Split(' ');
                 if (segments.Length < 2)
