@@ -33,7 +33,8 @@ namespace ChatCommands
         internal static EnemyVent[] currentLevelVents;
         internal static RoundManager currentRound;
         internal static bool EnableInfiniteAmmo = false;
-        private static ConfigEntry<string> PrefixSetting;
+        internal static ConfigEntry<string> PrefixSetting;
+        internal static ConfigEntry<bool> HostSetting;
         internal static bool enableGod;
         internal static bool EnableInfiniteCredits = false;
         internal static int CustomDeadline = int.MinValue;
@@ -48,8 +49,9 @@ namespace ChatCommands
                 instance = this;
             }
 
-            PrefixSetting = ((BaseUnityPlugin)this).Config.Bind<string>("Command Settings", "Command Prefix", "/", "An optional prefix for chat commands");
-            //mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
+            PrefixSetting = instance.Config.Bind<string>("Command Settings", "Command Prefix", "/", "An optional prefix for chat commands");
+            HostSetting = instance.Config.Bind<bool>("Command Settings", "Has to be Host", true, "(for server host only): determines if clients can also use some commands");
+
             mls.LogInfo("ChatCommands loaded");
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
             levelEnemySpawns = new Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>>();

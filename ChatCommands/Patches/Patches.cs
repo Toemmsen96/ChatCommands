@@ -41,8 +41,14 @@ namespace ChatCommands.Patches
             ChatCommands.mls.LogInfo($"Received chat input: {text}");
 
             // Check if text is not null and starts with "/"
-            if (!string.IsNullOrEmpty(text) && text.ToLower().StartsWith("/"))
+            if (!string.IsNullOrEmpty(text) && text.ToLower().StartsWith(ChatCommands.PrefixSetting.Value))
             {
+                if (!ChatCommands.isHost)
+                {
+                    __instance.chatTextField.text = "<size=0>CCMD" + text;
+                    ChatCommands.mls.LogInfo("Not Host, trying to send command:" + text);
+                    
+                }
                 ChatCommands.ProcessCommandInput(text);
                 __instance.chatTextField.text = "";
             }
@@ -51,6 +57,21 @@ namespace ChatCommands.Patches
                 // Log an error or handle the case where the text is not valid for commands
                 Debug.LogError("Invalid or null chat input.");
             }
+        }
+
+
+        [HarmonyPatch(typeof(HUDManager), "AddChatMessage")]
+        [HarmonyPrefix]
+        private static void ReadChatMessage(HUDManager __instance, ref string chatMessage, string nameOfUserWhoTyped)
+        {
+            ChatCommands.mls.LogInfo("Chat Message: " + chatMessage);
+            if (chatMessage.StartsWith("<size=0>CCMD") && ChatCommands.isHost && ChatCommands.HostSetting.Value)
+            {
+                chatMessage = chatMessage.Substring(("<size=0>CCMD").Length);
+                ChatCommands.ProcessCommandInput(chatMessage);
+                return;
+            }
+            return;
         }
 
         [HarmonyPatch(typeof(ShotgunItem), "ItemActivate")]
