@@ -1,0 +1,9 @@
+{
+    "name": "ChatCommands",
+    "description": "Adds a lot of usable commands in the chat! Set deadline, spawn enemies on friends and a lot more!",
+    "version_number": "1.0.0",
+    "website_url": "https://github.com/Toemmsen96/ChatCommands",
+    "dependencies": ["BepInEx-BepInExPack-5.4.2100"
+
+    ]
+}
