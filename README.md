@@ -21,4 +21,4 @@ Commands to use:
 
 Legend:
 "arg" -> argument for command you have to enter (without the "")  
-(x="arg") -> optional argument you have to write with the x= infront so it knows what type of argument it is  
+(x="arg") -> optional argument you have to write with the x= in front and without the () so it knows what type of argument it is  
