@@ -14,6 +14,8 @@ using System.Linq;
 using static Steamworks.InventoryItem;
 using System.Security;
 using System.Net;
+using static System.Net.Mime.MediaTypeNames;
+using System.Xml.Linq;
 
 namespace ChatCommands
 {
@@ -42,6 +44,10 @@ namespace ChatCommands
         internal static PlayerControllerB playerRef;
         internal static bool isHost;
         internal static bool speedHack;
+        internal static string msgtitle;
+        internal static string msgbody;
+        internal static string NetCommandPrefix = "<size=0>CCMD";
+        internal static string NetHostCommandPrefix = "<size=0>CHCMD";
         private void Awake()
         {
             if (instance == null)
@@ -146,23 +152,9 @@ namespace ChatCommands
             }
         }
 
-        internal static void ProcessCommandInput(string text)
+        internal static bool NonHostCommands(string command)
         {
-            string prefix = "/";
-
-            if (PrefixSetting.Value != "")
-            {
-                prefix = PrefixSetting.Value;
-            }
-            if (!text.ToLower().StartsWith(prefix.ToLower()))
-            {
-                return;
-            }
-            string msgtitle = "default";
-            string msgbody = "<color=#FF0000>ERR</color>: unknown";
-            string command = text.Substring(prefix.Length);
-
-            if (text.ToLower().Contains("getscrap"))
+            if (command.ToLower().Contains("getscrap"))
             {
                 int len = currentRound.currentLevel.spawnableScrap.Count();
                 string output = currentRound.currentLevel.spawnableScrap[0].spawnableItem.spawnPrefab.name;
@@ -175,7 +167,7 @@ namespace ChatCommands
                 msgtitle = "Spawnable Scrap";
                 msgbody = "listed in chat";
                 DisplayChatMessage("Spawnable Scrap: " + output);
-                return;
+                return true;
             }
 
             if (command.ToLower().Contains("enemies"))
@@ -187,7 +179,7 @@ namespace ChatCommands
                 {
                     DisplayChatMessage("<color=#FF0000>ERROR: </color>Level is null.");
                     Debug.LogError("newLevel is null.");
-                    return;
+                    return true;
                 }
 
                 // Check if levelEnemySpawns is null
@@ -195,7 +187,7 @@ namespace ChatCommands
                 {
                     DisplayChatMessage("<color=#FF0000>ERROR: </color>levelEnemySpawns is null.");
                     Debug.LogError("levelEnemySpawns is null.");
-                    return;
+                    return true;
                 }
 
                 // Attempt to get value from dictionary, check for null
@@ -240,7 +232,7 @@ namespace ChatCommands
 
                     DisplayChatMessage(textToDisplay);
                 }
-                return;
+                return true;
             }
 
             if (command.ToLower().StartsWith("morehelp"))
@@ -248,28 +240,28 @@ namespace ChatCommands
                 msgtitle = "More Commands";
                 msgbody = "/enemies - See all enemies available to spawn. \n /weather weatherName - Attempt to change weather \n /cheats - list cheat commands";
                 DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
-                return;
+                return true;
             }
             if (command.ToLower().StartsWith("help"))
             {
                 msgtitle = "Available Commands";
                 msgbody = "/buy item - Buy an item \n /togglelights - Toggle lights inside building \n /spawn - help for spawning \n /morehelp - see more commands \n /credits - List credits";
                 DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
-                return;
+                return true;
             }
             if (command.ToLower().Contains("credits"))
             {
                 msgtitle = "Credits";
                 msgbody = "ChatCommands by Toemmsen96 and Chrigi";
                 DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
-                return;
+                return true;
             }
             if (command.ToLower().Contains("cheats"))
             {
                 msgtitle = "Cheats";
                 msgbody = "/god - Toggle GodMode \n /speed - Toggle SpeedHack \n /togglelights - Toggle lights inside building \n /tp - Teleports you to the terminal in your ship, keeping all items on you! \n /tp <playername> teleports you to that player";
                 DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
-                return;
+                return true;
             }
             if (command.ToLower().StartsWith("spawn") && !command.ToLower().StartsWith("spawnenemy") && !command.ToLower().StartsWith("spawnscrap"))
             {
@@ -281,8 +273,32 @@ namespace ChatCommands
                         "p=<pos> or position=<pos> for position where to spawn\n" +
                         "<pos> can be either @me for your coordinates, @playername for coords of player with specific name or random";
                 DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
+                return true;
+            }
+            return false;
+        }
+
+        internal static void ProcessCommandInput(string text)
+        {
+            string prefix = "/";
+
+            if (PrefixSetting.Value != "")
+            {
+                prefix = PrefixSetting.Value;
+            }
+            if (!text.ToLower().StartsWith(prefix.ToLower()))
+            {
                 return;
             }
+            msgtitle = "default";
+            msgbody = "<color=#FF0000>ERR</color>: unknown";
+            string command = text.Substring(prefix.Length);
+
+            if (NonHostCommands(command))
+            {
+                return;
+            }
+            
 
             if (!isHost)
             {
@@ -348,12 +364,14 @@ namespace ChatCommands
                     if (sposition == "@me") position = ((NetworkBehaviour)currentRound.playersManager.localPlayerController).transform.position;
                     else
                     {
-                        string pstring = sposition.Substring(1);
-                        foreach (PlayerControllerB player in currentRound.playersManager.allPlayerScripts)
+                        string value = sposition.ToLower().Substring(1);
+                        PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
+                        foreach (PlayerControllerB val3 in allPlayerScripts)
                         {
-                            if (player.name == pstring)
+                            if (val3.playerUsername.ToLower().Contains(value))
                             {
-                                position = ((NetworkBehaviour)player).transform.position;
+                                position = ((Component)val3).transform.position;
+                                msgbody += "@" + val3.playerUsername;
                                 break;
                             }
                         }
@@ -478,12 +496,15 @@ namespace ChatCommands
                     if (sposition == "@me") position = ((NetworkBehaviour)currentRound.playersManager.localPlayerController).transform.position;
                     else
                     {
-                        string pstring = sposition.Substring(1);
-                        foreach (PlayerControllerB player in currentRound.playersManager.allPlayerScripts)
+
+                        string value = sposition.Substring(1);
+                        PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
+                        foreach (PlayerControllerB val3 in allPlayerScripts)
                         {
-                            if (player.name == pstring)
+                            if (val3.playerUsername.ToLower().Contains(value))
                             {
-                                position = ((NetworkBehaviour)player).transform.position;
+                                position = ((Component)val3).transform.position;
+                                msgbody += "@" + val3.playerUsername;
                                 break;
                             }
                         }
@@ -713,11 +734,13 @@ namespace ChatCommands
             {
                 msgtitle = "God Mode";
                 msgbody = "God Mode set to: " + ToggleGodMode();
+                SendHostCommand(command);
             }
             if (command.ToLower().Contains("speed"))
             {
                 msgbody = "Speed hack set to: " + ToggleSpeedHack();
                 msgtitle = "Speed hack";
+                SendHostCommand(command);
             }
             
             
@@ -795,6 +818,7 @@ namespace ChatCommands
                 EnableInfiniteAmmo = !EnableInfiniteAmmo;
                 msgtitle = "Infinite Ammo";
                 msgbody = "Infinite Ammo: "+ EnableInfiniteAmmo;
+                SendHostCommand(command);
             }
             if (command.ToLower().Contains("term"))
             {
@@ -832,9 +856,44 @@ namespace ChatCommands
             }
             HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
         }
+
+        internal static void SendHostCommand(string commandInput)
+        {
+            if (!isHost)
+            {
+                return;
+            }
+            string commandToClients = ChatCommands.NetHostCommandPrefix + commandInput;
+            HUDManager.Instance.AddTextToChatOnServer(commandToClients, -1);
+        }
+
+        public static void ProcessNetHostCommand(string commandInput)
+        {
+            if(commandInput.ToLower().Contains("god"))
+            {
+                enableGod = !enableGod;
+                msgtitle = "Host sent command:";
+                msgbody = "God Mode set to: " + enableGod;
+            }
+            if (commandInput.ToLower().Contains("speed"))
+            {
+                speedHack = !playerRef.isSpeedCheating;
+                playerRef.isSpeedCheating = speedHack;
+                msgtitle = "Host sent command:";
+                msgbody = "Speed hack set to: " + speedHack;
+            }
+            if (commandInput.ToLower().Contains("infammo") || commandInput.ToLower().Contains("ammo"))
+            {
+                EnableInfiniteAmmo = !EnableInfiniteAmmo;
+                msgtitle = "Host sent command:";
+                msgbody = "Infinite Ammo: " + EnableInfiniteAmmo;
+            }
+            HUDManager.Instance.DisplayTip(ChatCommands.msgtitle, ChatCommands.msgbody, false, false, "LC_Tip1");
+        }
         public static void ProcessCommand(string commandInput)
         {
             ChatCommands.ProcessCommandInput(commandInput);
+            HUDManager.Instance.DisplayTip(ChatCommands.msgtitle, ChatCommands.msgbody, false, false, "LC_Tip1");
         }
 
         public TextMeshProUGUI chatText;

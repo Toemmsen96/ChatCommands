@@ -17,8 +17,8 @@ namespace ChatCommands.Patches
 {
     internal class Patches
     {
-        private static string NetCommandPrefix = "<size=0>CCMD";
-        private static string NetHostCommandPrefix = "<size=0>CHCMD";
+        private static string NetCommandPrefix = ChatCommands.NetCommandPrefix;
+        private static string NetHostCommandPrefix = ChatCommands.NetHostCommandPrefix;
 
 
 
@@ -33,7 +33,7 @@ namespace ChatCommands.Patches
         [HarmonyPrefix]
         private static void LogSpawnEnemyFromVent()
         {
-            ChatCommands.mls.LogInfo((object)"Attempting to spawn an enemy");
+            ChatCommands.mls.LogInfo("Attempting to spawn an enemy");
         }
 
         [HarmonyPatch(typeof(HUDManager), "SubmitChat_performed")]
@@ -48,14 +48,21 @@ namespace ChatCommands.Patches
             // Check if text is not null and starts with "/"
             if (!string.IsNullOrEmpty(text) && text.ToLower().StartsWith(ChatCommands.PrefixSetting.Value))
             {
-                if (!ChatCommands.isHost)
+                if (!ChatCommands.NonHostCommands(text))
                 {
-                    __instance.chatTextField.text = NetCommandPrefix + text;
-                    ChatCommands.mls.LogInfo("Not Host, trying to send command:" + text);
-                    return;
+                    if (!ChatCommands.isHost)
+                    {
+                        __instance.chatTextField.text = NetCommandPrefix + text;
+                        ChatCommands.mls.LogInfo("Not Host, trying to send command:" + text);
+                    }
+                    else
+                    {
+                        ChatCommands.ProcessCommandInput(text);
+                        __instance.chatTextField.text = "";
+                    }
                 }
-                else {
-                    ChatCommands.ProcessCommandInput(text);
+                else
+                {
                     __instance.chatTextField.text = "";
                 }
                 
@@ -63,14 +70,14 @@ namespace ChatCommands.Patches
             else
             {
                 // Log an error or handle the case where the text is not valid for commands
-                ChatCommands.mls.LogError("Invalid or null chat input.");
+                ChatCommands.mls.LogWarning("Invalid or null chat input.");
             }
         }
 
 
         [HarmonyPatch(typeof(HUDManager), "AddChatMessage")]
         [HarmonyPrefix]
-        private static void ReadChatMessage(HUDManager __instance, ref string chatMessage, ref string nameOfUserWhoTyped)
+        private static bool ReadChatMessage(HUDManager __instance, ref string chatMessage, ref string nameOfUserWhoTyped)
         {
 
             ChatCommands.mls.LogInfo("Chat Message: " + chatMessage + " sent by: " + nameOfUserWhoTyped);
@@ -80,18 +87,22 @@ namespace ChatCommands.Patches
                 ChatCommands.mls.LogInfo("Host, trying to handle command: " + command);
                 ChatCommands.DisplayChatMessage(nameOfUserWhoTyped + " sent command: " + command);
                 ChatCommands.ProcessCommandInput(command);
+                return false;
             }
             else if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && !ChatCommands.HostSetting.Value)
             {
                 ChatCommands.mls.LogWarning("Host, but not allowing commands");
                 ChatCommands.DisplayChatMessage("Host, but not allowing commands");
+                return false;
             }
             else if (chatMessage.StartsWith(NetHostCommandPrefix) && !ChatCommands.isHost)
             {
                 string command = chatMessage.Substring((NetHostCommandPrefix).Length);
                 ChatCommands.mls.LogInfo("Recieved command from Host, trying to handle command: " + command);
-                ChatCommands.ProcessCommandInput(command);
+                ChatCommands.ProcessNetHostCommand(command);
+                return false;
             }
+            return true;
         }
 
         [HarmonyPatch(typeof(ShotgunItem), "ItemActivate")]
