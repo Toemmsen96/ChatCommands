@@ -4,6 +4,7 @@ To install either use a mod Manager or just drag thr ChatCommands.dll into your 
 
 Commands to use:  
 /enemies -> lists spawnable enemies on current map  
+/getscrap -> lists spawnable scrap on curent map  
 /spawn -> lists what spawn commands you can use  
 /spawnscrap or /spwscr "scrapname" (a="amount") (p="position") -> spawn scrap, position can be random, @me or @"playername", with gun as scrapname you can spawn a shotgun  
 /spawnenemy or /spweny "enemyname" (a="amount") (p="position") -> spawn enemy, position can be random, @me or @"playername"  
@@ -16,6 +17,9 @@ Commands to use:
 /togglelights -> toggles lights of facility  
 /help -> see what commands you can use  
 /morehelp -> more commands to use get listed  
+/cheats -> list cheat commands  
+/credits -> list credits for mod  
+/weather -> change weather of current planet (not working properly rn)  
 /dl "days" or /deadline "days" -> set amount of days until deadline, gets applied after quota is reached and new one is presented, so reaching the quota once is required. leaving blank after the command will reset to default  
 /term -> use Terminal from anywhere. On exiting input you need to type /term again to enable walking again  
 
