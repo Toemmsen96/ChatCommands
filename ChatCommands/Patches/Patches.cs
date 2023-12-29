@@ -17,6 +17,11 @@ namespace ChatCommands.Patches
 {
     internal class Patches
     {
+        private static string NetCommandPrefix = "<size=0>CCMD";
+        private static string NetHostCommandPrefix = "<size=0>CHCMD";
+
+
+
         [HarmonyPatch(typeof(RoundManager), "EnemyCannotBeSpawned")]
         [HarmonyPrefix]
         private static bool OverrideCannotSpawn()
@@ -45,33 +50,48 @@ namespace ChatCommands.Patches
             {
                 if (!ChatCommands.isHost)
                 {
-                    __instance.chatTextField.text = "<size=0>CCMD" + text;
+                    __instance.chatTextField.text = NetCommandPrefix + text;
                     ChatCommands.mls.LogInfo("Not Host, trying to send command:" + text);
-                    
+                    return;
                 }
-                ChatCommands.ProcessCommandInput(text);
-                __instance.chatTextField.text = "";
+                else {
+                    ChatCommands.ProcessCommandInput(text);
+                    __instance.chatTextField.text = "";
+                }
+                
             }
             else
             {
                 // Log an error or handle the case where the text is not valid for commands
-                Debug.LogError("Invalid or null chat input.");
+                ChatCommands.mls.LogError("Invalid or null chat input.");
             }
         }
 
 
         [HarmonyPatch(typeof(HUDManager), "AddChatMessage")]
         [HarmonyPrefix]
-        private static void ReadChatMessage(HUDManager __instance, ref string chatMessage, string nameOfUserWhoTyped)
+        private static void ReadChatMessage(HUDManager __instance, ref string chatMessage, ref string nameOfUserWhoTyped)
         {
-            ChatCommands.mls.LogInfo("Chat Message: " + chatMessage);
-            if (chatMessage.StartsWith("<size=0>CCMD") && ChatCommands.isHost && ChatCommands.HostSetting.Value)
+
+            ChatCommands.mls.LogInfo("Chat Message: " + chatMessage + " sent by: " + nameOfUserWhoTyped);
+            if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && ChatCommands.HostSetting.Value)
             {
-                chatMessage = chatMessage.Substring(("<size=0>CCMD").Length);
-                ChatCommands.ProcessCommandInput(chatMessage);
-                return;
+                string command = chatMessage.Substring((NetCommandPrefix).Length);
+                ChatCommands.mls.LogInfo("Host, trying to handle command: " + command);
+                ChatCommands.DisplayChatMessage(nameOfUserWhoTyped + " sent command: " + command);
+                ChatCommands.ProcessCommandInput(command);
             }
-            return;
+            else if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && !ChatCommands.HostSetting.Value)
+            {
+                ChatCommands.mls.LogWarning("Host, but not allowing commands");
+                ChatCommands.DisplayChatMessage("Host, but not allowing commands");
+            }
+            else if (chatMessage.StartsWith(NetHostCommandPrefix) && !ChatCommands.isHost)
+            {
+                string command = chatMessage.Substring((NetHostCommandPrefix).Length);
+                ChatCommands.mls.LogInfo("Recieved command from Host, trying to handle command: " + command);
+                ChatCommands.ProcessCommandInput(command);
+            }
         }
 
         [HarmonyPatch(typeof(ShotgunItem), "ItemActivate")]

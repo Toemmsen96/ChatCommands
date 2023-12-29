@@ -74,13 +74,14 @@ namespace ChatCommands
             return enableGod;
         }
 
-        private static void ToggleSpeedHack()
+        private static bool ToggleSpeedHack()
         {
             if (isHost)
             {
                 speedHack = !playerRef.isSpeedCheating;
                 playerRef.isSpeedCheating = speedHack;
             }
+            return speedHack;
         }
 
         private static void SpawnEnemy(SpawnableEnemyWithRarity enemy, int amount, bool inside, Vector3 location)
@@ -159,6 +160,130 @@ namespace ChatCommands
             }
             string msgtitle = "default";
             string msgbody = "<color=#FF0000>ERR</color>: unknown";
+            string command = text.Substring(prefix.Length);
+
+            if (text.ToLower().Contains("getscrap"))
+            {
+                int len = currentRound.currentLevel.spawnableScrap.Count();
+                string output = currentRound.currentLevel.spawnableScrap[0].spawnableItem.spawnPrefab.name;
+                for (int i = 1; i < len; i++)
+                {
+                    output += ", ";
+                    output += currentRound.currentLevel.spawnableScrap[i].spawnableItem.spawnPrefab.name;
+                }
+                //HUDManager.Instance.DisplayTip("Spawnable Scrap", output);
+                msgtitle = "Spawnable Scrap";
+                msgbody = "listed in chat";
+                DisplayChatMessage("Spawnable Scrap: " + output);
+                return;
+            }
+
+            if (command.ToLower().Contains("enemies"))
+            {
+                string textToDisplay = "";
+                SelectableLevel newLevel = currentLevel;
+                msgtitle = "Enemies:";
+                if (newLevel == null)
+                {
+                    DisplayChatMessage("<color=#FF0000>ERROR: </color>Level is null.");
+                    Debug.LogError("newLevel is null.");
+                    return;
+                }
+
+                // Check if levelEnemySpawns is null
+                if (levelEnemySpawns == null)
+                {
+                    DisplayChatMessage("<color=#FF0000>ERROR: </color>levelEnemySpawns is null.");
+                    Debug.LogError("levelEnemySpawns is null.");
+                    return;
+                }
+
+                // Attempt to get value from dictionary, check for null
+                if (levelEnemySpawns.TryGetValue(newLevel, out var value))
+                {
+                    newLevel.Enemies = value;
+                    textToDisplay += "<color=#FF00FF>Inside: </color><color=#FFFF00>";
+                    msgbody = "<color=#FF00FF>Inside: </color><color=#FFFF00>";
+
+                    if (newLevel.Enemies.Count == 0)
+                    {
+                        textToDisplay += "None";
+                        msgbody += "None";
+                    }
+                    else
+                    {
+                        foreach (SpawnableEnemyWithRarity enemy2 in newLevel.Enemies)
+                        {
+                            mls.LogInfo((object)("Inside: " + enemy2.enemyType.enemyName));
+                            textToDisplay += enemy2.enemyType.enemyName + ", ";
+                            msgbody += enemy2.enemyType.enemyName + ", ";
+                        }
+                    }
+
+                    textToDisplay += "\n</color><color=#FF00FF>Outside: </color>";
+                    msgbody += "\n</color><color=#FF00FF>Outside: </color>";
+
+                    if (newLevel.OutsideEnemies.Count == 0)
+                    {
+                        textToDisplay += "None";
+                        msgbody += "None";
+                    }
+                    else
+                    {
+                        foreach (SpawnableEnemyWithRarity outsideEnemy in newLevel.OutsideEnemies)
+                        {
+                            mls.LogInfo((object)("Outside: " + outsideEnemy.enemyType.enemyName));
+                            textToDisplay += outsideEnemy.enemyType.enemyName + ", ";
+                            msgbody += outsideEnemy.enemyType.enemyName + ", ";
+                        }
+                    }
+
+                    DisplayChatMessage(textToDisplay);
+                }
+                return;
+            }
+
+            if (command.ToLower().StartsWith("morehelp"))
+            {
+                msgtitle = "More Commands";
+                msgbody = "/enemies - See all enemies available to spawn. \n /weather weatherName - Attempt to change weather \n /cheats - list cheat commands";
+                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
+                return;
+            }
+            if (command.ToLower().StartsWith("help"))
+            {
+                msgtitle = "Available Commands";
+                msgbody = "/buy item - Buy an item \n /togglelights - Toggle lights inside building \n /spawn - help for spawning \n /morehelp - see more commands \n /credits - List credits";
+                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
+                return;
+            }
+            if (command.ToLower().Contains("credits"))
+            {
+                msgtitle = "Credits";
+                msgbody = "ChatCommands by Toemmsen96 and Chrigi";
+                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
+                return;
+            }
+            if (command.ToLower().Contains("cheats"))
+            {
+                msgtitle = "Cheats";
+                msgbody = "/god - Toggle GodMode \n /speed - Toggle SpeedHack \n /togglelights - Toggle lights inside building \n /tp - Teleports you to the terminal in your ship, keeping all items on you! \n /tp <playername> teleports you to that player";
+                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
+                return;
+            }
+            if (command.ToLower().StartsWith("spawn") && !command.ToLower().StartsWith("spawnenemy") && !command.ToLower().StartsWith("spawnscrap"))
+            {
+                msgtitle = "How To";
+                msgbody = "Spawn an enemy: /spawnenemy or /spweny\n" +
+                        "Spawn scrap items: /spawnscrap or /spwscr\n" +
+                        "after that put the name of what you want to spawn\n" +
+                        "options: a=<num> or amount=<num> for how many to spawn\n" +
+                        "p=<pos> or position=<pos> for position where to spawn\n" +
+                        "<pos> can be either @me for your coordinates, @playername for coords of player with specific name or random";
+                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
+                return;
+            }
+
             if (!isHost)
             {
                 msgtitle = "Command";
@@ -166,7 +291,7 @@ namespace ChatCommands
                 HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
                 return;
             }
-            string command = text.Substring(prefix.Length);
+           
 
             if (command.ToLower().StartsWith("spawnenemy") || command.ToLower().StartsWith("spweny"))
             {
@@ -302,6 +427,7 @@ namespace ChatCommands
                         }
                     }
                 }
+                return;
             }
             if(command.ToLower().StartsWith("spawnscrap") || command.ToLower().StartsWith("spwscr"))
             {
@@ -431,6 +557,7 @@ namespace ChatCommands
                         break;
                     }
                 }
+                return;
             }
 
             if (command.ToLower().StartsWith(prefix + "weather"))
@@ -471,6 +598,7 @@ namespace ChatCommands
                     }
                     msgbody = "tried to change the weather to " + array2[1];
                 }
+                return;
             }
             if (command.ToLower().StartsWith("togglelights"))
             {
@@ -491,6 +619,7 @@ namespace ChatCommands
                         msgbody = "Turned the lights on";
                     }
                 }
+                return;
             }
             if (command.ToLower().StartsWith("buy"))
             {
@@ -578,56 +707,20 @@ namespace ChatCommands
                         }
                     }
                 }
+                return;
             }
             if (command.ToLower().Contains("god"))
             {
-                ToggleGodMode();
                 msgtitle = "God Mode";
-                msgbody = "God Mode set to: " + enableGod;
+                msgbody = "God Mode set to: " + ToggleGodMode();
             }
             if (command.ToLower().Contains("speed"))
             {
-                ToggleSpeedHack();
-                msgbody = "Speed hack set to: " + speedHack;
+                msgbody = "Speed hack set to: " + ToggleSpeedHack();
                 msgtitle = "Speed hack";
             }
-            if (command.ToLower().StartsWith("morehelp"))
-            {
-                msgtitle = "More Commands";
-                msgbody = "/enemies - See all enemies available to spawn. \n /weather weatherName - Attempt to change weather \n /cheats - list cheat commands";
-                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
-            }
-            if (command.ToLower().StartsWith("help"))
-            {
-                msgtitle = "Available Commands";
-                msgbody = "/buy item - Buy an item \n /togglelights - Toggle lights inside building \n /spawn - help for spawning \n /morehelp - see more commands \n /credits - List credits";
-                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
-            }
-            if (command.ToLower().Contains("credits"))
-            {
-                msgtitle = "Credits";
-                msgbody = "ChatCommands by Toemmsen96 and Chrigi";
-                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
-            }
-            if (command.ToLower().Contains("cheats"))
-            {
-                msgtitle = "Cheats";
-                msgbody = "/god - Toggle GodMode \n /speed - Toggle SpeedHack \n /togglelights - Toggle lights inside building \n /tp - Teleports you to the terminal in your ship, keeping all items on you! \n /tp <playername> teleports you to that player";
-                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
-            }
-            if (command.ToLower().StartsWith("spawn") && !command.ToLower().StartsWith("spawnenemy") && !command.ToLower().StartsWith("spawnscrap"))
-            {
-                msgtitle = "How To";
-                msgbody = "Spawn an enemy: /spawnenemy or /spweny\n" +
-                        "Spawn scrap items: /spawnscrap or /spwscr\n" +
-                        "after that put the name of what you want to spawn\n" +
-                        "options: a=<num> or amount=<num> for how many to spawn\n" +
-                        "p=<pos> or position=<pos> for position where to spawn\n" +
-                        "<pos> can be either @me for your coordinates, @playername for coords of player with specific name or random";
-                DisplayChatMessage("<color=#FF00FF>" + msgtitle + "</color>\n" + msgbody);
-            }
-
-
+            
+            
 
             if (command.ToLower().StartsWith("deadline") || command.ToLower().StartsWith("dl"))
             {
@@ -686,69 +779,7 @@ namespace ChatCommands
                     }
                 }
             }
-            if (command.ToLower().Contains("enemies"))
-            {
-                string textToDisplay = "";
-                SelectableLevel newLevel = currentLevel;
-                msgtitle = "Enemies:";
-                if (newLevel == null)
-                {
-                    DisplayChatMessage("<color=#FF0000>ERROR: </color>Level is null.");
-                    Debug.LogError("newLevel is null.");
-                    return;
-                }
-
-                // Check if levelEnemySpawns is null
-                if (levelEnemySpawns == null)
-                {
-                    DisplayChatMessage("<color=#FF0000>ERROR: </color>levelEnemySpawns is null.");
-                    Debug.LogError("levelEnemySpawns is null.");
-                    return;
-                }
-
-                // Attempt to get value from dictionary, check for null
-                if (levelEnemySpawns.TryGetValue(newLevel, out var value))
-                {
-                    newLevel.Enemies = value;
-                    textToDisplay += "<color=#FF00FF>Inside: </color><color=#FFFF00>";
-                    msgbody = "<color=#FF00FF>Inside: </color><color=#FFFF00>";
-
-                    if (newLevel.Enemies.Count == 0)
-                    {
-                        textToDisplay += "None";
-                        msgbody += "None";
-                    }
-                    else
-                    {
-                        foreach (SpawnableEnemyWithRarity enemy2 in newLevel.Enemies)
-                        {
-                            mls.LogInfo((object)("Inside: " + enemy2.enemyType.enemyName));
-                            textToDisplay += enemy2.enemyType.enemyName + ", ";
-                            msgbody += enemy2.enemyType.enemyName + ", ";
-                        }
-                    }
-
-                    textToDisplay += "\n</color><color=#FF00FF>Outside: </color>";
-                    msgbody += "\n</color><color=#FF00FF>Outside: </color>";
-
-                    if (newLevel.OutsideEnemies.Count == 0)
-                    {
-                        textToDisplay += "None";
-                        msgbody += "None";
-                    }
-                    else
-                    {
-                        foreach (SpawnableEnemyWithRarity outsideEnemy in newLevel.OutsideEnemies)
-                        {
-                            mls.LogInfo((object)("Outside: " + outsideEnemy.enemyType.enemyName));
-                            textToDisplay += outsideEnemy.enemyType.enemyName + ", ";
-                            msgbody += outsideEnemy.enemyType.enemyName + ", ";
-                        }
-                    }
-
-                    DisplayChatMessage(textToDisplay);
-                }
-            }
+            
 
             if (command.ToLower().Contains("money"))
             {
@@ -758,18 +789,7 @@ namespace ChatCommands
             {
                 DisplayChatMessage("This is a test message");
             }
-            if (text.ToLower().Contains("getscrap"))
-            {
-                int len = currentRound.currentLevel.spawnableScrap.Count();
-                string output = currentRound.currentLevel.spawnableScrap[0].spawnableItem.spawnPrefab.name;
-                for (int i = 1; i < len; i++)
-                {
-                    output += ", ";
-                    output += currentRound.currentLevel.spawnableScrap[i].spawnableItem.spawnPrefab.name;
-                }
-                //HUDManager.Instance.DisplayTip("Spawnable Scrap", output);
-                DisplayChatMessage("Spawnable Scrap: " + output);
-            }
+            
             if(text.ToLower().Contains("infammo") || command.ToLower().Contains("ammo"))
             {
                 EnableInfiniteAmmo = !EnableInfiniteAmmo;
