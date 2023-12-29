@@ -19,6 +19,7 @@ namespace ChatCommands.Patches
     {
         private static string NetCommandPrefix = ChatCommands.NetCommandPrefix;
         private static string NetHostCommandPrefix = ChatCommands.NetHostCommandPrefix;
+        private static float defaultJumpForce;
 
 
 
@@ -207,6 +208,7 @@ namespace ChatCommands.Patches
         {
             ChatCommands.mls.LogInfo((object)("Host Status: " + ((NetworkBehaviour)RoundManager.Instance).NetworkManager.IsHost));
             ChatCommands.isHost = ((NetworkBehaviour)RoundManager.Instance).NetworkManager.IsHost;
+           
         }
 
         [HarmonyPatch(typeof(PlayerControllerB), "AllowPlayerDeath")]
@@ -240,6 +242,10 @@ namespace ChatCommands.Patches
                 ___sprintMeter = 1f;
                 if (___isSprinting) ___sprintMultiplier = 10f;
             }
+            else
+            {
+                ___jumpForce = defaultJumpForce;
+            }
 
         }
 
@@ -248,6 +254,8 @@ namespace ChatCommands.Patches
         private static void GetPlayerRef(ref PlayerControllerB __instance)
         {
             ChatCommands.playerRef = __instance;
+            defaultJumpForce = __instance.jumpForce;
+            ChatCommands.mls.LogInfo((object)("Default Jump Force: " + defaultJumpForce));
         }
     }
 }

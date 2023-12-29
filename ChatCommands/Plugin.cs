@@ -734,13 +734,13 @@ namespace ChatCommands
             {
                 msgtitle = "God Mode";
                 msgbody = "God Mode set to: " + ToggleGodMode();
-                SendHostCommand(command);
+                SendHostCommand(text);
             }
             if (command.ToLower().Contains("speed"))
             {
                 msgbody = "Speed hack set to: " + ToggleSpeedHack();
                 msgtitle = "Speed hack";
-                SendHostCommand(command);
+                SendHostCommand(text);
             }
             
             
@@ -818,7 +818,7 @@ namespace ChatCommands
                 EnableInfiniteAmmo = !EnableInfiniteAmmo;
                 msgtitle = "Infinite Ammo";
                 msgbody = "Infinite Ammo: "+ EnableInfiniteAmmo;
-                SendHostCommand(command);
+                SendHostCommand(text);
             }
             if (command.ToLower().Contains("term"))
             {
