@@ -5,7 +5,7 @@ To install either use a mod Manager or just drag thr ChatCommands.dll into your 
 Commands to use:  
 /enemies -> lists spawnable enemies on current map  
 /spawn -> lists what spawn commands you can use  
-/spawnscrap or /spwscr "<scrapname>" (a=<amount>) (p=<position>) -> spawn scrap, position can be random, @me or @<playername>, with gun as scrapname you can spawn a shotgun  
+/spawnscrap or /spwscr "scrapname" (a=<amount>) (p=<position>) -> spawn scrap, position can be random, @me or @<playername>, with gun as scrapname you can spawn a shotgun  
 /spawnenemy or /spweny <enemyname> (a=<amount>) (p=<position>) -> spawn enemy, position can be random, @me or @<playername>  
 /infammo or /ammo -> enable infinite ammo on shotgun  
 /speed -> toggles speed and jump hack for faster travelling  
