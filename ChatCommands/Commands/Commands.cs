@@ -320,7 +320,7 @@ namespace ChatCommands
                                         GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
                                         component.startFallingPosition = position;
                                         component.targetFloorPosition = component.GetItemFloorPosition(position);
-                                        component.SetScrapValue(1000);
+                                        component.SetScrapValue(value);
                                         component.NetworkObject.Spawn();
                                     }
                                     ChatCommands.msgtitle = "Spawned gun";
