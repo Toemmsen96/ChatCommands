@@ -254,7 +254,6 @@ namespace ChatCommands
             }
             string toSpawn = segments[1];
             int amount = 1;
-            string vstate = "alive";
             Vector3 position = Vector3.zero;
             string sposition = "random";
             int value = 1000;
@@ -274,11 +273,6 @@ namespace ChatCommands
                     case "amount":
                         amount = int.Parse(darg[1]);
                         ChatCommands.mls.LogInfo($"Amount {amount}");
-                        break;
-                    case "s":
-                    case "state":
-                        vstate = darg[1];
-                        ChatCommands.mls.LogInfo(vstate);
                         break;
                     case "p":
                     case "position":
@@ -364,7 +358,7 @@ namespace ChatCommands
                                     GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
                                     component.startFallingPosition = position;
                                     component.targetFloorPosition = component.GetItemFloorPosition(position);
-                                    component.SetScrapValue(1000);
+                                    component.SetScrapValue(value);
                                     component.NetworkObject.Spawn();
                                 }
                                 break;
