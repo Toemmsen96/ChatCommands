@@ -320,7 +320,7 @@ namespace ChatCommands
                                         GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
                                         component.startFallingPosition = position;
                                         component.targetFloorPosition = component.GetItemFloorPosition(position);
-                                        component.SetScrapValue(value);
+                                        component.SetScrapValue(value); // Set Scrap Value
                                         component.NetworkObject.Spawn();
                                     }
                                     ChatCommands.msgtitle = "Spawned gun";
@@ -358,7 +358,7 @@ namespace ChatCommands
                                     GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
                                     component.startFallingPosition = position;
                                     component.targetFloorPosition = component.GetItemFloorPosition(position);
-                                    component.SetScrapValue(value);
+                                    component.SetScrapValue(value); // Set Scrap Value
                                     component.NetworkObject.Spawn();
                                 }
                                 break;
