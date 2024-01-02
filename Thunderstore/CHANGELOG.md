@@ -1,3 +1,6 @@
+## v1.1.3 Fixed needing lowercase for spwscr
+- fixed lowercase issue
+
 ## v1.1.2 Important fixes to Spawn functions
 - fixed Inside enemies not being the right ones
 - fixed scrap spawning issues with error being displayed even if everything worked

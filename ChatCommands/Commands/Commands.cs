@@ -274,7 +274,7 @@ namespace ChatCommands
                 HUDManager.Instance.DisplayTip(ChatCommands.msgtitle, ChatCommands.msgbody, true, false, "LC_Tip1");
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
-            string toSpawn = segments[1];
+            string toSpawn = segments[1].ToLower();
             int amount = 1;
             Vector3 position = Vector3.zero;
             string sposition = "random";
@@ -379,6 +379,7 @@ namespace ChatCommands
                 }
             }
             int len = ChatCommands.currentRound.currentLevel.spawnableScrap.Count();
+            bool spawnable = false;
             for (int i = 0; i < len; i++)
             {
                 Item scrap = ChatCommands.currentRound.currentLevel.spawnableScrap[i].spawnableItem;
@@ -411,8 +412,15 @@ namespace ChatCommands
                         ChatCommands.msgtitle = "Spawned " + objToSpawn.name;
                         ChatCommands.msgbody = "Spawned " + amount + " " + objToSpawn.name + (amount > 1 ? "s" : "") + " with value of:" + value + "\n at position: " + position;
                     }
+                    spawnable = true;
                     break;
                 }
+            }
+            if (!spawnable)
+            {
+                ChatCommands.mls.LogWarning("Could not spawn " + toSpawn);
+                ChatCommands.msgtitle = "Command Error";
+                ChatCommands.msgbody = "Could not spawn " + toSpawn +".\nHave you checked using /getscrap if the scrap you are trying to spawn\n is even spawnable?";
             }
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
