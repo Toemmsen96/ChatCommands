@@ -22,7 +22,8 @@ Infocommands can always be used as a NonHost, these are:
 
 ## Host functionality
 Host only commands to use (require Host to have setting enabled):  
-/spawnscrap or /spwscr "scrapname" (a="amount") (p="position") -> spawn scrap, position can be random, @me or @"playername", with gun as scrapname you can spawn a shotgun (gun is broken at the moment, please dont use for now)  
+/spawnscrap or /spwscr "scrapname" (a="amount") (p="position") (v="value") -> spawn scrap, amount, position and value arguments are optional  
+position can be random, @me or @"playername", amount sets how many items will be spawned (without it defaults to 1) and value sets how much it is worth (default:1000) with gun as scrapname you can spawn a shotgun (gun is broken at the moment, please dont use for now)  
 /spawnenemy or /spweny "enemyname" (a="amount") (p="position") -> spawn enemy, position can be random, @me or @"playername"  
 /infammo or /ammo -> enable infinite ammo on shotgun  
 /speed -> toggles speed and jump hack for faster travelling  
