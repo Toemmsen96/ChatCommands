@@ -68,7 +68,16 @@ namespace ChatCommands
             harmony.PatchAll(typeof(ChatCommands));
             harmony.PatchAll(typeof(Patches.Patches));
 
-            mls.LogInfo((object)"Chat Commands loaded!");
+            mls.LogWarning((object)"\r\n" +
+                "  ______                                                                                                       \r\n"+
+                " /_  __/  ____   ___    ____ ___    ____ ___    _____  ___    ____    _____                                    \r\n"+
+                "  / /    / __ \\ / _ \\  / __ `__ \\  / __ `__ \\  / ___/ / _ \\  / __ \\  / ___/                                    \r\n"+
+                " / /    / /_/ //  __/ / / / / / / / / / / / / (__  ) /  __/ / / / / (__  )                                     \r\n"+
+                "/_/_____\\____/_\\___/ /_/ /_/_/_/ /_/ /_/ /_/_/____/  \\___/ /_/ /_/ /____/                            __        \r\n"+
+                "  / ____/   / /_   ____ _  / /_         / ____/  ____    ____ ___    ____ ___   ____ _   ____   ____/ /   _____\r\n"+
+                " / /       / __ \\ / __ `/ / __/        / /      / __ \\  / __ `__ \\  / __ `__ \\ / __ `/  / __ \\ / __  /   / ___/\r\n"+
+                "/ /___    / / / // /_/ / / /_         / /___   / /_/ / / / / / / / / / / / / // /_/ /  / / / // /_/ /   (__  ) \r\n"+
+                "\\____/   /_/ /_/ \\__,_/  \\__/         \\____/   \\____/ /_/ /_/ /_/ /_/ /_/ /_/ \\__,_/  /_/ /_/ \\__,_/   /____/  \r\n");
         }
 
 
@@ -117,10 +126,13 @@ namespace ChatCommands
             {
                 try
                 {
-                    for (int i = 0; i < amount; i++)
+                    int i = 0;
+                    for (; i < amount; i++)
                     {
                         UnityEngine.Object.Instantiate<GameObject>(currentLevel.OutsideEnemies[currentLevel.OutsideEnemies.IndexOf(enemy)].enemyType.enemyPrefab, location, Quaternion.Euler(Vector3.zero)).gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
                     }
+                    mls.LogInfo((object)$"You wanted to spawn: {amount} enemies");
+                    mls.LogInfo((object)("Spawned an enemy. Total Spawned: " + i + "at position:" + location));
                     return;
                 }
                 catch
@@ -133,10 +145,14 @@ namespace ChatCommands
             {
                 try
                 {
-                    for (int i = 0; i < amount; i++)
+                    int i = 0;
+                    for (; i < amount; i++)
                     {
                         currentRound.SpawnEnemyOnServer(currentRound.allEnemyVents[UnityEngine.Random.Range(0, currentRound.allEnemyVents.Length)].floorNode.position, currentRound.allEnemyVents[i].floorNode.eulerAngles.y, currentLevel.Enemies.IndexOf(enemy));
+                        
                     }
+                    mls.LogInfo((object)$"You wanted to spawn: {amount} enemies");
+                    mls.LogInfo((object)("Total Spawned: " + i));
                     return;
                 }
                 catch
@@ -145,12 +161,14 @@ namespace ChatCommands
                     return;
                 }
             }
-            for (int j = 0; j < amount; j++)
+            int j = 0;
+            for (; j < amount; j++)
             {
-                mls.LogInfo((object)$"You wanted to spawn: {amount} enemies");
-                mls.LogInfo((object)("Spawned an enemy. Total Spawned: " + j));
+                
                 UnityEngine.Object.Instantiate<GameObject>(currentLevel.OutsideEnemies[currentLevel.OutsideEnemies.IndexOf(enemy)].enemyType.enemyPrefab, GameObject.FindGameObjectsWithTag("OutsideAINode")[UnityEngine.Random.Range(0, GameObject.FindGameObjectsWithTag("OutsideAINode").Length - 1)].transform.position, Quaternion.Euler(Vector3.zero)).gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
             }
+            mls.LogInfo((object)$"You wanted to spawn: {amount} enemies");
+            mls.LogInfo((object)("Total Spawned: " + j));
         }
 
         internal static bool NonHostCommands(string command)
