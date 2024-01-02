@@ -48,6 +48,7 @@ namespace ChatCommands
         internal static string msgbody;
         internal static string NetCommandPrefix = "<size=0>CCMD";
         internal static string NetHostCommandPrefix = "<size=0>CHCMD";
+        internal static string playerwhocalled;
         private void Awake()
         {
             if (instance == null)
@@ -219,11 +220,11 @@ namespace ChatCommands
             {
                 case "spawnenemy":
                 case "spweny":
-                    Commands.SpawnEnemyFunc(text);
+                    Commands.SpawnEnemyFunc(text,playerwhocalled);
                     break;
                 case "spawnscrap":
                 case "spwscr":
-                    Commands.SpawnScrapFunc(text);
+                    Commands.SpawnScrapFunc(text,playerwhocalled);
                     break;
                 case "weather":
                     Commands.ChangeWeather(text);

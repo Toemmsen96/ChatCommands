@@ -53,11 +53,16 @@ namespace ChatCommands.Patches
                 {
                     if (!ChatCommands.isHost)
                     {
+                        string command = text.Substring((ChatCommands.PrefixSetting.Value).Length);
                         __instance.chatTextField.text = NetCommandPrefix + text;
-                        ChatCommands.mls.LogInfo("Not Host, trying to send command:" + text);
+                        ChatCommands.mls.LogInfo("Not Host, trying to send command:" + command);
                     }
                     else
                     {
+                        if(text.ToLower().Contains("p=@me"))
+                        {
+                            ChatCommands.playerwhocalled = ChatCommands.playerRef.name;
+                        }
                         ChatCommands.ProcessCommandInput(text);
                         __instance.chatTextField.text = "";
                     }
@@ -85,9 +90,12 @@ namespace ChatCommands.Patches
             if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && ChatCommands.HostSetting.Value)
             {
                 string command = chatMessage.Substring((NetCommandPrefix).Length);
+                if (command.ToLower().Contains("p=@me")){
+                    ChatCommands.playerwhocalled = nameOfUserWhoTyped;
+                }
                 ChatCommands.mls.LogInfo("Host, trying to handle command: " + command);
-                ChatCommands.DisplayChatMessage(nameOfUserWhoTyped + " sent command: " + command);
-                ChatCommands.ProcessCommandInput(command);
+                ChatCommands.DisplayChatMessage(nameOfUserWhoTyped + " sent command: "+ ChatCommands.PrefixSetting.Value + command);
+                ChatCommands.ProcessCommandInput(ChatCommands.PrefixSetting.Value+command);
                 return false;
             }
             else if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && !ChatCommands.HostSetting.Value)

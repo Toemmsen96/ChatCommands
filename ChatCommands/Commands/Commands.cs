@@ -81,7 +81,7 @@ namespace ChatCommands
             }
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
-        public static string SpawnEnemyFunc(string text)
+        public static string SpawnEnemyFunc(string text, string playerwhocalled)
         {
             ChatCommands.msgtitle = "Spawned Enemies";
             string[] array = text.Split(' ');
@@ -136,11 +136,11 @@ namespace ChatCommands
                 if (sposition == "@me") position = ((NetworkBehaviour)ChatCommands.currentRound.playersManager.localPlayerController).transform.position;
                 else
                 {
-                    string value = sposition.ToLower().Substring(1);
+                    string playername = sposition.ToLower().Substring(1);
                     PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
                     foreach (PlayerControllerB val3 in allPlayerScripts)
                     {
-                        if (val3.playerUsername.ToLower().Contains(value))
+                        if (val3.playerUsername.ToLower().Contains(playername))
                         {
                             position = ((Component)val3).transform.position;
                             ChatCommands.msgbody += "@" + val3.playerUsername;
@@ -241,7 +241,7 @@ namespace ChatCommands
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
 
-        public static string SpawnScrapFunc(string text)
+        public static string SpawnScrapFunc(string text, string playerwhocalled)
         {
             string[] segments = (text.Substring(1)).Split(' ');
             if (segments.Length < 2)
@@ -257,6 +257,7 @@ namespace ChatCommands
             string vstate = "alive";
             Vector3 position = Vector3.zero;
             string sposition = "random";
+            int value = 1000;
             var args = segments.Skip(2);
 
             foreach (string arg in args)
@@ -264,10 +265,15 @@ namespace ChatCommands
                 string[] darg = arg.Split('=');
                 switch (darg[0])
                 {
+                    case "v":
+                    case "value":
+                        value = int.Parse(darg[1]);
+                        ChatCommands.mls.LogInfo($"Value {value}");
+                        break;
                     case "a":
                     case "amount":
                         amount = int.Parse(darg[1]);
-                        ChatCommands.mls.LogInfo($"{amount}");
+                        ChatCommands.mls.LogInfo($"Amount {amount}");
                         break;
                     case "s":
                     case "state":
@@ -284,11 +290,11 @@ namespace ChatCommands
                             else
                             {
 
-                                string value = sposition.Substring(1);
+                                string playername = sposition.Substring(1);
                                 PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
                                 foreach (PlayerControllerB val3 in allPlayerScripts)
                                 {
-                                    if (val3.playerUsername.ToLower().Contains(value))
+                                    if (val3.playerUsername.ToLower().Contains(playername))
                                     {
                                         position = ((Component)val3).transform.position;
                                         ChatCommands.msgbody += "@" + val3.playerUsername;
