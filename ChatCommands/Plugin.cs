@@ -24,7 +24,7 @@ namespace ChatCommands
     {
         private const string modGUID = "toemmsen.ChatCommands";
         private const string modName = "ChatCommands";
-        private const string modVersion = "1.1.1";
+        private const string modVersion = "1.1.2";
         private readonly Harmony harmony = new Harmony(modGUID);
         private static ChatCommands instance;
         internal static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
@@ -112,7 +112,7 @@ namespace ChatCommands
                 {
                     for (int i = 0; i < amount; i++)
                     {
-                        currentRound.SpawnEnemyOnServer(location, currentLevel.Enemies.IndexOf(enemy));
+                        currentRound.SpawnEnemyOnServer(location,0.0f, currentLevel.Enemies.IndexOf(enemy));
                     }
                     return;
                 }
@@ -238,11 +238,11 @@ namespace ChatCommands
             {
                 case "spawnenemy":
                 case "spweny":
-                    Commands.SpawnEnemyFunc(text,playerwhocalled);
+                    Commands.SpawnEnemyFunc(text);
                     break;
                 case "spawnscrap":
                 case "spwscr":
-                    Commands.SpawnScrapFunc(text,playerwhocalled);
+                    Commands.SpawnScrapFunc(text);
                     break;
                 case "weather":
                     Commands.ChangeWeather(text);

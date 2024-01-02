@@ -1,3 +1,8 @@
+## v1.1.2 Important fixes to Spawn functions
+- fixed Inside enemies not being the right ones
+- fixed scrap spawning issues with error being displayed even if everything worked
+
+
 ## v1.1.1 Improved Host - NonHost communication
 - also fixed some prefix stuff
 

@@ -61,7 +61,8 @@ namespace ChatCommands.Patches
                     {
                         if(text.ToLower().Contains("p=@me"))
                         {
-                            ChatCommands.playerwhocalled = ChatCommands.playerRef.name;
+                            ChatCommands.playerwhocalled = ChatCommands.playerRef.playerUsername;
+                            ChatCommands.mls.LogInfo("Player who called: " + ChatCommands.playerwhocalled);
                         }
                         ChatCommands.ProcessCommandInput(text);
                         __instance.chatTextField.text = "";

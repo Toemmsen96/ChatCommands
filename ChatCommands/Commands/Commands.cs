@@ -81,7 +81,7 @@ namespace ChatCommands
             }
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
-        public static string SpawnEnemyFunc(string text, string playerwhocalled)
+        public static string SpawnEnemyFunc(string text)
         {
             ChatCommands.msgtitle = "Spawned Enemies";
             string[] array = text.Split(' ');
@@ -133,19 +133,41 @@ namespace ChatCommands
 
             if (sposition.StartsWith("@"))
             {
-                if (sposition == "@me") position = ((NetworkBehaviour)ChatCommands.currentRound.playersManager.localPlayerController).transform.position;
-                else
+                if (sposition == "@me")
                 {
-                    string playername = sposition.ToLower().Substring(1);
                     PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
                     foreach (PlayerControllerB val3 in allPlayerScripts)
                     {
-                        if (val3.playerUsername.ToLower().Contains(playername))
+                        ChatCommands.mls.LogInfo($"Checking Playername {val3.playerUsername}");
+                        if (val3.playerUsername.ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
                         {
+                            ChatCommands.mls.LogInfo($"Found player {val3.playerUsername}");
                             position = ((Component)val3).transform.position;
                             ChatCommands.msgbody += "@" + val3.playerUsername;
                             break;
                         }
+                    }
+                }
+                else
+                {
+                    string playername = sposition.Substring(1);
+                    PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
+                    bool found = false;
+                    foreach (PlayerControllerB val3 in allPlayerScripts)
+                    {
+                        if (val3.playerUsername.ToLower().Contains(playername))
+                        {
+                            ChatCommands.mls.LogInfo($"Found player {val3.playerUsername}");
+                            position = ((Component)val3).transform.position;
+                            ChatCommands.msgbody += "@" + val3.playerUsername;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        ChatCommands.mls.LogWarning("Player not found");
+                        ChatCommands.DisplayChatMessage("Player not found, spawning in random position");
                     }
                 }
             }
@@ -241,7 +263,7 @@ namespace ChatCommands
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
 
-        public static string SpawnScrapFunc(string text, string playerwhocalled)
+        public static string SpawnScrapFunc(string text)
         {
             string[] segments = (text.Substring(1)).Split(' ');
             if (segments.Length < 2)
@@ -280,21 +302,42 @@ namespace ChatCommands
                         ChatCommands.mls.LogInfo(sposition);
                         if (sposition.StartsWith("@"))
                         {
-                            if (sposition == "@me") position = ((NetworkBehaviour)ChatCommands.currentRound.playersManager.localPlayerController).transform.position;
+                            if (sposition == "@me")
+                            {
+                                PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
+                                foreach (PlayerControllerB val3 in allPlayerScripts)
+                                {
+                                    ChatCommands.mls.LogInfo($"Checking Playername {val3.playerUsername}");
+                                    if (val3.playerUsername.ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
+                                    {
+                                        ChatCommands.mls.LogInfo($"Found player {val3.playerUsername}");
+                                        position = ((Component)val3).transform.position;
+                                        ChatCommands.msgbody += "@" + val3.playerUsername;
+                                        break;
+                                    }
+                                }
+                            }
                             else
                             {
-
                                 string playername = sposition.Substring(1);
                                 PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
+                                bool found = false;
                                 foreach (PlayerControllerB val3 in allPlayerScripts)
                                 {
                                     if (val3.playerUsername.ToLower().Contains(playername))
                                     {
                                         position = ((Component)val3).transform.position;
                                         ChatCommands.msgbody += "@" + val3.playerUsername;
+                                        found = true;
                                         break;
                                     }
                                 }
+                                if (!found)
+                                {
+                                    ChatCommands.mls.LogWarning("Player not found");
+                                    ChatCommands.DisplayChatMessage("Player not found, spawning in random position");
+                                }
+
                             }
 
                         }
@@ -303,68 +346,72 @@ namespace ChatCommands
                             ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
                             sposition = "random";
                         }
-                        if (toSpawn == "gun")
-                        {
-                            for (int i = 0; i < ChatCommands.currentRound.currentLevel.Enemies.Count(); i++)
-                            {
-                                if (ChatCommands.currentRound.currentLevel.Enemies[i].enemyType.name == "Nutcracker")
-                                {
-                                    GameObject nutcra = UnityEngine.Object.Instantiate(ChatCommands.currentRound.currentLevel.Enemies[i].enemyType.enemyPrefab, new Vector3(float.MinValue, float.MinValue, float.MinValue), Quaternion.identity);
-                                    NutcrackerEnemyAI nutcracomponent = nutcra.GetComponent<NutcrackerEnemyAI>();
-
-                                    ChatCommands.mls.LogInfo("Spawning " + amount + " gun" + (amount > 1 ? "s" : ""));
-
-                                    for (int j = 0; j < amount; j++)
-                                    {
-                                        GameObject gameObject = UnityEngine.Object.Instantiate(nutcracomponent.gunPrefab, position, Quaternion.identity, ChatCommands.currentRound.spawnedScrapContainer);
-                                        GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
-                                        component.startFallingPosition = position;
-                                        component.targetFloorPosition = component.GetItemFloorPosition(position);
-                                        component.SetScrapValue(value); // Set Scrap Value
-                                        component.NetworkObject.Spawn();
-                                    }
-                                    ChatCommands.msgtitle = "Spawned gun";
-                                    ChatCommands.msgbody = "Spawned " + amount + " gun" + (amount > 1 ? "s" : "");
-                                    break;
-
-                                }
-                            }
-                        }
-                        int len = ChatCommands.currentRound.currentLevel.spawnableScrap.Count();
-                        for (int i = 0; i < len; i++)
-                        {
-                            Item scrap = ChatCommands.currentRound.currentLevel.spawnableScrap[i].spawnableItem;
-                            if (scrap.spawnPrefab.name.ToLower() == toSpawn)
-                            {
-                                GameObject objToSpawn = scrap.spawnPrefab;
-                                bool ra = sposition == "random";
-                                RandomScrapSpawn[] source;
-                                List<RandomScrapSpawn> list4 = null;
-                                if (ra)
-                                {
-                                    source = UnityEngine.Object.FindObjectsOfType<RandomScrapSpawn>();
-                                    list4 = ((scrap.spawnPositionTypes != null && scrap.spawnPositionTypes.Count != 0) ? source.Where((RandomScrapSpawn x) => scrap.spawnPositionTypes.Contains(x.spawnableItems) && !x.spawnUsed).ToList() : source.ToList());
-                                }
-
-                                ChatCommands.mls.LogInfo("Spawning " + amount + " " + objToSpawn.name + (amount > 1 ? "s" : ""));
-                                for (int j = 0; j < amount; j++)
-                                {
-                                    if (ra)
-                                    {
-                                        RandomScrapSpawn randomScrapSpawn = list4[ChatCommands.currentRound.AnomalyRandom.Next(0, list4.Count)];
-                                        position = ChatCommands.currentRound.GetRandomNavMeshPositionInRadiusSpherical(randomScrapSpawn.transform.position, randomScrapSpawn.itemSpawnRange, ChatCommands.currentRound.navHit) + Vector3.up * scrap.verticalOffset;
-                                    }
-                                    GameObject gameObject = UnityEngine.Object.Instantiate(objToSpawn, position, Quaternion.identity, ChatCommands.currentRound.spawnedScrapContainer);
-                                    GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
-                                    component.startFallingPosition = position;
-                                    component.targetFloorPosition = component.GetItemFloorPosition(position);
-                                    component.SetScrapValue(value); // Set Scrap Value
-                                    component.NetworkObject.Spawn();
-                                }
-                                break;
-                            }
-                        }
                         break;
+                    default:
+                        break;
+                }
+            }
+            if (toSpawn == "gun")
+            {
+                for (int i = 0; i < ChatCommands.currentRound.currentLevel.Enemies.Count(); i++)
+                {
+                    if (ChatCommands.currentRound.currentLevel.Enemies[i].enemyType.name == "Nutcracker")
+                    {
+                        GameObject nutcra = UnityEngine.Object.Instantiate(ChatCommands.currentRound.currentLevel.Enemies[i].enemyType.enemyPrefab, new Vector3(float.MinValue, float.MinValue, float.MinValue), Quaternion.identity);
+                        NutcrackerEnemyAI nutcracomponent = nutcra.GetComponent<NutcrackerEnemyAI>();
+
+                        ChatCommands.mls.LogInfo("Spawning " + amount + " gun" + (amount > 1 ? "s" : ""));
+
+                        for (int j = 0; j < amount; j++)
+                        {
+                            GameObject gameObject = UnityEngine.Object.Instantiate(nutcracomponent.gunPrefab, position, Quaternion.identity, ChatCommands.currentRound.spawnedScrapContainer);
+                            GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
+                            component.startFallingPosition = position;
+                            component.targetFloorPosition = component.GetItemFloorPosition(position);
+                            component.SetScrapValue(value); // Set Scrap Value
+                            component.NetworkObject.Spawn();
+                        }
+                        ChatCommands.msgtitle = "Spawned gun";
+                        ChatCommands.msgbody = "Spawned " + amount + " " + "gun" + (amount > 1 ? "s" : "") + "with value of:" + value + "\n at position: " + position;
+                        break;
+
+                    }
+                }
+            }
+            int len = ChatCommands.currentRound.currentLevel.spawnableScrap.Count();
+            for (int i = 0; i < len; i++)
+            {
+                Item scrap = ChatCommands.currentRound.currentLevel.spawnableScrap[i].spawnableItem;
+                if (scrap.spawnPrefab.name.ToLower() == toSpawn)
+                {
+                    GameObject objToSpawn = scrap.spawnPrefab;
+                    bool ra = sposition == "random";
+                    RandomScrapSpawn[] source;
+                    List<RandomScrapSpawn> list4 = null;
+                    if (ra)
+                    {
+                        source = UnityEngine.Object.FindObjectsOfType<RandomScrapSpawn>();
+                        list4 = ((scrap.spawnPositionTypes != null && scrap.spawnPositionTypes.Count != 0) ? source.Where((RandomScrapSpawn x) => scrap.spawnPositionTypes.Contains(x.spawnableItems) && !x.spawnUsed).ToList() : source.ToList());
+                    }
+
+                    ChatCommands.mls.LogInfo("Spawning " + amount + " " + objToSpawn.name + (amount > 1 ? "s" : ""));
+                    for (int j = 0; j < amount; j++)
+                    {
+                        if (ra)
+                        {
+                            RandomScrapSpawn randomScrapSpawn = list4[ChatCommands.currentRound.AnomalyRandom.Next(0, list4.Count)];
+                            position = ChatCommands.currentRound.GetRandomNavMeshPositionInRadiusSpherical(randomScrapSpawn.transform.position, randomScrapSpawn.itemSpawnRange, ChatCommands.currentRound.navHit) + Vector3.up * scrap.verticalOffset;
+                        }
+                        GameObject gameObject = UnityEngine.Object.Instantiate(objToSpawn, position, Quaternion.identity, ChatCommands.currentRound.spawnedScrapContainer);
+                        GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
+                        component.startFallingPosition = position;
+                        component.targetFloorPosition = component.GetItemFloorPosition(position);
+                        component.SetScrapValue(value); // Set Scrap Value
+                        component.NetworkObject.Spawn();
+                        ChatCommands.msgtitle = "Spawned " + objToSpawn.name;
+                        ChatCommands.msgbody = "Spawned " + amount + " " + objToSpawn.name + (amount > 1 ? "s" : "") + " with value of:" + value + "\n at position: " + position;
+                    }
+                    break;
                 }
             }
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
