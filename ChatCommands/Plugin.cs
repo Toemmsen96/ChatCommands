@@ -49,6 +49,7 @@ namespace ChatCommands
         internal static string NetCommandPrefix = "<size=0>CCMD";
         internal static string NetHostCommandPrefix = "<size=0>CHCMD";
         internal static string playerwhocalled;
+        internal static List<AllowedHostPlayer> AllowedHostPlayers = new List<AllowedHostPlayer>();
         private void Awake()
         {
             if (instance == null)
@@ -286,14 +287,14 @@ namespace ChatCommands
                 case "terminal":
                     Commands.TerminalFunc();
                     break;
+                case "hostcmd":
+                case "cohost":
+                    string[] playername = text.ToLower().Split(' ');
+                    Commands.SetHostCmds(playername[1]);
+                    break;
 
                 default:
                     break;
-            }
-            if (command.ToLower().Contains("term"))
-            {
-                
-
             }
             HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
         }
@@ -356,5 +357,15 @@ namespace ChatCommands
         }
 
     }
+    internal class AllowedHostPlayer
+    {
+        public string Name { get; set; }
+        public bool AllowHostCMD { get; set; }
 
+        public AllowedHostPlayer(string name, bool isActive)
+        {
+            Name = name;
+            AllowHostCMD = isActive;
+        }
+    }
 }

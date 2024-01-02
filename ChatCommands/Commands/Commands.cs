@@ -681,6 +681,49 @@ namespace ChatCommands
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
 
+        public static string SetHostCmds(string playername)
+        {
+            PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
+            bool found = false;
+            foreach (PlayerControllerB val3 in allPlayerScripts)
+            {
+                if (val3.playerUsername.ToLower().Contains(playername.ToLower()))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                ChatCommands.mls.LogWarning("Player not found");
+                ChatCommands.DisplayChatMessage("Player "+playername+" not found!!!");
+                ChatCommands.msgtitle = "Set Host Command allowance";
+                ChatCommands.msgbody = "Player not found! Check your command";
+                return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
+            }
+            else
+            {
+                bool foundinlist = false;
+                ChatCommands.msgtitle = "Set Host Command allowance";
+                foreach (AllowedHostPlayer player in ChatCommands.AllowedHostPlayers)
+                {
+                    if (player.Name.ToLower().Contains(playername.ToLower()))
+                    {
+                        player.AllowHostCMD = !player.AllowHostCMD;
+                        ChatCommands.msgbody = "Host Commands for " + playername + " set to" + player.AllowHostCMD;
+                        foundinlist = true;
+                        break;
+                    }
+                }
+                if (!foundinlist)
+                {
+                    ChatCommands.AllowedHostPlayers.Add(new AllowedHostPlayer(playername, true));
+                    ChatCommands.msgbody = "Host Commands for " + playername + " set to true";
+                }
+            }
+            return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
+        }
+
         public static string GetHelp()
         {
             ChatCommands.msgtitle = "Available Commands";

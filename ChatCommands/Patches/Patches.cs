@@ -101,7 +101,23 @@ namespace ChatCommands.Patches
             }
             else if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && !ChatCommands.HostSetting.Value)
             {
-                ChatCommands.mls.LogWarning("Host, but not allowing commands");
+                ChatCommands.mls.LogWarning("Host, but not allowing commands, checking player for allowance");
+                foreach (AllowedHostPlayer player in ChatCommands.AllowedHostPlayers)
+                {
+                    if (player.Name.ToLower().Contains(nameOfUserWhoTyped.ToLower()))
+                    {
+                        ChatCommands.mls.LogInfo("Player is allowed to send commands");
+                        string command = chatMessage.Substring((NetCommandPrefix).Length);
+                        if (command.ToLower().Contains("p=@me"))
+                        {
+                            ChatCommands.playerwhocalled = nameOfUserWhoTyped;
+                        }
+                        ChatCommands.mls.LogInfo("Host, trying to handle command: " + command);
+                        ChatCommands.DisplayChatMessage(nameOfUserWhoTyped + " sent command: " + ChatCommands.PrefixSetting.Value + command);
+                        ChatCommands.ProcessCommandInput(ChatCommands.PrefixSetting.Value + command);
+                        return false;
+                    }
+                }
                 ChatCommands.DisplayChatMessage("Host, but not allowing commands");
                 return false;
             }
