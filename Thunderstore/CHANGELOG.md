@@ -1,3 +1,6 @@
+## v1.1.1 Improved Host - NonHost communication
+- also fixed some prefix stuff
+
 ## v1.1.0 Stability and working improvements
 - improved stuff to work better
 
