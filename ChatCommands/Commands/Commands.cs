@@ -610,8 +610,16 @@ namespace ChatCommands
         }
         public static string GetScrap()
         {
+            SelectableLevel newLevel = ChatCommands.currentLevel;
+            if (newLevel == null)
+            {
+                ChatCommands.DisplayChatMessage("<color=#FF0000>ERROR: </color>Level is null.");
+                Debug.LogError("Current Level is null.");
+                return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
+            }
             int len = ChatCommands.currentRound.currentLevel.spawnableScrap.Count();
             string output = ChatCommands.currentRound.currentLevel.spawnableScrap[0].spawnableItem.spawnPrefab.name;
+
             for (int i = 1; i < len; i++)
             {
                 output += ", ";
