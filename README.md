@@ -1,6 +1,9 @@
 # ChatCommands
 This mod adds some chat commands used with a / by default.  
 
+## Disclaimer
+with "/" as the default prefix this mod may be incompatible with other mods that use this prefix like for example the GameMaster mod
+
 ## Install
 To install either use a mod Manager or just drag thr ChatCommands.dll into your BepInEx/plugins folder.  
 
