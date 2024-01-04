@@ -68,3 +68,6 @@ with gun as scrapname you can spawn a shotgun (gun is broken at the moment, plea
 Toemmsen96 - Making most of the mod  
 Chrigi - Spawn Scrap and gun functionality with position parameters and stuff  
 GameMaster Team - some parts of the code that were used as a base  
+## Donate  
+If you want to donate, to support making mods like this one:
+https://ko-fi.com/ctmods
