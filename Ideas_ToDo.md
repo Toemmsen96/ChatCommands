@@ -6,4 +6,6 @@
 
 # ToDo
 - Fix @"me" argument because playerreference sometimes breaks
+- Fix @"playername" for some reason breaking
 - Improve Networking (maybe with something else than Chat Communications)
+- Fix togglelights
