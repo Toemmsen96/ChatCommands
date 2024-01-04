@@ -20,6 +20,7 @@ namespace ChatCommands.Patches
         private static string NetCommandPrefix = ChatCommands.NetCommandPrefix;
         private static string NetHostCommandPrefix = ChatCommands.NetHostCommandPrefix;
         private static float defaultJumpForce;
+        private static string nullChatMessage = "";
 
 
 
@@ -46,7 +47,7 @@ namespace ChatCommands.Patches
             // Log the text to ensure it's not null
             ChatCommands.mls.LogInfo($"Received chat input: {text}");
 
-            // Check if text is not null and starts with "/"
+            // Check if text is not null and starts with the set prefix
             if (!string.IsNullOrEmpty(text) && text.ToLower().StartsWith(ChatCommands.PrefixSetting.Value))
             {
                 if (!ChatCommands.NonHostCommands(text))
@@ -64,13 +65,14 @@ namespace ChatCommands.Patches
                             ChatCommands.playerwhocalled = ChatCommands.playerRef.playerUsername;
                             ChatCommands.mls.LogInfo("Player who called: " + ChatCommands.playerwhocalled);
                         }
-                        ChatCommands.ProcessCommandInput(text);
-                        __instance.chatTextField.text = "";
+                        string command = text.Substring((ChatCommands.PrefixSetting.Value).Length);
+                        ChatCommands.ProcessCommandInput(command);
+                        __instance.chatTextField.text = nullChatMessage;
                     }
                 }
                 else
                 {
-                    __instance.chatTextField.text = "";
+                    __instance.chatTextField.text = nullChatMessage;
                 }
                 
             }
@@ -84,7 +86,7 @@ namespace ChatCommands.Patches
 
         [HarmonyPatch(typeof(HUDManager), "AddChatMessage")]
         [HarmonyPrefix]
-        private static bool ReadChatMessage(HUDManager __instance, ref string chatMessage, ref string nameOfUserWhoTyped)
+        private static void ReadChatMessage(HUDManager __instance, ref string chatMessage, ref string nameOfUserWhoTyped)
         {
 
             ChatCommands.mls.LogInfo("Chat Message: " + chatMessage + " sent by: " + nameOfUserWhoTyped);
@@ -96,8 +98,10 @@ namespace ChatCommands.Patches
                 }
                 ChatCommands.mls.LogInfo("Host, trying to handle command: " + command);
                 ChatCommands.DisplayChatMessage(nameOfUserWhoTyped + " sent command: "+ ChatCommands.PrefixSetting.Value + command);
-                ChatCommands.ProcessCommandInput(ChatCommands.PrefixSetting.Value+command);
-                return false;
+                ChatCommands.ProcessCommandInput(command);
+                chatMessage = nullChatMessage;
+                nameOfUserWhoTyped = nullChatMessage;
+                return;
             }
             else if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && !ChatCommands.HostSetting.Value)
             {
@@ -114,21 +118,23 @@ namespace ChatCommands.Patches
                         }
                         ChatCommands.mls.LogInfo("Host, trying to handle command: " + command);
                         ChatCommands.DisplayChatMessage(nameOfUserWhoTyped + " sent command: " + ChatCommands.PrefixSetting.Value + command);
-                        ChatCommands.ProcessCommandInput(ChatCommands.PrefixSetting.Value + command);
-                        return false;
+                        ChatCommands.ProcessCommandInput(command);
+                        chatMessage = nullChatMessage;
+                        nameOfUserWhoTyped = nullChatMessage;
+                        return;
                     }
                 }
                 ChatCommands.DisplayChatMessage("Host, but not allowing commands");
-                return false;
+                return;
             }
             else if (chatMessage.StartsWith(NetHostCommandPrefix) && !ChatCommands.isHost)
             {
                 string command = chatMessage.Substring((NetHostCommandPrefix).Length);
                 ChatCommands.mls.LogInfo("Recieved command from Host, trying to handle command: " + command);
                 ChatCommands.ProcessNetHostCommand(command);
-                return false;
+                return;
             }
-            return true;
+            return;
         }
 
         [HarmonyPatch(typeof(ShotgunItem), "ItemActivate")]

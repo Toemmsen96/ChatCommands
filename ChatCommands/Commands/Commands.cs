@@ -766,5 +766,20 @@ namespace ChatCommands
             ChatCommands.DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
+
+        public static bool CheckPrefix(string text)
+        {
+            string prefix = "/";
+
+            if (ChatCommands.PrefixSetting.Value != "")
+            {
+                prefix = ChatCommands.PrefixSetting.Value;
+            }
+            if (!text.ToLower().StartsWith(prefix.ToLower()))
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

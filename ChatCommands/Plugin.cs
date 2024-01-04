@@ -46,8 +46,8 @@ namespace ChatCommands
         internal static bool speedHack;
         internal static string msgtitle;
         internal static string msgbody;
-        internal static string NetCommandPrefix = "<size=0>CCMD";
-        internal static string NetHostCommandPrefix = "<size=0>CHCMD";
+        internal static string NetCommandPrefix = "<size=0>CCMD:";
+        internal static string NetHostCommandPrefix = "<size=0>CHCMD:";
         internal static string playerwhocalled;
         internal static List<AllowedHostPlayer> AllowedHostPlayers = new List<AllowedHostPlayer>();
         private void Awake()
@@ -205,24 +205,13 @@ namespace ChatCommands
             return IsNonHostCommand;
         }
 
-        internal static void ProcessCommandInput(string text)
+        internal static void ProcessCommandInput(string command)
         {
-            string prefix = "/";
-
-            if (PrefixSetting.Value != "")
-            {
-                prefix = PrefixSetting.Value;
-            }
-            if (!text.ToLower().StartsWith(prefix.ToLower()))
-            {
-                return;
-            }
             msgtitle = "default";
             msgbody = "<color=#FF0000>ERR</color>: unknown";
-            string command = text.ToLower().Substring(prefix.Length);
-            string[] commandstart = command.Split(' ');
+            string[] commandarguments = command.Split(' ');
 
-            if (NonHostCommands(commandstart[0]))
+            if (NonHostCommands(command))
             {
                 return;
             }
@@ -235,41 +224,41 @@ namespace ChatCommands
                 return;
             }
 
-            switch (commandstart[0])
+            switch (commandarguments[0])
             {
                 case "spawnenemy":
                 case "spweny":
-                    Commands.SpawnEnemyFunc(text);
+                    Commands.SpawnEnemyFunc(command);
                     break;
                 case "spawnscrap":
                 case "spwscr":
-                    Commands.SpawnScrapFunc(text);
+                    Commands.SpawnScrapFunc(command);
                     break;
                 case "weather":
-                    Commands.ChangeWeather(text);
+                    Commands.ChangeWeather(command);
                     break;
                 case "togglelights":
-                    Commands.ToggleLights(text);
+                    Commands.ToggleLights(command);
                     break;
                 case "buy":
-                    Commands.BuyFunc(text);
+                    Commands.BuyFunc(command);
                     break;
                 case "god":
                     msgtitle = "God Mode";
                     msgbody = "God Mode set to: " + ToggleGodMode();
-                    SendHostCommand(text);
+                    SendHostCommand(command);
                     break;
                 case "speed":
                     msgtitle = "Speed hack";
                     msgbody = "Speed hack set to: " + ToggleSpeedHack();
-                    SendHostCommand(text);
+                    SendHostCommand(command);
                     break;
                 case "deadline":
                 case "dl":
-                    Commands.SetCustomDeadline(text);
+                    Commands.SetCustomDeadline(command);
                     break;
                 case "tp":
-                    Commands.Teleport(text);
+                    Commands.Teleport(command);
                     break;
                 case "money":
                     EnableInfiniteCredits = !EnableInfiniteCredits;
@@ -281,7 +270,7 @@ namespace ChatCommands
                     EnableInfiniteAmmo = !EnableInfiniteAmmo;
                     msgtitle = "Infinite Ammo";
                     msgbody = "Infinite Ammo: " + EnableInfiniteAmmo;
-                    SendHostCommand(text);
+                    SendHostCommand(command);
                     break;
                 case "term":
                 case "terminal":
@@ -289,8 +278,7 @@ namespace ChatCommands
                     break;
                 case "hostcmd":
                 case "cohost":
-                    string[] playername = text.ToLower().Split(' ');
-                    Commands.SetHostCmds(playername[1]);
+                    Commands.SetHostCmds(commandarguments[1]);
                     break;
 
                 default:
