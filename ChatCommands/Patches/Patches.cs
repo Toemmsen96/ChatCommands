@@ -19,6 +19,7 @@ namespace ChatCommands.Patches
     {
         private static string NetCommandPrefix = ChatCommands.NetCommandPrefix;
         private static string NetHostCommandPrefix = ChatCommands.NetHostCommandPrefix;
+        private static string NetCommandPostfix = ChatCommands.NetCommandPostfix;
         private static float defaultJumpForce;
         private static string nullChatMessage = "";
 
@@ -55,7 +56,7 @@ namespace ChatCommands.Patches
                     if (!ChatCommands.isHost)
                     {
                         string command = text.Substring((ChatCommands.PrefixSetting.Value).Length);
-                        __instance.chatTextField.text = NetCommandPrefix + text;
+                        __instance.chatTextField.text = NetCommandPrefix + text + NetCommandPostfix;
                         ChatCommands.mls.LogInfo("Not Host, trying to send command:" + command);
                     }
                     else

@@ -1,3 +1,9 @@
+## v1.1.4 Trying to fix some Host - NonHost issues
+- trying to fix some prefix issues
+- trying to fix some communication and chat visibility issues
+- added ability to give host commands to specific users using /hostcmd "playername" or /cohost "playername"
+- added config entry disable sending the commands to clients (for host only)
+
 ## v1.1.3 Fixed needing lowercase for spwscr
 - fixed lowercase issue
 

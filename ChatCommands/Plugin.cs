@@ -24,7 +24,7 @@ namespace ChatCommands
     {
         private const string modGUID = "toemmsen.ChatCommands";
         private const string modName = "ChatCommands";
-        private const string modVersion = "1.1.3";
+        private const string modVersion = "1.1.4";
         private readonly Harmony harmony = new Harmony(modGUID);
         private static ChatCommands instance;
         internal static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
@@ -37,6 +37,7 @@ namespace ChatCommands
         internal static bool EnableInfiniteAmmo = false;
         internal static ConfigEntry<string> PrefixSetting;
         internal static ConfigEntry<bool> HostSetting;
+        internal static ConfigEntry<bool> SendHostCommandsSetting;
         internal static bool enableGod;
         internal static bool EnableInfiniteCredits = false;
         internal static int CustomDeadline = int.MinValue;
@@ -48,6 +49,7 @@ namespace ChatCommands
         internal static string msgbody;
         internal static string NetCommandPrefix = "<size=0>CCMD:";
         internal static string NetHostCommandPrefix = "<size=0>CHCMD:";
+        internal static string NetCommandPostfix = "</size>";
         internal static string playerwhocalled;
         internal static List<AllowedHostPlayer> AllowedHostPlayers = new List<AllowedHostPlayer>();
         private void Awake()
@@ -58,7 +60,8 @@ namespace ChatCommands
             }
 
             PrefixSetting = instance.Config.Bind<string>("Command Settings", "Command Prefix", "/", "An optional prefix for chat commands");
-            HostSetting = instance.Config.Bind<bool>("Command Settings", "Has to be Host", true, "(for server host only): determines if clients can also use some commands");
+            HostSetting = instance.Config.Bind<bool>("Command Settings", "Has to be Host", true, "(for server host only): determines if clients can also use the host commands");
+            SendHostCommandsSetting = instance.Config.Bind<bool>("Command Settings", "Send Host Commands", true, "(for server host only): determines if commands get sent to the clients, so for example god mode is enabled for them too");
 
             mls.LogInfo("ChatCommands loaded");
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
@@ -290,11 +293,11 @@ namespace ChatCommands
 
         internal static void SendHostCommand(string commandInput)
         {
-            if (!isHost)
+            if (!isHost || !SendHostCommandsSetting.Value)
             {
                 return;
             }
-            string commandToClients = ChatCommands.NetHostCommandPrefix + commandInput;
+            string commandToClients = ChatCommands.NetHostCommandPrefix + commandInput + ChatCommands.NetCommandPostfix;
             HUDManager.Instance.AddTextToChatOnServer(commandToClients, -1);
         }
 
