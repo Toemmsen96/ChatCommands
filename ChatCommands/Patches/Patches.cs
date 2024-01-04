@@ -93,7 +93,9 @@ namespace ChatCommands.Patches
             ChatCommands.mls.LogInfo("Chat Message: " + chatMessage + " sent by: " + nameOfUserWhoTyped);
             if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && ChatCommands.HostSetting.Value)
             {
-                string command = chatMessage.Substring((NetCommandPrefix).Length);
+                string commandwithpost = chatMessage.Substring((NetCommandPrefix).Length);
+                string[]temp = commandwithpost.Split('<');
+                string command = temp[0];
                 if (command.ToLower().Contains("p=@me")){
                     ChatCommands.playerwhocalled = nameOfUserWhoTyped;
                 }
@@ -112,7 +114,9 @@ namespace ChatCommands.Patches
                     if (player.Name.ToLower().Contains(nameOfUserWhoTyped.ToLower()))
                     {
                         ChatCommands.mls.LogInfo("Player is allowed to send commands");
-                        string command = chatMessage.Substring((NetCommandPrefix).Length);
+                        string commandwithpost = chatMessage.Substring((NetCommandPrefix).Length);
+                        string[] temp = commandwithpost.Split('<');
+                        string command = temp[0];
                         if (command.ToLower().Contains("p=@me"))
                         {
                             ChatCommands.playerwhocalled = nameOfUserWhoTyped;
@@ -130,7 +134,9 @@ namespace ChatCommands.Patches
             }
             else if (chatMessage.StartsWith(NetHostCommandPrefix) && !ChatCommands.isHost)
             {
-                string command = chatMessage.Substring((NetHostCommandPrefix).Length);
+                string commandwithpost = chatMessage.Substring((NetHostCommandPrefix).Length);
+                string[] temp = commandwithpost.Split('<');
+                string command = temp[0];
                 ChatCommands.mls.LogInfo("Recieved command from Host, trying to handle command: " + command);
                 ChatCommands.ProcessNetHostCommand(command);
                 return;

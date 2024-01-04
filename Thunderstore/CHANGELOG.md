@@ -1,3 +1,6 @@
+## v1.1.5 Hotfix because i broke something in 1.1.4
+- hotfix for nonhost commands
+
 ## v1.1.4 Trying to fix some Host - NonHost issues
 - trying to fix some prefix issues
 - trying to fix some communication and chat visibility issues
