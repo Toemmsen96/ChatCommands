@@ -136,14 +136,14 @@ namespace ChatCommands
                 if (sposition == "@me")
                 {
                     PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                    foreach (PlayerControllerB val3 in allPlayerScripts)
+                    foreach (PlayerControllerB testedPlayer in allPlayerScripts)
                     {
-                        ChatCommands.mls.LogInfo($"Checking Playername {val3.playerUsername}");
-                        if (val3.playerUsername.ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
+                        ChatCommands.mls.LogInfo($"Checking Playername {testedPlayer.playerUsername}");
+                        if (testedPlayer.playerUsername.ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
                         {
-                            ChatCommands.mls.LogInfo($"Found player {val3.playerUsername}");
-                            position = ((Component)val3).transform.position;
-                            ChatCommands.msgbody += "@" + val3.playerUsername;
+                            ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
+                            position = testedPlayer.transform.position;
+                            ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
                             break;
                         }
                     }
@@ -153,13 +153,13 @@ namespace ChatCommands
                     string playername = sposition.Substring(1);
                     PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
                     bool found = false;
-                    foreach (PlayerControllerB val3 in allPlayerScripts)
+                    foreach (PlayerControllerB testedPlayer in allPlayerScripts)
                     {
-                        if (val3.playerUsername.ToLower().Contains(playername))
+                        if (testedPlayer.playerUsername.ToLower().Contains(playername))
                         {
-                            ChatCommands.mls.LogInfo($"Found player {val3.playerUsername}");
-                            position = ((Component)val3).transform.position;
-                            ChatCommands.msgbody += "@" + val3.playerUsername;
+                            ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
+                            position = testedPlayer.transform.position;
+                            ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
                             found = true;
                             break;
                         }
@@ -179,7 +179,7 @@ namespace ChatCommands
             if (array.Length > 1)
             {
                 bool flag = false;
-                string text5 = "";
+                string enemyName = "";
                 foreach (SpawnableEnemyWithRarity enemy in ChatCommands.currentLevel.Enemies)
                 {
                     if (enemy.enemyType.enemyName.ToLower().Contains(array[1].ToLower()))
@@ -187,7 +187,7 @@ namespace ChatCommands
                         try
                         {
                             flag = true;
-                            text5 = enemy.enemyType.enemyName;
+                            enemyName = enemy.enemyType.enemyName;
                             if (sposition == "random")
                             {
                                 ChatCommands.SpawnEnemy(enemy, amount, inside: true, location: new Vector3(0f, 0f, 0f));
@@ -202,7 +202,7 @@ namespace ChatCommands
                         {
                             ChatCommands.mls.LogInfo((object)"Could not spawn enemy");
                         }
-                        ChatCommands.msgbody = "Spawned: " + text5;
+                        ChatCommands.msgbody = "Spawned: " + enemyName;
                         break;
                     }
                 }
@@ -215,9 +215,9 @@ namespace ChatCommands
                             try
                             {
                                 flag = true;
-                                text5 = outsideEnemy.enemyType.enemyName;
-                                ChatCommands.mls.LogInfo((object)outsideEnemy.enemyType.enemyName);
-                                ChatCommands.mls.LogInfo((object)("The index of " + outsideEnemy.enemyType.enemyName + " is " + ChatCommands.currentLevel.OutsideEnemies.IndexOf(outsideEnemy)));
+                                enemyName = outsideEnemy.enemyType.enemyName;
+                                ChatCommands.mls.LogInfo(outsideEnemy.enemyType.enemyName);
+                                ChatCommands.mls.LogInfo(("The index of " + outsideEnemy.enemyType.enemyName + " is " + ChatCommands.currentLevel.OutsideEnemies.IndexOf(outsideEnemy)));
                                 if (sposition == "random")
                                 {
                                     ChatCommands.SpawnEnemy(outsideEnemy, amount, inside: false, location: new Vector3(0f, 0f, 0f));
@@ -226,14 +226,14 @@ namespace ChatCommands
                                 {
                                     ChatCommands.SpawnEnemy(outsideEnemy, amount, inside: false, location: position);
                                 }
-                                ChatCommands.mls.LogInfo((object)("Spawned " + outsideEnemy.enemyType.enemyName));
+                                ChatCommands.mls.LogInfo(("Spawned " + outsideEnemy.enemyType.enemyName));
                             }
                             catch (Exception ex)
                             {
-                                ChatCommands.mls.LogInfo((object)"Could not spawn enemy");
-                                ChatCommands.mls.LogInfo((object)("The game tossed an error: " + ex.Message));
+                                ChatCommands.mls.LogInfo("Could not spawn enemy");
+                                ChatCommands.mls.LogInfo(("The game tossed an error: " + ex.Message));
                             }
-                            ChatCommands.msgbody = "Spawned " + amount + " " + text5 + (amount > 1 ? "s" : "");
+                            ChatCommands.msgbody = "Spawned " + amount + " " + enemyName + (amount > 1 ? "s" : "");
                             break;
                         }
                     }
@@ -241,17 +241,17 @@ namespace ChatCommands
             }
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
-        public static string ToggleLights(string text)
+        public static string ToggleLights()
         {
-            BreakerBox val = UnityEngine.Object.FindObjectOfType<BreakerBox>();
-            if ((UnityEngine.Object)(object)val != (UnityEngine.Object)null)
+            BreakerBox breakerBox = UnityEngine.Object.FindObjectOfType<BreakerBox>();
+            if (breakerBox != null)
             {
                 ChatCommands.msgtitle = "Light Change";
-                if (val.isPowerOn)
+                if (breakerBox.isPowerOn)
                 {
                     ChatCommands.currentRound.TurnBreakerSwitchesOff();
                     ChatCommands.currentRound.TurnOnAllLights(false);
-                    val.isPowerOn = false;
+                    breakerBox.isPowerOn = false;
                     ChatCommands.msgbody = "Turned the lights off";
                 }
                 else
@@ -305,14 +305,14 @@ namespace ChatCommands
                             if (sposition == "@me")
                             {
                                 PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                                foreach (PlayerControllerB val3 in allPlayerScripts)
+                                foreach (PlayerControllerB testedPlayer in allPlayerScripts)
                                 {
-                                    ChatCommands.mls.LogInfo($"Checking Playername {val3.playerUsername}");
-                                    if (val3.playerUsername.ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
+                                    ChatCommands.mls.LogInfo($"Checking Playername {testedPlayer.playerUsername}");
+                                    if (testedPlayer.playerUsername.ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
                                     {
-                                        ChatCommands.mls.LogInfo($"Found player {val3.playerUsername}");
-                                        position = ((Component)val3).transform.position;
-                                        ChatCommands.msgbody += "@" + val3.playerUsername;
+                                        ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
+                                        position = testedPlayer.transform.position;
+                                        ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
                                         break;
                                     }
                                 }
@@ -322,12 +322,12 @@ namespace ChatCommands
                                 string playername = sposition.Substring(1);
                                 PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
                                 bool found = false;
-                                foreach (PlayerControllerB val3 in allPlayerScripts)
+                                foreach (PlayerControllerB testedPlayer in allPlayerScripts)
                                 {
-                                    if (val3.playerUsername.ToLower().Contains(playername))
+                                    if (testedPlayer.playerUsername.ToLower().Contains(playername))
                                     {
-                                        position = ((Component)val3).transform.position;
-                                        ChatCommands.msgbody += "@" + val3.playerUsername;
+                                        position = testedPlayer.transform.position;
+                                        ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
                                         found = true;
                                         break;
                                     }
@@ -435,32 +435,33 @@ namespace ChatCommands
                 {
                     case "rain":
                         ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)1;
-                        ChatCommands.mls.LogInfo((object)("tried to change the weather to " + array2[1]));
+                        ChatCommands.mls.LogInfo(("tried to change the weather to " + array2[1]));
                         break;
                     case "eclipse":
                         ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)5;
-                        ChatCommands.mls.LogInfo((object)("tried to change the weather to " + array2[1]));
+                        ChatCommands.mls.LogInfo(("tried to change the weather to " + array2[1]));
                         break;
                     case "flood":
                         ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)4;
-                        ChatCommands.mls.LogInfo((object)("tried to change the weather to " + array2[1]));
+                        ChatCommands.mls.LogInfo(("tried to change the weather to " + array2[1]));
                         break;
                     case "dust":
                     case "fog":
                     case "mist":
                         ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)0;
-                        ChatCommands.mls.LogInfo((object)("tried to change the weather to " + array2[1]));
+                        ChatCommands.mls.LogInfo(("tried to change the weather to " + array2[1]));
                         break;
                     case "storm":
                         ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)2;
-                        ChatCommands.mls.LogInfo((object)("tried to change the weather to " + array2[1]));
+                        ChatCommands.mls.LogInfo(("tried to change the weather to " + array2[1]));
                         break;
                     case "none":
                         ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)(-1);
-                        ChatCommands.mls.LogInfo((object)("tried to change the weather to " + array2[1]));
+                        ChatCommands.mls.LogInfo(("tried to change the weather to " + array2[1]));
                         break;
                     default:
-                        ChatCommands.mls.LogInfo((object)("Couldn't figure out what [ " + array2[1] + " ] was."));
+                        ChatCommands.mls.LogInfo(("Couldn't figure out what [ " + array2[1] + " ] was."));
+                        ChatCommands.msgbody = "Couldn't figure out what [ " + array2[1] + " ] was.";
                         break;
                 }
                 ChatCommands.msgbody = "tried to change the weather to " + array2[1];
@@ -507,8 +508,8 @@ namespace ChatCommands
         public static string BuyFunc(string text)
         {
             ChatCommands.msgtitle = "Item Buying";
-            Terminal val2 = UnityEngine.Object.FindObjectOfType<Terminal>();
-            if ((UnityEngine.Object)(object)val2 != (UnityEngine.Object)null)
+            Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+            if (terminal != null)
             {
                 List<string> list = new List<string>
                     {
@@ -538,7 +539,8 @@ namespace ChatCommands
                     {
                         if (!int.TryParse(array3[2], out var result2))
                         {
-                            ChatCommands.mls.LogInfo((object)("Couldn't parse command [ " + array3[2] + " ]"));
+                            ChatCommands.mls.LogInfo(("Couldn't parse command [ " + array3[2] + " ]"));
+                            ChatCommands.DisplayChatError("Couldn't parse command [ " + array3[2] + " ]");
                             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
                         }
                         foreach (string item in list)
@@ -551,14 +553,15 @@ namespace ChatCommands
                                 {
                                     list2.Add(dictionary[item]);
                                 }
-                                val2.BuyItemsServerRpc(list2.ToArray(), val2.groupCredits, 0);
+                                terminal.BuyItemsServerRpc(list2.ToArray(), terminal.groupCredits, 0);
                                 ChatCommands.msgbody = "Bought " + result2 + " " + item + "s";
                                 break;
                             }
                         }
                         if (!flag3)
                         {
-                            ChatCommands.mls.LogInfo((object)("Couldn't figure out what [ " + array3[1] + " ] was."));
+                            ChatCommands.mls.LogInfo(("Couldn't figure out what [ " + array3[1] + " ] was."));
+                            ChatCommands.DisplayChatError("Couldn't figure out what [ " + array3[1] + " ] was.");
                             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
                         }
                     }
@@ -571,21 +574,22 @@ namespace ChatCommands
                             {
                                 flag4 = true;
                                 int[] array4 = new int[1] { dictionary[item2] };
-                                val2.BuyItemsServerRpc(array4, val2.groupCredits, 0);
+                                terminal.BuyItemsServerRpc(array4, terminal.groupCredits, 0);
                                 ChatCommands.msgbody = "Bought " + 1 + " " + item2;
                             }
                         }
                         if (!flag4)
                         {
-                            ChatCommands.mls.LogInfo((object)("Couldn't figure out what [ " + array3[1] + " ] was. Trying via int parser."));
+                            ChatCommands.mls.LogInfo(("Couldn't figure out what [ " + array3[1] + " ] was. Trying via int parser."));
                         }
                         if (!int.TryParse(array3[1], out var result3))
                         {
-                            ChatCommands.mls.LogInfo((object)("Couldn't figure out what [ " + array3[1] + " ] was. Int parser failed, please try again."));
+                            ChatCommands.mls.LogInfo(("Couldn't figure out what [ " + array3[1] + " ] was. Int parser failed, please try again."));
+                            ChatCommands.DisplayChatError("Couldn't figure out what [ " + array3[1] + " ] was. Int parser failed, please try again.");
                             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
                         }
                         int[] array5 = new int[1] { result3 };
-                        val2.BuyItemsServerRpc(array5, val2.groupCredits, 0);
+                        terminal.BuyItemsServerRpc(array5, terminal.groupCredits, 0);
                         ChatCommands.msgbody = "Bought item with ID [" + result3 + "]";
                     }
                 }
@@ -600,7 +604,7 @@ namespace ChatCommands
             ChatCommands.msgtitle = "Enemies:";
             if (newLevel == null)
             {
-                ChatCommands.DisplayChatMessage("<color=#FF0000>ERROR: </color>Level is null.");
+                ChatCommands.DisplayChatError("Level is null.");
                 Debug.LogError("newLevel is null.");
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
@@ -608,7 +612,7 @@ namespace ChatCommands
             // Check if levelEnemySpawns is null
             if (ChatCommands.levelEnemySpawns == null)
             {
-                ChatCommands.DisplayChatMessage("<color=#FF0000>ERROR: </color>levelEnemySpawns is null.");
+                ChatCommands.DisplayChatError("levelEnemySpawns is null.");
                 Debug.LogError("levelEnemySpawns is null.");
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
@@ -662,7 +666,7 @@ namespace ChatCommands
             SelectableLevel newLevel = ChatCommands.currentLevel;
             if (newLevel == null)
             {
-                ChatCommands.DisplayChatMessage("<color=#FF0000>ERROR: </color>Level is null.");
+                ChatCommands.DisplayChatError("Level is null.");
                 Debug.LogError("Current Level is null.");
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
@@ -696,7 +700,7 @@ namespace ChatCommands
             if (!found)
             {
                 ChatCommands.mls.LogWarning("Player not found");
-                ChatCommands.DisplayChatMessage("Player "+playername+" not found!!!");
+                ChatCommands.DisplayChatError("Player "+playername+" not found!!!");
                 ChatCommands.msgtitle = "Set Host Command allowance";
                 ChatCommands.msgbody = "Player not found! Check your command";
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;

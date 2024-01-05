@@ -122,7 +122,7 @@ namespace ChatCommands
                 }
                 catch
                 {
-                    mls.LogInfo((object)"Failed to spawn enemies, check your command.");
+                    mls.LogInfo("Failed to spawn enemies, check your command.");
                     return;
                 }
             }
@@ -135,13 +135,13 @@ namespace ChatCommands
                     {
                         UnityEngine.Object.Instantiate<GameObject>(currentLevel.OutsideEnemies[currentLevel.OutsideEnemies.IndexOf(enemy)].enemyType.enemyPrefab, location, Quaternion.Euler(Vector3.zero)).gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
                     }
-                    mls.LogInfo((object)$"You wanted to spawn: {amount} enemies");
-                    mls.LogInfo((object)("Spawned an enemy. Total Spawned: " + i + "at position:" + location));
+                    mls.LogInfo($"You wanted to spawn: {amount} enemies");
+                    mls.LogInfo("Spawned an enemy. Total Spawned: " + i + "at position:" + location);
                     return;
                 }
                 catch
                 {
-                    mls.LogInfo((object)"Failed to spawn enemies, check your command.");
+                    mls.LogInfo("Failed to spawn enemies, check your command.");
                     return;
                 }
             }
@@ -155,13 +155,13 @@ namespace ChatCommands
                         currentRound.SpawnEnemyOnServer(currentRound.allEnemyVents[UnityEngine.Random.Range(0, currentRound.allEnemyVents.Length)].floorNode.position, currentRound.allEnemyVents[i].floorNode.eulerAngles.y, currentLevel.Enemies.IndexOf(enemy));
                         
                     }
-                    mls.LogInfo((object)$"You wanted to spawn: {amount} enemies");
-                    mls.LogInfo((object)("Total Spawned: " + i));
+                    mls.LogInfo($"You wanted to spawn: {amount} enemies");
+                    mls.LogInfo(("Total Spawned: " + i));
                     return;
                 }
                 catch
                 {
-                    mls.LogInfo((object)"Failed to spawn enemies, check your command.");
+                    mls.LogInfo("Failed to spawn enemies, check your command.");
                     return;
                 }
             }
@@ -171,8 +171,8 @@ namespace ChatCommands
                 
                 UnityEngine.Object.Instantiate<GameObject>(currentLevel.OutsideEnemies[currentLevel.OutsideEnemies.IndexOf(enemy)].enemyType.enemyPrefab, GameObject.FindGameObjectsWithTag("OutsideAINode")[UnityEngine.Random.Range(0, GameObject.FindGameObjectsWithTag("OutsideAINode").Length - 1)].transform.position, Quaternion.Euler(Vector3.zero)).gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
             }
-            mls.LogInfo((object)$"You wanted to spawn: {amount} enemies");
-            mls.LogInfo((object)("Total Spawned: " + j));
+            mls.LogInfo($"You wanted to spawn: {amount} enemies");
+            mls.LogInfo(("Total Spawned: " + j));
         }
 
         internal static bool NonHostCommands(string command)
@@ -241,7 +241,7 @@ namespace ChatCommands
                     Commands.ChangeWeather(command);
                     break;
                 case "togglelights":
-                    Commands.ToggleLights(command);
+                    Commands.ToggleLights();
                     break;
                 case "buy":
                     Commands.BuyFunc(command);
@@ -285,6 +285,9 @@ namespace ChatCommands
                     break;
 
                 default:
+                    msgtitle = "Command";
+                    msgbody = "Unknown command: " + commandarguments[0];
+                    ChatCommands.DisplayChatError(msgbody);
                     break;
             }
             HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
@@ -336,6 +339,15 @@ namespace ChatCommands
         {
             string formattedMessage =
                 $"<color=#FF00FF>ChatCommands</color>: <color=#FFFF00>{chatMessage}</color>";
+
+            HUDManager.Instance.ChatMessageHistory.Add(formattedMessage);
+
+            UpdateChatText();
+        }
+        public static void DisplayChatError(string errorMessage)
+        {
+            string formattedMessage =
+                $"<color=#FF0000>CCMD: ERROR</color>: <color=#FF0000>{errorMessage}</color>";
 
             HUDManager.Instance.ChatMessageHistory.Add(formattedMessage);
 

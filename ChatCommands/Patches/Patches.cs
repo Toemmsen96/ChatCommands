@@ -44,6 +44,8 @@ namespace ChatCommands.Patches
         private static void ChatCommandsSubmitted(HUDManager __instance)
         {
             string text = __instance.chatTextField.text;
+            string localPlayer = GameNetworkManager.Instance.username;
+            
 
             // Log the text to ensure it's not null
             ChatCommands.mls.LogInfo($"Received chat input: {text}");
@@ -63,7 +65,7 @@ namespace ChatCommands.Patches
                     {
                         if(text.ToLower().Contains("p=@me"))
                         {
-                            ChatCommands.playerwhocalled = ChatCommands.playerRef.playerUsername;
+                            ChatCommands.playerwhocalled = localPlayer;
                             ChatCommands.mls.LogInfo("Player who called: " + ChatCommands.playerwhocalled);
                         }
                         string command = text.Substring((ChatCommands.PrefixSetting.Value).Length);
@@ -80,7 +82,7 @@ namespace ChatCommands.Patches
             else
             {
                 // Log an error or handle the case where the text is not valid for commands
-                ChatCommands.mls.LogWarning("Invalid or null chat input.");
+                ChatCommands.mls.LogWarning("Invalid input for a command or null chat.");
             }
         }
 
@@ -192,7 +194,7 @@ namespace ChatCommands.Patches
             newLevel.Enemies = value;
             foreach (SpawnableEnemyWithRarity enemy2 in newLevel.Enemies)
             {
-                ChatCommands.mls.LogInfo((object)("Inside: " + enemy2.enemyType.enemyName));
+                ChatCommands.mls.LogInfo("Inside: " + enemy2.enemyType.enemyName);
                 if (!ChatCommands.enemyRaritys.ContainsKey(enemy2))
                 {
                     ChatCommands.enemyRaritys.Add(enemy2, enemy2.rarity);
@@ -202,7 +204,7 @@ namespace ChatCommands.Patches
             }
             foreach (SpawnableEnemyWithRarity outsideEnemy in newLevel.OutsideEnemies)
             {
-                ChatCommands.mls.LogInfo((object)("Outside: " + outsideEnemy.enemyType.enemyName));
+                ChatCommands.mls.LogInfo("Outside: " + outsideEnemy.enemyType.enemyName);
                 if (!ChatCommands.enemyRaritys.ContainsKey(outsideEnemy))
                 {
                     ChatCommands.enemyRaritys.Add(outsideEnemy, outsideEnemy.rarity);
@@ -235,7 +237,7 @@ namespace ChatCommands.Patches
 
                 TimeOfDay.Instance.timeUntilDeadline = (int)(TimeOfDay.Instance.totalTime * (float)TimeOfDay.Instance.quotaVariables.deadlineDaysAmount);
                 TimeOfDay.Instance.SyncTimeClientRpc(__instance.globalTime, (int)__instance.timeUntilDeadline);
-                ((TMP_Text)StartOfRound.Instance.deadlineMonitorText).text = "DEADLINE:\n " + TimeOfDay.Instance.daysUntilDeadline;
+                StartOfRound.Instance.deadlineMonitorText.text = "DEADLINE:\n " + TimeOfDay.Instance.daysUntilDeadline;
             }
         }
 
@@ -244,8 +246,8 @@ namespace ChatCommands.Patches
         [HarmonyPrefix]
         private static void SetIsHost()
         {
-            ChatCommands.mls.LogInfo((object)("Host Status: " + ((NetworkBehaviour)RoundManager.Instance).NetworkManager.IsHost));
-            ChatCommands.isHost = ((NetworkBehaviour)RoundManager.Instance).NetworkManager.IsHost;
+            ChatCommands.mls.LogInfo("Host Status: " + RoundManager.Instance.NetworkManager.IsHost);
+            ChatCommands.isHost = RoundManager.Instance.NetworkManager.IsHost;
            
         }
 
@@ -253,11 +255,7 @@ namespace ChatCommands.Patches
         [HarmonyPrefix]
         private static bool OverrideDeath()
         {
-            if (ChatCommands.isHost)
-            {
-                return !ChatCommands.enableGod;
-            }
-            return true;
+            return !ChatCommands.enableGod;
         }
 
         [HarmonyPatch(typeof(Terminal), "RunTerminalEvents")]
@@ -293,7 +291,7 @@ namespace ChatCommands.Patches
         {
             ChatCommands.playerRef = __instance;
             defaultJumpForce = __instance.jumpForce;
-            ChatCommands.mls.LogInfo((object)("Default Jump Force: " + defaultJumpForce));
+            ChatCommands.mls.LogInfo("Default Jump Force: " + defaultJumpForce);
         }
     }
 }
