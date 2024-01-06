@@ -353,7 +353,7 @@ namespace ChatCommands
                 {
                     ChatCommands.mls.LogWarning("Mine not found");
                     ChatCommands.msgtitle = "Command Error";
-                    ChatCommands.msgbody = "Mine not found";
+                    ChatCommands.msgbody = "Mine not spawnable on map";
                     return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
                 }
                 for (int i = 0; i < amount; i++)
@@ -376,7 +376,7 @@ namespace ChatCommands
                 {
                     ChatCommands.mls.LogWarning("Turret not found");
                     ChatCommands.msgtitle = "Command Error";
-                    ChatCommands.msgbody = "Turret not found";
+                    ChatCommands.msgbody = "Turret not spawnable on map";
                     return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
                 }
                 for (int i = 0; i < amount; i++)
