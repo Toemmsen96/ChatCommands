@@ -1,7 +1,7 @@
 # Ideas
 - Spawnable apparatus
 - Spawnable Beehive
-- Spawnable Mines and Turrets
+- ~~Spawnable Mines and Turrets~~ Implemented in 1.1.6
 - Youtube Boombox (maybe as a different mod, because the YT Boombox mod on Thunderstore doesnt always work)
 
 # ToDo
