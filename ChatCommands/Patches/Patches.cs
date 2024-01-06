@@ -22,6 +22,7 @@ namespace ChatCommands.Patches
         private static string NetCommandPostfix = ChatCommands.NetCommandPostfix;
         private static float defaultJumpForce;
         private static string nullChatMessage = "";
+        
 
 
 
@@ -292,6 +293,28 @@ namespace ChatCommands.Patches
             ChatCommands.playerRef = __instance;
             defaultJumpForce = __instance.jumpForce;
             ChatCommands.mls.LogInfo("Default Jump Force: " + defaultJumpForce);
+        }
+
+        [HarmonyPatch(typeof(RoundManager), "FinishGeneratingNewLevelClientRpc")]
+        [HarmonyPrefix]
+        private static void GetRoundManagerRef(ref RoundManager __instance)
+        {
+            int len = ChatCommands.currentRound.currentLevel.spawnableMapObjects.Count();
+            for (int i = 0; i < len; i++)
+            {
+                if (ChatCommands.currentRound.currentLevel.spawnableMapObjects[i].prefabToSpawn.name == "Landmine")
+                {
+                    ChatCommands.mls.LogInfo("Found Mine Index: " + i);
+                    ChatCommands.mine = i;
+                    break;
+                }
+                if (ChatCommands.currentRound.currentLevel.spawnableMapObjects[i].prefabToSpawn.name == "Turret")
+                {
+                    ChatCommands.mls.LogInfo("Found Turret Index: " + i);
+                    ChatCommands.turret = i;
+                    break;
+                }
+            }
         }
     }
 }

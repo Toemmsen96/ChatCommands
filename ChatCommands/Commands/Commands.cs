@@ -16,6 +16,7 @@ using System.Security;
 using System.Net;
 using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Linq;
+using System.Collections;
 
 namespace ChatCommands
 {
@@ -261,6 +262,139 @@ namespace ChatCommands
                 }
             }
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
+        }
+
+        public static string SpawnMapObj(string text)
+        {
+            string[] segments = (text.Substring(1)).Split(' ');
+            if (segments.Length < 2)
+            {
+                ChatCommands.mls.LogWarning("Missing Arguments For Spawn\n'/spawnmapobj <name> (amount=<amount>) (position={random, @me, @<playername>})");
+                ChatCommands.msgtitle = "Command Error";
+                ChatCommands.msgbody = "Missing Arguments For Spawn\n'/spawnmapobj <name> (amount=<amount>) (position={random, @me, @<playername>})";
+                HUDManager.Instance.DisplayTip(ChatCommands.msgtitle, ChatCommands.msgbody, true, false, "LC_Tip1");
+                return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
+            }
+            string toSpawn = segments[1].ToLower();
+            int amount = 1;
+            Vector3 position = Vector3.zero;
+            string sposition = "random";
+            var args = segments.Skip(2);
+
+            foreach (string arg in args)
+            {
+                string[] darg = arg.Split('=');
+                switch (darg[0])
+                {
+                    case "a":
+                    case "amount":
+                        amount = int.Parse(darg[1]);
+                        ChatCommands.mls.LogInfo($"Amount {amount}");
+                        break;
+                    case "p":
+                    case "position":
+                        sposition = darg[1];
+                        ChatCommands.mls.LogInfo(sposition);
+                        if (sposition.StartsWith("@"))
+                        {
+                            if (sposition == "@me")
+                            {
+                                PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
+                                foreach (PlayerControllerB testedPlayer in allPlayerScripts)
+                                {
+                                    ChatCommands.mls.LogInfo($"Checking Playername {testedPlayer.playerUsername}");
+                                    if (testedPlayer.playerUsername.ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
+                                    {
+                                        ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
+                                        position = testedPlayer.transform.position;
+                                        ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                string playername = sposition.Substring(1);
+                                PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
+                                bool found = false;
+                                foreach (PlayerControllerB testedPlayer in allPlayerScripts)
+                                {
+                                    if (testedPlayer.playerUsername.ToLower().Contains(playername))
+                                    {
+                                        position = testedPlayer.transform.position;
+                                        ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (!found)
+                                {
+                                    ChatCommands.mls.LogWarning("Player not found");
+                                    ChatCommands.DisplayChatMessage("Player not found, spawning in random position");
+                                }
+
+                            }
+
+                        }
+                        else if (sposition != "random")
+                        {
+                            ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
+                            sposition = "random";
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (toSpawn == "mine")
+            {
+                if (ChatCommands.mine == -1)
+                {
+                    ChatCommands.mls.LogWarning("Mine not found");
+                    ChatCommands.msgtitle = "Command Error";
+                    ChatCommands.msgbody = "Mine not found";
+                    return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
+                }
+                for (int i = 0; i < amount; i++)
+                {
+                    if (sposition == "random")
+                    {
+                        //need to implement
+                        // position = 
+                    }
+                    ChatCommands.mls.LogInfo("Spawning mine at position:" + position);
+                    GameObject gameObject = UnityEngine.Object.Instantiate(ChatCommands.currentRound.currentLevel.spawnableMapObjects[ChatCommands.mine].prefabToSpawn, position, Quaternion.identity, ChatCommands.currentRound.mapPropsContainer.transform);
+                    gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
+                    ChatCommands.msgtitle = "Spawned mine";
+                    ChatCommands.msgbody = "Spawned mine at position:" + position;
+                } 
+            }
+            else if (toSpawn == "turret")
+            {
+                if (ChatCommands.turret == -1)
+                {
+                    ChatCommands.mls.LogWarning("Turret not found");
+                    ChatCommands.msgtitle = "Command Error";
+                    ChatCommands.msgbody = "Turret not found";
+                    return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
+                }
+                for (int i = 0; i < amount; i++)
+                {
+                    if (sposition == "random")
+                    {
+                        //need to implement
+                        // position = 
+                    }
+                    ChatCommands.mls.LogInfo("Spawning turret at position:" + position);
+                    GameObject gameObject = UnityEngine.Object.Instantiate(ChatCommands.currentRound.currentLevel.spawnableMapObjects[ChatCommands.turret].prefabToSpawn, position, Quaternion.identity, ChatCommands.currentRound.mapPropsContainer.transform);
+                    gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
+                    ChatCommands.msgtitle = "Spawned turret";
+                    ChatCommands.msgbody = "Spawned turret at position:" + position;
+                }
+                    
+            }
+            return ChatCommands.msgtitle + "/" + ChatCommands.msgbody;
         }
 
         public static string SpawnScrapFunc(string text)

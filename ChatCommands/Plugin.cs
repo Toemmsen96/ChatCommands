@@ -24,7 +24,7 @@ namespace ChatCommands
     {
         private const string modGUID = "toemmsen.ChatCommands";
         private const string modName = "ChatCommands";
-        private const string modVersion = "1.1.4";
+        private const string modVersion = "1.1.6";
         private readonly Harmony harmony = new Harmony(modGUID);
         private static ChatCommands instance;
         internal static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
@@ -52,6 +52,8 @@ namespace ChatCommands
         internal static string NetCommandPostfix = "</size>";
         internal static string playerwhocalled;
         internal static List<AllowedHostPlayer> AllowedHostPlayers = new List<AllowedHostPlayer>();
+        internal static int mine = -1;
+        internal static int turret = -1;
         private void Awake()
         {
             if (instance == null)
@@ -282,6 +284,10 @@ namespace ChatCommands
                 case "hostcmd":
                 case "cohost":
                     Commands.SetHostCmds(commandarguments[1]);
+                    break;
+                case "spawnmapobj":
+                case "spwmapobj":
+                    Commands.SpawnMapObj(command);
                     break;
 
                 default:
