@@ -1,3 +1,6 @@
+## v1.1.6 Fix @me argument for p=@me
+- remember using p=@me and not just @me for position
+
 ## v1.1.5 Hotfix because i broke something in 1.1.4
 - hotfix for nonhost commands
 
