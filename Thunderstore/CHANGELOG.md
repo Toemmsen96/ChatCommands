@@ -1,3 +1,6 @@
+## v1.1.7 Fix NonHost not loading
+- fixed Hostcheck when loading level
+
 ## v1.1.6 Fix @me argument for p=@me
 - remember using p=@me and not just @me for position
 

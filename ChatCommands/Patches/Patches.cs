@@ -299,22 +299,27 @@ namespace ChatCommands.Patches
         [HarmonyPrefix]
         private static void GetRoundManagerRef(ref RoundManager __instance)
         {
-            int len = ChatCommands.currentRound.currentLevel.spawnableMapObjects.Count();
-            for (int i = 0; i < len; i++)
+            if (ChatCommands.isHost)
             {
-                if (ChatCommands.currentRound.currentLevel.spawnableMapObjects[i].prefabToSpawn.name == "Landmine")
+                ChatCommands.mls.LogInfo("Host, getting mine ref...");
+                int len = ChatCommands.currentRound.currentLevel.spawnableMapObjects.Count();
+                for (int i = 0; i < len; i++)
                 {
-                    ChatCommands.mls.LogInfo("Found Mine Index: " + i);
-                    ChatCommands.mine = i;
-                    break;
-                }
-                if (ChatCommands.currentRound.currentLevel.spawnableMapObjects[i].prefabToSpawn.name == "Turret")
-                {
-                    ChatCommands.mls.LogInfo("Found Turret Index: " + i);
-                    ChatCommands.turret = i;
-                    break;
+                    if (ChatCommands.currentRound.currentLevel.spawnableMapObjects[i].prefabToSpawn.name == "Landmine")
+                    {
+                        ChatCommands.mls.LogInfo("Found Mine Index: " + i);
+                        ChatCommands.mine = i;
+                        break;
+                    }
+                    if (ChatCommands.currentRound.currentLevel.spawnableMapObjects[i].prefabToSpawn.name == "Turret")
+                    {
+                        ChatCommands.mls.LogInfo("Found Turret Index: " + i);
+                        ChatCommands.turret = i;
+                        break;
+                    }
                 }
             }
+            
         }
     }
 }
