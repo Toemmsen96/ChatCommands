@@ -7,7 +7,7 @@
 
 # ToDo
 - ~~Fix @"me" argument because playerreference sometimes breaks~~ Should be fixed in 1.1.6
-- Fix @"playername" for some reason breaking
+- ~~Fix @"playername" for some reason breaking~~ Should be fixed in 1.1.8
 - Improve Networking (maybe with something else than Chat Communications)
 - Fix togglelights
 - Fix weather

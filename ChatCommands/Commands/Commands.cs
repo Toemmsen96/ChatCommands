@@ -54,28 +54,29 @@ namespace ChatCommands
             string[] array6 = text.Split(new char[1] { ' ' });
             if (array6.Length > 1)
             {
-                string value = array6[1].ToLower();
+                string tpname = array6[1].ToLower();
+                tpname = ChatCommands.ConvertPlayername(tpname);
                 PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                foreach (PlayerControllerB val3 in allPlayerScripts)
+                foreach (PlayerControllerB testedplayer in allPlayerScripts)
                 {
-                    if (val3.playerUsername.ToLower().Contains(value))
+                    if (testedplayer.playerUsername.ToLower().Contains(tpname))
                     {
                         GameNetworkManager.Instance.localPlayerController.beamUpParticle.Play();
                         GameNetworkManager.Instance.localPlayerController.beamOutBuildupParticle.Play();
-                        GameNetworkManager.Instance.localPlayerController.TeleportPlayer(((Component)val3).transform.position, false, 0f, false, true);
+                        GameNetworkManager.Instance.localPlayerController.TeleportPlayer(testedplayer.transform.position, false, 0f, false, true);
                         ChatCommands.msgtitle = "Teleported";
-                        ChatCommands.msgbody = "Teleported to Player:" + val3.playerUsername;
+                        ChatCommands.msgbody = "Teleported to Player:" + testedplayer.playerUsername;
                     }
                 }
             }
             else
             {
-                Terminal val4 = ChatCommands.FindObjectOfType<Terminal>();
-                if (val4 != null)
+                Terminal term = UnityEngine.Object.FindObjectOfType<Terminal>();
+                if (term != null)
                 {
                     GameNetworkManager.Instance.localPlayerController.beamUpParticle.Play();
                     GameNetworkManager.Instance.localPlayerController.beamOutBuildupParticle.Play();
-                    GameNetworkManager.Instance.localPlayerController.TeleportPlayer(((Component)val4).transform.position, false, 0f, false, true);
+                    GameNetworkManager.Instance.localPlayerController.TeleportPlayer(term.transform.position, false, 0f, false, true);
                     ChatCommands.msgtitle = "Teleported";
                     ChatCommands.msgbody = "Teleported to Terminal";
                 }
@@ -84,20 +85,21 @@ namespace ChatCommands
         }
         public static string SpawnEnemyFunc(string text)
         {
+
             ChatCommands.msgtitle = "Spawned Enemies";
             string[] array = text.Split(' ');
             if (ChatCommands.currentLevel == null || ChatCommands.levelEnemySpawns == null || ChatCommands.currentLevel.Enemies == null)
             {
                 ChatCommands.msgtitle = "Command";
                 ChatCommands.msgbody = (ChatCommands.currentLevel == null ? "Unable to send command since currentLevel is null." : "Unable to send command since levelEnemySpawns is null.");
-                HUDManager.Instance.DisplayTip(ChatCommands.msgtitle, ChatCommands.msgbody, true, false, "LC_Tip1");
+                ChatCommands.DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
             if (array.Length < 2)
             {
                 ChatCommands.msgtitle = "Command Error";
                 ChatCommands.msgbody = "Missing Arguments For Spawn\n'/spawnenemy <name> (amount=<amount>) (state=<state>) (position={random, @me, @<playername>})";
-                HUDManager.Instance.DisplayTip(ChatCommands.msgtitle, ChatCommands.msgbody, true, false, "LC_Tip1");
+                ChatCommands.DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
                 ChatCommands.mls.LogWarning("Missing Arguments For Spawn\n'/spawnenemy <name> (amount=<amount>) (state=<state>) (position={random, @me, @<playername>})");
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
@@ -132,51 +134,16 @@ namespace ChatCommands
                 }
             }
 
-            if (sposition.StartsWith("@"))
+            if (sposition != "random")
             {
-                if (sposition == "@me")
+                position = CalculateSpawnPosition(sposition);
+                if (position == Vector3.zero && sposition != "random")
                 {
-                    PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                    foreach (PlayerControllerB testedPlayer in allPlayerScripts)
-                    {
-                        ChatCommands.mls.LogInfo($"Checking Playername {testedPlayer.playerUsername}");
-                        if (testedPlayer.playerUsername.ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
-                        {
-                            ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
-                            position = testedPlayer.transform.position;
-                            ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    string playername = sposition.Substring(1);
-                    PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                    bool found = false;
-                    foreach (PlayerControllerB testedPlayer in allPlayerScripts)
-                    {
-                        if (testedPlayer.playerUsername.ToLower().Contains(playername))
-                        {
-                            ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
-                            position = testedPlayer.transform.position;
-                            ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)
-                    {
-                        ChatCommands.mls.LogWarning("Player not found");
-                        ChatCommands.DisplayChatMessage("Player not found, spawning in random position");
-                    }
+                    ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
+                    sposition = "random";
                 }
             }
-            else if (sposition != "random")
-            {
-                ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
-                sposition = "random";
-            }
+
             if (array.Length > 1)
             {
                 bool flag = false;
@@ -266,13 +233,22 @@ namespace ChatCommands
 
         public static string SpawnMapObj(string text)
         {
+            if (ChatCommands.currentLevel == null|| ChatCommands.currentRound.currentLevel.spawnableMapObjects == null)
+            {
+                ChatCommands.mls.LogWarning("Unable to send command since currentLevel or spawnableMapObjects is null.");
+                ChatCommands.msgtitle = "Command Error";
+                ChatCommands.msgbody = "Unable to send command since currentLevel or spawnableMapObjects is null.";
+                ChatCommands.DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
+                return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
+            }
+
             string[] segments = (text.Substring(1)).Split(' ');
             if (segments.Length < 2)
             {
                 ChatCommands.mls.LogWarning("Missing Arguments For Spawn\n'/spawnmapobj <name> (amount=<amount>) (position={random, @me, @<playername>})");
                 ChatCommands.msgtitle = "Command Error";
                 ChatCommands.msgbody = "Missing Arguments For Spawn\n'/spawnmapobj <name> (amount=<amount>) (position={random, @me, @<playername>})";
-                HUDManager.Instance.DisplayTip(ChatCommands.msgtitle, ChatCommands.msgbody, true, false, "LC_Tip1");
+                ChatCommands.DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
             string toSpawn = segments[1].ToLower();
@@ -295,55 +271,18 @@ namespace ChatCommands
                     case "position":
                         sposition = darg[1];
                         ChatCommands.mls.LogInfo(sposition);
-                        if (sposition.StartsWith("@"))
-                        {
-                            if (sposition == "@me")
-                            {
-                                PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                                foreach (PlayerControllerB testedPlayer in allPlayerScripts)
-                                {
-                                    ChatCommands.mls.LogInfo($"Checking Playername {testedPlayer.playerUsername}");
-                                    if (testedPlayer.playerUsername.ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
-                                    {
-                                        ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
-                                        position = testedPlayer.transform.position;
-                                        ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                string playername = sposition.Substring(1);
-                                PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                                bool found = false;
-                                foreach (PlayerControllerB testedPlayer in allPlayerScripts)
-                                {
-                                    if (testedPlayer.playerUsername.ToLower().Contains(playername))
-                                    {
-                                        position = testedPlayer.transform.position;
-                                        ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
-                                        found = true;
-                                        break;
-                                    }
-                                }
-                                if (!found)
-                                {
-                                    ChatCommands.mls.LogWarning("Player not found");
-                                    ChatCommands.DisplayChatMessage("Player not found, spawning in random position");
-                                }
-
-                            }
-
-                        }
-                        else if (sposition != "random")
-                        {
-                            ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
-                            sposition = "random";
-                        }
                         break;
                     default:
                         break;
+                }
+            }
+            if (sposition != "random")
+            {
+                position = CalculateSpawnPosition(sposition);
+                if (position == Vector3.zero && sposition != "random")
+                {
+                    ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
+                    sposition = "random";
                 }
             }
 
@@ -399,6 +338,15 @@ namespace ChatCommands
 
         public static string SpawnScrapFunc(string text)
         {
+            if (ChatCommands.currentLevel == null)
+            {
+                ChatCommands.mls.LogWarning("Unable to send command since currentLevel is null.");
+                ChatCommands.msgtitle = "Command Error";
+                ChatCommands.msgbody = "Unable to send command since currentLevel is null.";
+                ChatCommands.DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
+                return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
+            }
+
             string[] segments = (text.Substring(1)).Split(' ');
             if (segments.Length < 2)
             {
@@ -434,57 +382,21 @@ namespace ChatCommands
                     case "position":
                         sposition = darg[1];
                         ChatCommands.mls.LogInfo(sposition);
-                        if (sposition.StartsWith("@"))
-                        {
-                            if (sposition == "@me")
-                            {
-                                PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                                foreach (PlayerControllerB testedPlayer in allPlayerScripts)
-                                {
-                                    ChatCommands.mls.LogInfo($"Checking Playername {testedPlayer.playerUsername}");
-                                    if (testedPlayer.playerUsername.ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
-                                    {
-                                        ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
-                                        position = testedPlayer.transform.position;
-                                        ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                string playername = sposition.Substring(1);
-                                PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                                bool found = false;
-                                foreach (PlayerControllerB testedPlayer in allPlayerScripts)
-                                {
-                                    if (testedPlayer.playerUsername.ToLower().Contains(playername))
-                                    {
-                                        position = testedPlayer.transform.position;
-                                        ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
-                                        found = true;
-                                        break;
-                                    }
-                                }
-                                if (!found)
-                                {
-                                    ChatCommands.mls.LogWarning("Player not found");
-                                    ChatCommands.DisplayChatMessage("Player not found, spawning in random position");
-                                }
-
-                            }
-
-                        }
-                        else if (sposition != "random")
-                        {
-                            ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
-                            sposition = "random";
-                        }
                         break;
                     default:
                         break;
                 }
             }
+            if (sposition != "random")
+            {
+                position = CalculateSpawnPosition(sposition);
+                if (position == Vector3.zero && sposition != "random")
+                {
+                    ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
+                    sposition = "random";
+                }
+            }
+
             if (toSpawn == "gun")
             {
                 for (int i = 0; i < ChatCommands.currentRound.currentLevel.Enemies.Count(); i++)
@@ -558,6 +470,25 @@ namespace ChatCommands
             }
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
+
+        //public static string SpawnHive(string text)
+        //{
+        //    GameObject hivePrefab = GameObject.Find("Hive");
+        //    EnemyType enemyType = EnemyType;
+        //    
+        //    Debug.Log($"Setting bee random seed: {StartOfRound.Instance.randomMapSeed + 1314 + enemyType.numberSpawned}");
+        //    System.Random random = new System.Random(StartOfRound.Instance.randomMapSeed + 1314 + enemyType.numberSpawned);
+        //    Vector3 randomNavMeshPositionInBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(base.transform.position, 10f, RoundManager.Instance.navHit, random, -5);
+        //    Debug.Log($"Set bee hive random position: {randomNavMeshPositionInBoxPredictable}");
+        //    GameObject gameObject = UnityEngine.Object.Instantiate(hivePrefab, randomNavMeshPositionInBoxPredictable + Vector3.up * 0.5f, Quaternion.Euler(Vector3.zero), RoundManager.Instance.spawnedScrapContainer);
+        //    gameObject.SetActive(value: true);
+        //    gameObject.GetComponent<NetworkObject>().Spawn();
+        //    gameObject.GetComponent<GrabbableObject>().targetFloorPosition = randomNavMeshPositionInBoxPredictable + Vector3.up * 0.5f;
+        //    RedLocustBees.SpawnHiveClientRpc(hiveScrapValue: (!(Vector3.Distance(randomNavMeshPositionInBoxPredictable, StartOfRound.Instance.elevatorTransform.transform.position) < 40f)) ? random.Next(50, 150) : random.Next(40, 100), hiveObject: gameObject.GetComponent<NetworkObject>(), hivePosition: randomNavMeshPositionInBoxPredictable + Vector3.up * 0.5f);
+        //
+        //
+        //    return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
+        //}
 
         public static string ChangeWeather(string text)
         {
@@ -872,7 +803,7 @@ namespace ChatCommands
         public static string GetMoreHelp()
         {
             ChatCommands.msgtitle = "More Commands";
-            ChatCommands.msgbody = "/enemies - See all enemies available to spawn. \n /weather weatherName - Attempt to change weather \n /cheats - list cheat commands";
+            ChatCommands.msgbody = "/enemies - See all enemies available to spawn. \n /weather weatherName - Attempt to change weather \n /cheats - list cheat commands \n /override - Override Enemy spawns";
             ChatCommands.DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
@@ -897,6 +828,7 @@ namespace ChatCommands
             ChatCommands.msgtitle = "How To";
             ChatCommands.msgbody = "Spawn an enemy: /spawnenemy or /spweny\n" +
                     "Spawn scrap items: /spawnscrap or /spwscr\n" +
+                    "Spawn map objects: /spawnmapobj or /spwobj\n" +
                     "after that put the name of what you want to spawn\n" +
                     "options: a=<num> or amount=<num> for how many to spawn\n" +
                     "p=<pos> or position=<pos> for position where to spawn\n" +
@@ -918,6 +850,62 @@ namespace ChatCommands
                 return false;
             }
             return true;
+        }
+
+        private static Vector3 CalculateSpawnPosition(string sposition)
+        {
+            Vector3 position = Vector3.zero;
+            if (sposition.StartsWith("@"))
+            {
+                if (sposition == "@me")
+                {
+                    PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
+                    foreach (PlayerControllerB testedPlayer in allPlayerScripts)
+                    {
+                        ChatCommands.mls.LogInfo($"Checking Playername {testedPlayer.playerUsername}");
+                        if (testedPlayer.playerUsername.Replace(" ","").ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
+                        {
+                            ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
+                            position = testedPlayer.transform.position;
+                            ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    string origplayername = sposition.Substring(1);
+                    string playername = ChatCommands.ConvertPlayername(origplayername);
+                    PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
+                    bool found = false;
+                    ChatCommands.mls.LogInfo($"Looking for Playername {playername} or Playername {origplayername}...");
+                    foreach (PlayerControllerB testedPlayer in allPlayerScripts)
+                    {
+                        ChatCommands.mls.LogInfo($"Checking Playername {testedPlayer.playerUsername.Replace(" ","")}");
+                        if (testedPlayer.playerUsername.Replace(" ", "").ToLower().Contains(playername.ToLower()) || testedPlayer.playerUsername.Replace(" ", "").ToLower().Contains(origplayername.ToLower()))
+                        {
+                            position = testedPlayer.transform.position;
+                            ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
+                            found = true;
+                            ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        ChatCommands.mls.LogWarning("Player not found");
+                        ChatCommands.DisplayChatMessage("Player not found, spawning in random position");
+                    }
+
+                }
+
+            }
+            return position;
+        }
+
+        public static void ToggleOverrideSpawns()
+        {
+            ChatCommands.OverrideSpawns = !ChatCommands.OverrideSpawns;
         }
     }
 }

@@ -12,6 +12,8 @@ using Unity.Netcode;
 using GameNetcodeStuff;
 using BepInEx;
 using BepInEx.Configuration;
+using System.Text.RegularExpressions;
+using UnityEngine.Windows;
 
 namespace ChatCommands.Patches
 {
@@ -30,7 +32,14 @@ namespace ChatCommands.Patches
         [HarmonyPrefix]
         private static bool OverrideCannotSpawn()
         {
-            return false;
+            if (ChatCommands.OverrideSpawns)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         [HarmonyPatch(typeof(RoundManager), "SpawnEnemyFromVent")]
@@ -66,7 +75,7 @@ namespace ChatCommands.Patches
                     {
                         if(text.ToLower().Contains("p=@me"))
                         {
-                            ChatCommands.playerwhocalled = localPlayer;
+                            ChatCommands.playerwhocalled = ChatCommands.ConvertPlayername(localPlayer);
                             ChatCommands.mls.LogInfo("Player who called: " + ChatCommands.playerwhocalled);
                         }
                         string command = text.Substring((ChatCommands.PrefixSetting.Value).Length);
@@ -94,13 +103,13 @@ namespace ChatCommands.Patches
         {
 
             ChatCommands.mls.LogInfo("Chat Message: " + chatMessage + " sent by: " + nameOfUserWhoTyped);
-            if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && ChatCommands.HostSetting.Value)
+            if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && ChatCommands.AllowHostCommands)
             {
                 string commandwithpost = chatMessage.Substring((NetCommandPrefix).Length);
                 string[]temp = commandwithpost.Split('<');
                 string command = temp[0];
                 if (command.ToLower().Contains("p=@me")){
-                    ChatCommands.playerwhocalled = nameOfUserWhoTyped;
+                    ChatCommands.playerwhocalled = ChatCommands.ConvertPlayername(nameOfUserWhoTyped);
                 }
                 ChatCommands.mls.LogInfo("Host, trying to handle command: " + command);
                 ChatCommands.DisplayChatMessage(nameOfUserWhoTyped + " sent command: "+ ChatCommands.PrefixSetting.Value + command);
@@ -109,7 +118,7 @@ namespace ChatCommands.Patches
                 nameOfUserWhoTyped = nullChatMessage;
                 return;
             }
-            else if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && !ChatCommands.HostSetting.Value)
+            else if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && !ChatCommands.AllowHostCommands)
             {
                 ChatCommands.mls.LogWarning("Host, but not allowing commands, checking player for allowance");
                 foreach (AllowedHostPlayer player in ChatCommands.AllowedHostPlayers)
@@ -321,5 +330,7 @@ namespace ChatCommands.Patches
             }
             
         }
+
+        
     }
 }

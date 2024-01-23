@@ -16,6 +16,7 @@ using System.Security;
 using System.Net;
 using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Linq;
+using System.Text.RegularExpressions;
 
 namespace ChatCommands
 {
@@ -24,7 +25,7 @@ namespace ChatCommands
     {
         private const string modGUID = "toemmsen.ChatCommands";
         private const string modName = "ChatCommands";
-        private const string modVersion = "1.1.7";
+        private const string modVersion = "1.1.8";
         private readonly Harmony harmony = new Harmony(modGUID);
         private static ChatCommands instance;
         internal static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
@@ -38,6 +39,9 @@ namespace ChatCommands
         internal static ConfigEntry<string> PrefixSetting;
         internal static ConfigEntry<bool> HostSetting;
         internal static ConfigEntry<bool> SendHostCommandsSetting;
+        internal static ConfigEntry<bool> OverrideSpawnsSetting;
+        internal static bool OverrideSpawns = false;
+        internal static bool AllowHostCommands = false;
         internal static bool enableGod;
         internal static bool EnableInfiniteCredits = false;
         internal static int CustomDeadline = int.MinValue;
@@ -64,6 +68,9 @@ namespace ChatCommands
             PrefixSetting = instance.Config.Bind<string>("Command Settings", "Command Prefix", "/", "An optional prefix for chat commands");
             HostSetting = instance.Config.Bind<bool>("Command Settings", "Has to be Host", true, "(for server host only): determines if clients can also use the host commands");
             SendHostCommandsSetting = instance.Config.Bind<bool>("Command Settings", "Send Host Commands", true, "(for server host only): determines if commands get sent to the clients, so for example god mode is enabled for them too");
+            OverrideSpawnsSetting = instance.Config.Bind<bool>("Command Settings", "Override Spawns", true, "(for server host only): determines if the spawn command overrides the default spawns. If enabled there can be spawned more than one girl etc. Can be toggled ingame by using /override command.");
+            OverrideSpawns = OverrideSpawnsSetting.Value;
+            AllowHostCommands = HostSetting.Value;
 
             mls.LogInfo("ChatCommands loaded");
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
@@ -285,11 +292,24 @@ namespace ChatCommands
                 case "cohost":
                     Commands.SetHostCmds(commandarguments[1]);
                     break;
+                case "togglehostcmd":
+                case "thcmd":
+                    AllowHostCommands = !AllowHostCommands;
+                    break;
                 case "spawnmapobj":
-                case "spwmapobj":
+                case "spwobj":
                     Commands.SpawnMapObj(command);
                     break;
-
+                case "ovr":
+                case "override":
+                    Commands.ToggleOverrideSpawns();
+                    msgtitle = "Override Spawns";
+                    msgbody = "Override Spawns set to: " + OverrideSpawns;
+                    break;
+                case "spawnhive":
+                case "spwhive":
+                    //Commands.SpawnHive(command);
+                    //break;
                 default:
                     msgtitle = "Command";
                     msgbody = "Unknown command: " + commandarguments[0];
@@ -363,6 +383,15 @@ namespace ChatCommands
         private static void UpdateChatText()
         {
             HUDManager.Instance.chatText.text = string.Join("\n", HUDManager.Instance.ChatMessageHistory);
+        }
+
+        internal static string ConvertPlayername(string name)
+        {
+            ChatCommands.mls.LogInfo("Converting name: " + name);
+            string convname = new string(name.Where((char c) => char.IsLetter(c)).ToArray());
+            convname = (Regex.Replace(convname, "[^\\w\\._]", ""));
+            ChatCommands.mls.LogInfo("Converted name: " + convname);
+            return convname;
         }
 
     }

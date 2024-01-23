@@ -1,3 +1,9 @@
+## v1.1.8 Added toggle for Spawn override
+- added a config setting to turn on or off overriding spawns
+- added command /override or /ovr to toggle overriding enemy spawns
+- added ability to spawn mines or turrets using /spawnmine
+- fixed some playernames not being recognized right by p=@
+
 ## v1.1.7 Fix NonHost not loading
 - fixed Hostcheck when loading level
 

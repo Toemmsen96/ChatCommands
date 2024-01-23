@@ -28,7 +28,7 @@ Infocommands can always be used as a NonHost, these are:
 /credits -> list credits for mod  
   
 ## Host functionality
-Host only commands to use (require Host to have setting enabled):  
+Host only commands to use (require Host to have setting enabled if wanted to be used as NonHost):  
 /spawnscrap or /spwscr "scrapname" (a="amount") (p="position") (v="value") -> spawn scrap, amount, position and value arguments are optional  
 position can be random, @me or @"playername",  
 amount sets how many items will be spawned (without it defaults to 1),  
@@ -58,6 +58,11 @@ with gun as scrapname you can spawn a shotgun (gun is broken at the moment, plea
 /term -> use Terminal from anywhere. On exiting input you need to type /term again to enable walking again  
   
 /hostcmd "playername" or /cohost "playername" -> give host commands to specific users if you turned off hostcommands for everyone in the cfg  
+
+/togglehostcmd or /thcmd -> toggle allowing host commands for everyone  
+  
+/override or /ovr -> toggle overriding enemy spawns. If set to true there can be more than one girl spawned automatically etc.  
+If set to false, enemies spawned using /spawnenemy might not spawn. Default can be set in cfg.  
 
 ### Legend:  
 "arg" -> argument for command you have to enter (without the "")  
