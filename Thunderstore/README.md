@@ -13,10 +13,9 @@ To install either use a mod Manager or just drag thr ChatCommands.dll into your 
 This can be used as Host and also as NonHost if the Host has the mod and enabled nonhost commands in the Config file.  
 The config file gets created on first startup of the mod. The setting is turned on by default  
 Infocommands can always be used as a NonHost, these are:  
-/enemies -> lists spawnable enemies on current map (currently only for host, will try to fix for nonhost)  
   
-/getscrap -> lists spawnable scrap on curent map (currently only for host, will try to fix for nonhost)  
-  
+/position or /pos -> get your own current position displayed  
+
 /spawn -> lists what spawn commands you can use  
   
 /help -> see what commands you can use  
@@ -29,13 +28,19 @@ Infocommands can always be used as a NonHost, these are:
   
 ## Host functionality
 Host only commands to use (require Host to have setting enabled if wanted to be used as NonHost):  
+/enemies -> lists spawnable enemies on current map (currently only for host, will try to fix for nonhost)  
+  
+/getscrap -> lists spawnable scrap on curent map (currently only for host, will try to fix for nonhost)  
+
 /spawnscrap or /spwscr "scrapname" (a="amount") (p="position") (v="value") -> spawn scrap, amount, position and value arguments are optional  
-position can be random, @me or @"playername",  
+position can be random, @me or @"playername" or a vector using just 3 floating point numbers separated by a comma eg: 2.1,3,2 ,  
 amount sets how many items will be spawned (without it defaults to 1),  
 value sets how much it is worth (default:1000)  
 with gun as scrapname you can spawn a shotgun (gun is broken at the moment, please dont use for now)  
   
-/spawnenemy or /spweny "enemyname" (a="amount") (p="position") -> spawn enemy, position can be random, @me or @"playername"  
+/spawnenemy or /spweny "enemyname" (a="amount") (p="position") -> spawn enemy, amount and position are optional  
+position can be random, @me or @"playername" or a vector using just 3 floating point numbers separated by a comma eg: 2.1,3,2 ,  
+amount sets how many enemies will be spawned (without it defaults to 1),  
   
 /infammo or /ammo -> enable infinite ammo on shotgun  
   

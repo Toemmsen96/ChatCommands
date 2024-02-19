@@ -1,7 +1,9 @@
 ## v1.1.8 Added toggle for Spawn override
 - added a config setting to turn on or off overriding spawns
 - added command /override or /ovr to toggle overriding enemy spawns
-- added ability to spawn mines or turrets using /spawnmine
+- added ability to spawn mines or turrets using /spawnmine (not fully tested yet)
+- added ability to use coordinates when using p=. FE: /spweny p=3,2,1   
+- added ability to check own position using /pos or /position  
 - fixed some playernames not being recognized right by p=@
 
 ## v1.1.7 Fix NonHost not loading

@@ -189,14 +189,13 @@ namespace ChatCommands
             bool IsNonHostCommand = true;
             switch (command.ToLower())
             {
-                case "enemies":
-                    Commands.GetEnemies();
-                    break;
-                case "getscrap":
-                    Commands.GetScrap();
-                    break;
+
                 case "help":
                     Commands.GetHelp();
+                    break;
+                case "pos":
+                case "position":
+                    Commands.GetPos();
                     break;
                 case "morehelp":
                     Commands.GetMoreHelp();
@@ -238,6 +237,12 @@ namespace ChatCommands
 
             switch (commandarguments[0])
             {
+                case "enemies":
+                    Commands.GetEnemies();
+                    break;
+                case "getscrap":
+                    Commands.GetScrap();
+                    break;
                 case "spawnenemy":
                 case "spweny":
                     Commands.SpawnEnemyFunc(command);

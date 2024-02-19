@@ -837,6 +837,13 @@ namespace ChatCommands
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
 
+        public static string GetPos()
+        {
+            ChatCommands.msgtitle = "Position";
+            ChatCommands.msgbody = "Your Position is: " + ChatCommands.playerRef.transform.position;
+            return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
+        }
+
         public static bool CheckPrefix(string text)
         {
             string prefix = "/";
@@ -855,6 +862,10 @@ namespace ChatCommands
         private static Vector3 CalculateSpawnPosition(string sposition)
         {
             Vector3 position = Vector3.zero;
+            if (sposition == "random")
+            {
+                return position;
+            }
             if (sposition.StartsWith("@"))
             {
                 if (sposition == "@me")
@@ -899,6 +910,20 @@ namespace ChatCommands
 
                 }
 
+            }
+            else
+            {
+                string[] pos = sposition.Split(',');
+                if (pos.Length == 3)
+                {
+                    position = new Vector3(float.Parse(pos[0]), float.Parse(pos[1]), float.Parse(pos[2]));
+                    ChatCommands.msgbody += "position: " + position;
+                }
+                else
+                {
+                    ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
+                    ChatCommands.msgbody += "position: " + "random";
+                }
             }
             return position;
         }
