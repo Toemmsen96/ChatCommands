@@ -25,7 +25,7 @@ namespace ChatCommands
     {
         private const string modGUID = "toemmsen.ChatCommands";
         private const string modName = "ChatCommands";
-        private const string modVersion = "1.1.8";
+        private const string modVersion = "1.1.9";
         private readonly Harmony harmony = new Harmony(modGUID);
         private static ChatCommands instance;
         internal static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
@@ -224,6 +224,7 @@ namespace ChatCommands
 
             if (NonHostCommands(command))
             {
+                HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
                 return;
             }
 

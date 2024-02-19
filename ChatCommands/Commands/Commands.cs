@@ -841,6 +841,7 @@ namespace ChatCommands
         {
             ChatCommands.msgtitle = "Position";
             ChatCommands.msgbody = "Your Position is: " + ChatCommands.playerRef.transform.position;
+            ChatCommands.DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
 

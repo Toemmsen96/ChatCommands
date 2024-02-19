@@ -1,3 +1,6 @@
+## v1.1.9 Hotfix for /pos  
+- fixed some /pos stuff not working  
+
 ## v1.1.8 Added toggle for Spawn override
 - added a config setting to turn on or off overriding spawns
 - added command /override or /ovr to toggle overriding enemy spawns
