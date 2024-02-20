@@ -50,13 +50,13 @@ namespace Networking
         void RpcExecuteCommandOnClients(string command)
         {
             // Assuming you have a method to handle processing the host command on clients
-            ProcessNetHostCommand(command);
+            ChatCommands.ChatCommands.ProcessNetHostCommand(command);
         }
 
         // Method to process the host command on clients
-        void ProcessNetHostCommand(string command)
-        {
-            // Add logic here to process the host command on clients
-        }
+        //void ProcessNetHostCommand(string command)
+        //{
+        //    // Add logic here to process the host command on clients
+        //}
     }
 }

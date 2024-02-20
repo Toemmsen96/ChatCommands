@@ -97,11 +97,11 @@ namespace ChatCommands.Patches
         }
 
 
-        [HarmonyPatch(typeof(HUDManager), "AddChatMessage")]
+        [HarmonyPatch(typeof(HUDManager), "AddPlayerChatMessageServerRpc")]
         [HarmonyPrefix]
-        private static void ReadChatMessage(HUDManager __instance, ref string chatMessage, ref string nameOfUserWhoTyped)
+        private static void ReadChatMessage(HUDManager __instance, ref string chatMessage, ref int playerId)
         {
-
+            string nameOfUserWhoTyped = __instance.playersManager.allPlayerScripts[playerId].playerUsername;
             ChatCommands.mls.LogInfo("Chat Message: " + chatMessage + " sent by: " + nameOfUserWhoTyped);
             if (chatMessage.StartsWith(NetCommandPrefix) && ChatCommands.isHost && ChatCommands.AllowHostCommands)
             {
