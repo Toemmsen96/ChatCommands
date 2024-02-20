@@ -326,15 +326,40 @@ namespace ChatCommands
         }
 
 
+        //internal static void SendHostCommand(string commandInput)
+        //{
+        //    if (!isHost || !SendHostCommandsSetting.Value)
+        //    {
+        //        return;
+        //    }
+        //    string commandToClients = ChatCommands.NetHostCommandPrefix + commandInput + ChatCommands.NetCommandPostfix;
+        //    HUDManager.Instance.AddTextToChatOnServer(commandToClients, -1);
+        //}
+        // Method to send a command from the host to all clients
         internal static void SendHostCommand(string commandInput)
         {
             if (!isHost || !SendHostCommandsSetting.Value)
             {
                 return;
             }
-            string commandToClients = ChatCommands.NetHostCommandPrefix + commandInput + ChatCommands.NetCommandPostfix;
-            HUDManager.Instance.AddTextToChatOnServer(commandToClients, -1);
+
+            // Construct the full command to send to clients
+            string commandToClients = NetHostCommandPrefix + commandInput + NetCommandPostfix;
+
+            // Call an RPC to execute the command on all clients
+            instance.RpcExecuteCommandOnClients(commandToClients);
         }
+
+        // RPC method to execute the command on all clients
+        [ClientRpc]
+        void RpcExecuteCommandOnClients(string command)
+        {
+            // Assuming you have a method to handle adding text to the chat on clients
+            // You would replace this line with the appropriate method call to add text to the chat
+            ProcessNetHostCommand(command);
+        }
+
+
 
         public static void ProcessNetHostCommand(string commandInput)
         {
