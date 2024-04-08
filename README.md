@@ -1,5 +1,7 @@
 # ChatCommands
 This mod adds some chat commands used with a / by default.  
+## Donate
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I2I1SFBR7)
 
 ## Disclaimers
 with "/" as the default prefix this mod may be incompatible with other mods that use this prefix like for example the GameMaster mod.
