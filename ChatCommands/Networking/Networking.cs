@@ -22,11 +22,12 @@ namespace Networking
             if (instance == null)
             {
                 instance = this;
+                DontDestroyOnLoad(gameObject);
             }
             else
             {
                 Debug.LogWarning("Multiple instances of CustomNetworkManager found!");
-                Destroy(this.gameObject);
+                Destroy(gameObject);
             }
         }
 
@@ -38,8 +39,16 @@ namespace Networking
             //    return;
             //}
 
+            if (instance == null)
+            {
+                Debug.LogError("CCMDNetworking instance is not initialized!");
+                return;
+            }
+
             // Construct the full command to send to clients
             string commandToClients = instance.netHostCommandPrefix + commandInput + instance.netCommandPostfix;
+
+            ChatCommands.ChatCommands.DisplayChatMessage("Host Command: " + commandInput+"\nsending to clients via RPC");
 
             // Call an RPC to execute the command on all clients
             instance.RpcExecuteCommandOnClients(commandToClients);
@@ -50,6 +59,7 @@ namespace Networking
         void RpcExecuteCommandOnClients(string command)
         {
             // Assuming you have a method to handle processing the host command on clients
+            ChatCommands.ChatCommands.DisplayChatMessage("Client Command: " + command);
             ChatCommands.ChatCommands.ProcessNetHostCommand(command);
         }
 

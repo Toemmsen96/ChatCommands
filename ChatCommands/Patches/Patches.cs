@@ -268,6 +268,22 @@ namespace ChatCommands.Patches
             return !ChatCommands.enableGod;
         }
 
+        [HarmonyPatch(typeof(MouthDogAI), "OnCollideWithPlayer")]
+        [HarmonyPrefix]
+        private static bool OverrideDeath2()
+        {
+            return !ChatCommands.enableGod;
+        }
+
+        [HarmonyPatch(typeof(ForestGiantAI), "GrabPlayerServerRpc")]
+        [HarmonyPrefix]
+        private static bool OverrideDeath3()
+        {
+            return !ChatCommands.enableGod;
+        }
+
+
+
         [HarmonyPatch(typeof(Terminal), "RunTerminalEvents")]
         [HarmonyPostfix]
         private static void InfiniteCredits(ref int ___groupCredits)

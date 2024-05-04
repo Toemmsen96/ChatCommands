@@ -26,7 +26,7 @@ namespace ChatCommands
     {
         private const string modGUID = "toemmsen.ChatCommands";
         private const string modName = "ChatCommands";
-        private const string modVersion = "1.1.91";
+        private const string modVersion = "1.1.92";
         private readonly Harmony harmony = new Harmony(modGUID);
         private static ChatCommands instance;
         internal static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
@@ -64,6 +64,7 @@ namespace ChatCommands
             if (instance == null)
             {
                 instance = this;
+                
             }
 
             PrefixSetting = instance.Config.Bind<string>("Command Settings", "Command Prefix", "/", "An optional prefix for chat commands");
@@ -79,6 +80,7 @@ namespace ChatCommands
             enableGod = false;
             harmony.PatchAll(typeof(ChatCommands));
             harmony.PatchAll(typeof(Patches.Patches));
+            //CCMDNetworking newCMDNW = new CCMDNetworking();
             mls.LogWarning((object)"\r\n" +
                 "  ______                                                                                                       \r\n"+
                 " /_  __/  ____   ___    ____ ___    ____ ___    _____  ___    ____    _____                                    \r\n"+
@@ -264,6 +266,7 @@ namespace ChatCommands
                     msgtitle = "God Mode";
                     msgbody = "God Mode set to: " + ToggleGodMode();
                     SendHostCommand(command);
+                    //CCMDNetworking.SendHostCommand(command);
                     break;
                 case "speed":
                     msgtitle = "Speed hack";

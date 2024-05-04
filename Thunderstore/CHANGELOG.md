@@ -1,5 +1,8 @@
-## v1.1.91 Update for newer version
-- just some simple stuff updated
+## v1.1.92 Fixed Godmode  
+- MouthDog and ForestGiant now don't break interactability when godmode is enabled  
+
+## v1.1.91 Update for newer version  
+- just some simple stuff updated  
 
 ## v1.1.9 Hotfix for /pos  
 - fixed some /pos stuff not working  
