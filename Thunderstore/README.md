@@ -1,5 +1,8 @@
 # ChatCommands
 This mod adds some chat commands used with a / by default.  
+## Donate  
+If you want to donate, to support making mods like this one:  
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I2I1SFBR7)
 
 ## Disclaimers
 with "/" as the default prefix this mod may be incompatible with other mods that use this prefix like for example the GameMaster mod.
@@ -78,6 +81,3 @@ If set to false, enemies spawned using /spawnenemy might not spawn. Default can 
 Toemmsen96 - Making most of the mod  
 Chrigi - Spawn Scrap and gun functionality with position parameters and stuff  
 GameMaster Team - some parts of the code that were used as a base  
-## Donate  
-If you want to donate, to support making mods like this one:
-https://ko-fi.com/ctmods
