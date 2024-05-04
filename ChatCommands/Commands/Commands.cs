@@ -17,6 +17,7 @@ using System.Net;
 using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Linq;
 using System.Collections;
+using UnityEngine.AI;
 
 namespace ChatCommands
 {
@@ -51,21 +52,60 @@ namespace ChatCommands
 
         public static string Teleport(string text)
         {
-            string[] array6 = text.Split(new char[1] { ' ' });
-            if (array6.Length > 1)
+            Vector3 position = Vector3.zero;
+            string[] arguments = text.Split(new char[1] { ' ' });
+            string sposition = "random";
+            if (arguments.Length > 1)
             {
-                string tpname = array6[1].ToLower();
-                tpname = ChatCommands.ConvertPlayername(tpname);
-                PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                foreach (PlayerControllerB testedplayer in allPlayerScripts)
+                if (arguments[1].ToLower().StartsWith("p="))
                 {
-                    if (testedplayer.playerUsername.ToLower().Contains(tpname))
+                    sposition = arguments[1].ToLower().Substring(2);
+                    if (sposition != "random")
                     {
-                        GameNetworkManager.Instance.localPlayerController.beamUpParticle.Play();
-                        GameNetworkManager.Instance.localPlayerController.beamOutBuildupParticle.Play();
-                        GameNetworkManager.Instance.localPlayerController.TeleportPlayer(testedplayer.transform.position, false, 0f, false, true);
-                        ChatCommands.msgtitle = "Teleported";
-                        ChatCommands.msgbody = "Teleported to Player:" + testedplayer.playerUsername;
+                        position = CalculateSpawnPosition(sposition);
+                        if (position == Vector3.zero && sposition != "random")
+                        {
+                            ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
+                            sposition = "random";
+                        }
+                    }
+                    if (sposition == "random")
+                    {
+                        if (ChatCommands.currentRound != null && ChatCommands.currentLevel != null)
+                        {
+                            System.Random shipTeleporterSeed;
+                            shipTeleporterSeed = new System.Random(StartOfRound.Instance.randomMapSeed + 17 + (int)GameNetworkManager.Instance.localPlayerController.playerClientId);
+                            Vector3 position3 = RoundManager.Instance.insideAINodes[shipTeleporterSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
+                            Debug.DrawRay(position3, Vector3.up * 1f, Color.red);
+                            position3 = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position3, 10f, default(NavMeshHit), shipTeleporterSeed);
+                            Debug.DrawRay(position3 + Vector3.right * 0.01f, Vector3.up * 3f, Color.green);
+                            position = position3;
+                        }
+                        
+                    }
+                    GameNetworkManager.Instance.localPlayerController.beamUpParticle.Play();
+                    GameNetworkManager.Instance.localPlayerController.beamOutBuildupParticle.Play();
+                    GameNetworkManager.Instance.localPlayerController.TeleportPlayer(position, false, 0f, false, true);
+                    ChatCommands.msgtitle = "Teleported";
+                    ChatCommands.msgbody = "Teleported to " + sposition;
+                    
+                }
+                else
+                {
+                    string tpname = arguments[1].ToLower();
+                    tpname = ChatCommands.ConvertPlayername(tpname);
+
+                    PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
+                    foreach (PlayerControllerB testedplayer in allPlayerScripts)
+                    {
+                        if (testedplayer.playerUsername.ToLower().Contains(tpname))
+                        {
+                            GameNetworkManager.Instance.localPlayerController.beamUpParticle.Play();
+                            GameNetworkManager.Instance.localPlayerController.beamOutBuildupParticle.Play();
+                            GameNetworkManager.Instance.localPlayerController.TeleportPlayer(testedplayer.transform.position, false, 0f, false, true);
+                            ChatCommands.msgtitle = "Teleported";
+                            ChatCommands.msgbody = "Teleported to Player:" + testedplayer.playerUsername;
+                        }
                     }
                 }
             }

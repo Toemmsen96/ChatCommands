@@ -17,6 +17,7 @@ using System.Net;
 using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
+using Networking;
 
 namespace ChatCommands
 {
@@ -71,8 +72,6 @@ namespace ChatCommands
             OverrideSpawnsSetting = instance.Config.Bind<bool>("Command Settings", "Override Spawns", true, "(for server host only): determines if the spawn command overrides the default spawns. If enabled there can be spawned more than one girl etc. Can be toggled ingame by using /override command.");
             OverrideSpawns = OverrideSpawnsSetting.Value;
             AllowHostCommands = HostSetting.Value;
-
-            mls.LogInfo("ChatCommands loaded");
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
             levelEnemySpawns = new Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>>();
             enemyPropCurves = new Dictionary<SpawnableEnemyWithRarity, AnimationCurve>();
@@ -80,7 +79,6 @@ namespace ChatCommands
             enableGod = false;
             harmony.PatchAll(typeof(ChatCommands));
             harmony.PatchAll(typeof(Patches.Patches));
-
             mls.LogWarning((object)"\r\n" +
                 "  ______                                                                                                       \r\n"+
                 " /_  __/  ____   ___    ____ ___    ____ ___    _____  ___    ____    _____                                    \r\n"+
@@ -91,6 +89,7 @@ namespace ChatCommands
                 " / /       / __ \\ / __ `/ / __/        / /      / __ \\  / __ `__ \\  / __ `__ \\ / __ `/  / __ \\ / __  /   / ___/\r\n"+
                 "/ /___    / / / // /_/ / / /_         / /___   / /_/ / / / / / / / / / / / / // /_/ /  / / / // /_/ /   (__  ) \r\n"+
                 "\\____/   /_/ /_/ \\__,_/  \\__/         \\____/   \\____/ /_/ /_/ /_/ /_/ /_/ /_/ \\__,_/  /_/ /_/ \\__,_/   /____/  \r\n");
+            mls.LogInfo("ChatCommands loaded");
         }
 
 
@@ -335,7 +334,7 @@ namespace ChatCommands
             string commandToClients = ChatCommands.NetHostCommandPrefix + commandInput + ChatCommands.NetCommandPostfix;
             HUDManager.Instance.AddTextToChatOnServer(commandToClients, -1);
         }
-
+        
         public static void ProcessNetHostCommand(string commandInput)
         {
             if (commandInput.ToLower().Contains("god"))
