@@ -35,13 +35,13 @@ Host only commands to use (require Host to have setting enabled if wanted to be 
   
 /getscrap -> lists spawnable scrap on curent map (currently only for host, will try to fix for nonhost)  
 
-/spawnscrap or /spwscr "scrapname" (a="amount") (p="position") (v="value") -> spawn scrap, amount, position and value arguments are optional  
+/spawnscrap or /spwscr "scrapname" (a="amount") (p="position") (v="value") -> spawn scrap, amount, position and value arguments are optional, use the optional stuff without ()-Brackets  
 position can be random, @me or @"playername" or a vector using just 3 floating point numbers separated by a comma eg: 2.1,3,2 ,  
 amount sets how many items will be spawned (without it defaults to 1),  
 value sets how much it is worth (default:1000)  
 with gun as scrapname you can spawn a shotgun (gun is broken at the moment, please dont use for now)  
   
-/spawnenemy or /spweny "enemyname" (a="amount") (p="position") -> spawn enemy, amount and position are optional  
+/spawnenemy or /spweny "enemyname" (a="amount") (p="position") -> spawn enemy, amount and position are optional, use the optional stuff without ()-Brackets  
 position can be random, @me or @"playername" or a vector using just 3 floating point numbers separated by a comma eg: 2.1,3,2 ,  
 amount sets how many enemies will be spawned (without it defaults to 1),  
   
