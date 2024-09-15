@@ -347,6 +347,16 @@ namespace ChatCommands.Patches
             
         }
 
+        // Patch game to think its in Unity Editor
+        [HarmonyPatch(typeof(Application), "get_isEditor")]
+        [HarmonyPostfix]
+        private static void IsEditorPatch(ref bool __result)
+        {
+            __result = ChatCommands.EnableDebugModeSetting.Value;
+            return;
+        }
+
+
         
     }
 }

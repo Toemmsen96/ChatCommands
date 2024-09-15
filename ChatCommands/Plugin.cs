@@ -41,6 +41,7 @@ namespace ChatCommands
         internal static ConfigEntry<bool> HostSetting;
         internal static ConfigEntry<bool> SendHostCommandsSetting;
         internal static ConfigEntry<bool> OverrideSpawnsSetting;
+        internal static ConfigEntry<bool> EnableDebugModeSetting;
         internal static bool OverrideSpawns = false;
         internal static bool AllowHostCommands = false;
         internal static bool enableGod;
@@ -71,6 +72,7 @@ namespace ChatCommands
             HostSetting = instance.Config.Bind<bool>("Command Settings", "Has to be Host", true, "(for server host only): determines if clients can also use the host commands");
             SendHostCommandsSetting = instance.Config.Bind<bool>("Command Settings", "Send Host Commands", true, "(for server host only): determines if commands get sent to the clients, so for example god mode is enabled for them too");
             OverrideSpawnsSetting = instance.Config.Bind<bool>("Command Settings", "Override Spawns", true, "(for server host only): determines if the spawn command overrides the default spawns. If enabled there can be spawned more than one girl etc. Can be toggled ingame by using /override command.");
+            EnableDebugModeSetting = instance.Config.Bind<bool>("Command Settings", "Enable Debug Mode", true, "Enables Unity Debug mode");
             OverrideSpawns = OverrideSpawnsSetting.Value;
             AllowHostCommands = HostSetting.Value;
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
@@ -81,16 +83,16 @@ namespace ChatCommands
             harmony.PatchAll(typeof(ChatCommands));
             harmony.PatchAll(typeof(Patches.Patches));
             //CCMDNetworking newCMDNW = new CCMDNetworking();
-            mls.LogWarning((object)"\r\n" +
-                "  ______                                                                                                       \r\n"+
-                " /_  __/  ____   ___    ____ ___    ____ ___    _____  ___    ____    _____                                    \r\n"+
-                "  / /    / __ \\ / _ \\  / __ `__ \\  / __ `__ \\  / ___/ / _ \\  / __ \\  / ___/                                    \r\n"+
-                " / /    / /_/ //  __/ / / / / / / / / / / / / (__  ) /  __/ / / / / (__  )                                     \r\n"+
-                "/_/_____\\____/_\\___/ /_/ /_/_/_/ /_/ /_/ /_/_/____/  \\___/ /_/ /_/ /____/                            __        \r\n"+
-                "  / ____/   / /_   ____ _  / /_         / ____/  ____    ____ ___    ____ ___   ____ _   ____   ____/ /   _____\r\n"+
-                " / /       / __ \\ / __ `/ / __/        / /      / __ \\  / __ `__ \\  / __ `__ \\ / __ `/  / __ \\ / __  /   / ___/\r\n"+
-                "/ /___    / / / // /_/ / / /_         / /___   / /_/ / / / / / / / / / / / / // /_/ /  / / / // /_/ /   (__  ) \r\n"+
-                "\\____/   /_/ /_/ \\__,_/  \\__/         \\____/   \\____/ /_/ /_/ /_/ /_/ /_/ /_/ \\__,_/  /_/ /_/ \\__,_/   /____/  \r\n");
+            mls.LogWarning((object)"\n" +
+                "  ______                                                                                                       \n"+
+                " /_  __/  ____   ___    ____ ___    ____ ___    _____  ___    ____    _____                                    \n"+
+                "  / /    / __ \\ / _ \\  / __ `__ \\  / __ `__ \\  / ___/ / _ \\  / __ \\  / ___/                                    \n"+
+                " / /    / /_/ //  __/ / / / / / / / / / / / / (__  ) /  __/ / / / / (__  )                                     \n"+
+                "/_/_____\\____/_\\___/ /_/ /_/_/_/ /_/ /_/ /_/_/____/  \\___/ /_/ /_/ /____/                            __        \n"+
+                "  / ____/   / /_   ____ _  / /_         / ____/  ____    ____ ___    ____ ___   ____ _   ____   ____/ /   _____\n"+
+                " / /       / __ \\ / __ `/ / __/        / /      / __ \\  / __ `__ \\  / __ `__ \\ / __ `/  / __ \\ / __  /   / ___/\n"+
+                "/ /___    / / / // /_/ / / /_         / /___   / /_/ / / / / / / / / / / / / // /_/ /  / / / // /_/ /   (__  ) \n"+
+                "\\____/   /_/ /_/ \\__,_/  \\__/         \\____/   \\____/ /_/ /_/ /_/ /_/ /_/ /_/ \\__,_/  /_/ /_/ \\__,_/   /____/  \n");
             mls.LogInfo("ChatCommands loaded");
         }
 
@@ -112,6 +114,14 @@ namespace ChatCommands
                 playerRef.isSpeedCheating = speedHack;
             }
             return speedHack;
+        }
+
+        internal static void SpawnItems(Vector3 location, int itemToSpawnId){
+            DisplayChatMessage("Spawning items");
+            DisplayChatMessage(StartOfRound.Instance.allItemsList.itemsList.ToString());
+            GameObject obj = UnityEngine.Object.Instantiate(StartOfRound.Instance.allItemsList.itemsList[itemToSpawnId].spawnPrefab, location, Quaternion.identity, StartOfRound.Instance.propsContainer);
+			obj.GetComponent<GrabbableObject>().fallTime = 0f;
+			obj.GetComponent<NetworkObject>().Spawn();
         }
 
         internal static void SpawnEnemy(SpawnableEnemyWithRarity enemy, int amount, bool inside, Vector3 location)
@@ -252,6 +262,10 @@ namespace ChatCommands
                 case "spawnscrap":
                 case "spwscr":
                     Commands.SpawnScrapFunc(command);
+                    break;
+                case "spawnitem":
+                case "spwitm":
+                    Commands.SpawnItemFunc(command);
                     break;
                 case "weather":
                     Commands.ChangeWeather(command);
