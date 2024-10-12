@@ -86,6 +86,8 @@ namespace ChatCommands.Commands
             {
                 string command = ConvertFromNetHostCommand(chatMessage);
                 LogInfo("Recieved command from Host, trying to handle command: " + command);
+                //TODO: need to rework / adjust
+                ProcessNetHostCommand(command); //currently empty, see below
                 if (CheckForCommand(command)){
                     chatMessage = nullChatMessage;
                     return false;
@@ -111,6 +113,32 @@ namespace ChatCommands.Commands
                 // TODO: Send command to host
             }
             return false;
+        }
+
+        private static void ProcessNetHostCommand(string commandInput)
+        {
+            /*
+            if (commandInput.ToLower().Contains("god"))
+            {
+                enableGod = !enableGod;
+                msgtitle = "Host sent command:";
+                msgbody = "God Mode set to: " + enableGod;
+            }
+            if (commandInput.ToLower().Contains("speed"))
+            {
+                speedHack = !playerRef.isSpeedCheating;
+                playerRef.isSpeedCheating = speedHack;
+                msgtitle = "Host sent command:";
+                msgbody = "Speed hack set to: " + speedHack;
+            }
+            if (commandInput.ToLower().Contains("infammo") || commandInput.ToLower().Contains("ammo"))
+            {
+                EnableInfiniteAmmo = !EnableInfiniteAmmo;
+                msgtitle = "Host sent command:";
+                msgbody = "Infinite Ammo: " + EnableInfiniteAmmo;
+            }
+            HUDManager.Instance.DisplayTip(ChatCommands.msgtitle, ChatCommands.msgbody, false, false, "LC_Tip1");
+            */
         }
         
     }

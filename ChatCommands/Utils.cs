@@ -11,12 +11,14 @@ namespace ChatCommands
     public static class Utils
     {
         private static bool logToChat = ChatCommands.LogToChatSetting.Value;
-        private static string NetCommandPrefix = ChatCommands.NetCommandPrefix;
-        private static string NetHostCommandPrefix = ChatCommands.NetHostCommandPrefix;
-        private static string NetCommandPostfix = ChatCommands.NetCommandPostfix;
+        private static string NetCommandPrefix = "<size=0>CCMD:";
+        private static string NetHostCommandPrefix = "<size=0>CHCMD:";
+        private static string NetCommandPostfix = ":CCMD</size>";
 
         public static Vector3 CalculateSpawnPosition(string sposition)
         {
+            string msgtitle = "";
+            string msgbody = "";
             Vector3 position = Vector3.zero;
             if (sposition == "random")
             {
@@ -42,7 +44,7 @@ namespace ChatCommands
                         {
                             ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
                             position = testedPlayer.transform.position;
-                            ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
+                            msgbody += "@" + testedPlayer.playerUsername;
                             break;
                         }
                     }
@@ -59,7 +61,7 @@ namespace ChatCommands
                         if (testedPlayer.playerUsername.Replace(" ", "").ToLower().Contains(playername.ToLower()) || testedPlayer.playerUsername.Replace(" ", "").ToLower().Contains(origplayername.ToLower()))
                         {
                             position = testedPlayer.transform.position;
-                            ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
+                            msgbody += "@" + testedPlayer.playerUsername;
                             found = true;
                             ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
                             break;
@@ -80,12 +82,12 @@ namespace ChatCommands
                 if (pos.Length == 3)
                 {
                     position = new Vector3(float.Parse(pos[0]), float.Parse(pos[1]), float.Parse(pos[2]));
-                    ChatCommands.msgbody += "position: " + position;
+                    msgbody += "position: " + position;
                 }
                 else
                 {
                     ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
-                    ChatCommands.msgbody += "position: " + "random";
+                    msgbody += "position: " + "random";
                 }
             }
             return position;
@@ -184,6 +186,19 @@ namespace ChatCommands
 
         internal static string ConvertToNetCommand(string command){
             return NetCommandPrefix + command + NetCommandPostfix;
+        }
+        internal static string ConvertToNetHostCommand(string command){
+            return NetHostCommandPrefix + command + NetCommandPostfix;
+        }
+
+        internal static void SendHostCommand(string commandInput)
+        {
+            if (!ChatCommands.isHost || !ChatCommands.SendHostCommandsSetting.Value)
+            {
+                return;
+            }
+            string commandToClients = ConvertToNetHostCommand(commandInput);
+            HUDManager.Instance.AddTextToChatOnServer(commandToClients, -1);
         }
 
     }

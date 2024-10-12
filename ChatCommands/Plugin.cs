@@ -43,15 +43,12 @@ namespace ChatCommands
         internal static PlayerControllerB playerRef;
         internal static bool isHost;
         internal static bool speedHack;
-        internal static string msgtitle;
-        internal static string msgbody;
-        internal static string NetCommandPrefix = "<size=0>CCMD:";
-        internal static string NetHostCommandPrefix = "<size=0>CHCMD:";
-        internal static string NetCommandPostfix = "</size>";
         internal static string playerwhocalled;
         internal static List<AllowedHostPlayer> AllowedHostPlayers = new List<AllowedHostPlayer>();
         internal static int mine = -1;
         internal static int turret = -1;
+        private static string msgtitle = ""; //TODO: remove
+        private static string msgbody = ""; //TODO: remove
         private void Awake()
         {
             if (instance == null)
@@ -248,47 +245,7 @@ namespace ChatCommands
             }
             HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
         }
-
-
-        internal static void SendHostCommand(string commandInput)
-        {
-            if (!isHost || !SendHostCommandsSetting.Value)
-            {
-                return;
-            }
-            string commandToClients = ChatCommands.NetHostCommandPrefix + commandInput + ChatCommands.NetCommandPostfix;
-            HUDManager.Instance.AddTextToChatOnServer(commandToClients, -1);
-        }
         
-        public static void ProcessNetHostCommand(string commandInput)
-        {
-            if (commandInput.ToLower().Contains("god"))
-            {
-                enableGod = !enableGod;
-                msgtitle = "Host sent command:";
-                msgbody = "God Mode set to: " + enableGod;
-            }
-            if (commandInput.ToLower().Contains("speed"))
-            {
-                speedHack = !playerRef.isSpeedCheating;
-                playerRef.isSpeedCheating = speedHack;
-                msgtitle = "Host sent command:";
-                msgbody = "Speed hack set to: " + speedHack;
-            }
-            if (commandInput.ToLower().Contains("infammo") || commandInput.ToLower().Contains("ammo"))
-            {
-                EnableInfiniteAmmo = !EnableInfiniteAmmo;
-                msgtitle = "Host sent command:";
-                msgbody = "Infinite Ammo: " + EnableInfiniteAmmo;
-            }
-            HUDManager.Instance.DisplayTip(ChatCommands.msgtitle, ChatCommands.msgbody, false, false, "LC_Tip1");
-        }
-        public static void ProcessCommand(string commandInput)
-        {
-            ChatCommands.ProcessCommandInput(commandInput);
-            HUDManager.Instance.DisplayTip(ChatCommands.msgtitle, ChatCommands.msgbody, false, false, "LC_Tip1");
-        }
-
 
     }
     internal class AllowedHostPlayer

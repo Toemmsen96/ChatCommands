@@ -20,18 +20,19 @@ namespace ChatCommands.Commands
         public override void Execute(CommandInput message)
         {
 
-            ChatCommands.msgtitle = "Spawned Enemies";
+            string msgtitle = "Spawned Enemies";
+            string msgbody = "";
             if (ChatCommands.currentLevel == null || ChatCommands.levelEnemySpawns == null || ChatCommands.currentLevel.Enemies == null)
             {
-                ChatCommands.msgtitle = "Command";
-                ChatCommands.msgbody = ChatCommands.currentLevel == null ? "Unable to send command since currentLevel is null." : "Unable to send command since levelEnemySpawns is null.";
-                DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
+                msgtitle = "Command";
+                msgbody = ChatCommands.currentLevel == null ? "Unable to send command since currentLevel is null." : "Unable to send command since levelEnemySpawns is null.";
+                DisplayChatError(msgtitle + "\n" + msgbody);
             }
             if (message.Args.Count < 1)
             {
-                ChatCommands.msgtitle = "Command Error";
-                ChatCommands.msgbody = "Missing Arguments For Spawn\n'/spawnenemy <name> (amount=<amount>) (state=<state>) (position={random, @me, @<playername>})";
-                DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
+                msgtitle = "Command Error";
+                msgbody = "Missing Arguments For Spawn\n'/spawnenemy <name> (amount=<amount>) (state=<state>) (position={random, @me, @<playername>})";
+                DisplayChatError(msgtitle + "\n" + msgbody);
             }
             int amount = 1;
             string vstate = "alive";
@@ -100,7 +101,7 @@ namespace ChatCommands.Commands
                         {
                             LogInfo("Could not spawn enemy");
                         }
-                        ChatCommands.msgbody = "Spawned: " + enemyName;
+                        msgbody = "Spawned: " + enemyName;
                         break;
                     }
                 }
@@ -131,7 +132,7 @@ namespace ChatCommands.Commands
                                 LogInfo("Could not spawn enemy");
                                 LogInfo("The game tossed an error: " + ex.Message);
                             }
-                            ChatCommands.msgbody = "Spawned " + amount + " " + enemyName + (amount > 1 ? "s" : "");
+                            msgbody = "Spawned " + amount + " " + enemyName + (amount > 1 ? "s" : "");
                             break;
                         }
                     }

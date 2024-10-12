@@ -60,7 +60,7 @@ namespace Networking
         {
             // Assuming you have a method to handle processing the host command on clients
             DisplayChatMessage("Client Command: " + command);
-            ChatCommands.ChatCommands.ProcessNetHostCommand(command);
+            //ChatCommands.Commands.CommandController.ProcessNetHostCommand(command);
         }
 
         // Method to process the host command on clients

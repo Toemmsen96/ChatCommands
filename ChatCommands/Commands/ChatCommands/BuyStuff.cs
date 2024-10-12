@@ -22,7 +22,8 @@ namespace ChatCommands.Commands
         //TODO: Add more items / completely redo this
         public override void Execute(CommandInput message)
         {
-            ChatCommands.msgtitle = "Item Buying";
+            string msgtitle = "Item Buying";
+            string msgbody = "";
             Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
             if (terminal != null)
             {
@@ -68,7 +69,7 @@ namespace ChatCommands.Commands
                                     list2.Add(dictionary[item]);
                                 }
                                 terminal.BuyItemsServerRpc(list2.ToArray(), terminal.groupCredits, 0);
-                                ChatCommands.msgbody = "Bought " + result2 + " " + item + "s";
+                                msgbody = "Bought " + result2 + " " + item + "s";
                                 break;
                             }
                         }
@@ -88,7 +89,7 @@ namespace ChatCommands.Commands
                                 flag4 = true;
                                 int[] array4 = new int[1] { dictionary[item2] };
                                 terminal.BuyItemsServerRpc(array4, terminal.groupCredits, 0);
-                                ChatCommands.msgbody = "Bought " + 1 + " " + item2;
+                                msgbody = "Bought " + 1 + " " + item2;
                             }
                         }
                         if (!flag4)
@@ -103,8 +104,9 @@ namespace ChatCommands.Commands
                         }
                         int[] array5 = new int[1] { result3 };
                         terminal.BuyItemsServerRpc(array5, terminal.groupCredits, 0);
-                        ChatCommands.msgbody = "Bought item with ID [" + result3 + "]";
+                        msgbody = "Bought item with ID [" + result3 + "]";
                     }
                 }
+            DisplayChatMessage(msgtitle+"\n"+msgbody);
             }
         }}}
