@@ -10,7 +10,9 @@ you can change the prefix to anything you want, so if your keyboard is maybe inc
 If you encounter any issues, or you have suggestions, please open an Issue in the linked GitHub page.  
 
 ## Install
-To install either use a mod Manager or just drag thr ChatCommands.dll into your BepInEx/plugins folder.  
+To install either use a mod Manager or just drag the ChatCommands.dll into your BepInEx/plugins folder.  
+### Recommendation
+Install NiceChat Plugin alongside this, provides nicer Navigation etc to the chat and a better layout.  
 
 ## NonHost functionality
 This can be used as Host and also as NonHost if the Host has the mod and enabled nonhost commands in the Config file.  

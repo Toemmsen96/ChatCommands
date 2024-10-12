@@ -17,6 +17,20 @@ namespace ChatCommands.Commands
             new GetEnemies(),
             new BuyStuff(),
             new ChangeWeather(),
+            new SpawnItem(),
+            new GetEnemies(),
+            new GetScrap(),
+            //new CoHost(),
+            //new GodMode(),
+            //new InfiniteAmmo(),
+            //new GetPosition(),
+            //new SetMoney(),
+            //new SpawnMapObject(),
+            //new SpeedHack(),
+            //new TerminalCommand(),
+            //new ToggleHostCmd(),
+            //new ToggleOverrideSpawns(),
+            //new ViewCredits(),
         };
 
         private static string nullChatMessage = "";

@@ -49,6 +49,7 @@ namespace ChatCommands
         internal static int turret = -1;
         private static string msgtitle = ""; //TODO: remove
         private static string msgbody = ""; //TODO: remove
+        
         private void Awake()
         {
             if (instance == null)
@@ -90,13 +91,6 @@ namespace ChatCommands
             mls.LogInfo("ChatCommands loaded");
         }
 
-        private void Update(){
-            ccmdGUI.Update();
-        }
-
-        private void OnGUI(){
-            ccmdGUI.OnGUI();
-        }
 
 
         private static bool ToggleGodMode()
@@ -181,9 +175,6 @@ namespace ChatCommands
 
             switch (commandarguments[0])
             {
-                case "getscrap":
-                    oldCommands.GetScrap();
-                    break;
                 case "spawnitem":
                 case "spwitm":
                     oldCommands.SpawnItemFunc(command);
@@ -245,9 +236,15 @@ namespace ChatCommands
             }
             HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
         }
+
+
+
         
 
     }
+
+
+
     internal class AllowedHostPlayer
     {
         public string Name { get; set; }
