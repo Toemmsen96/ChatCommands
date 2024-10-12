@@ -12,6 +12,11 @@ namespace ChatCommands.Commands
             new SetCustomDeadline(),
             new SpawnScrapCommand(),
             new TeleportCommand(),
+            new HelpCommand(),
+            new ToggleLights(),
+            new GetEnemies(),
+            new BuyStuff(),
+            new ChangeWeather(),
         };
 
         private static string nullChatMessage = "";

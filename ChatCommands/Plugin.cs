@@ -184,24 +184,12 @@ namespace ChatCommands
 
             switch (commandarguments[0])
             {
-                case "enemies":
-                    oldCommands.GetEnemies();
-                    break;
                 case "getscrap":
                     oldCommands.GetScrap();
                     break;
                 case "spawnitem":
                 case "spwitm":
                     oldCommands.SpawnItemFunc(command);
-                    break;
-                case "weather":
-                    oldCommands.ChangeWeather(command);
-                    break;
-                case "togglelights":
-                    oldCommands.ToggleLights();
-                    break;
-                case "buy":
-                    oldCommands.BuyFunc(command);
                     break;
                 case "god":
                     msgtitle = "God Mode";

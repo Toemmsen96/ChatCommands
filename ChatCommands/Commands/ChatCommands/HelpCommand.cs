@@ -23,7 +23,9 @@ namespace ChatCommands.Commands
             string msgtitle = "Available Commands";
             string msgbody = "";
             foreach (CustomChatCommand command in CommandController.Commands){
-                msgbody += command.Name + " - " + command.Description +"\n Format: " + command.Format +" Alternative Format: "+command.AltFormat+"\n";
+                msgbody += command.Name + " - " + command.Description+(command.IsHostCommand?" Needs Host":" Doesn't need Host")+"\n Format: " + command.Format +" Alternative Format: "+command.AltFormat+"\n";
             }
             DisplayChatMessage(msgtitle + "\n" + msgbody);
-        }}}
+        }
+    }
+}
