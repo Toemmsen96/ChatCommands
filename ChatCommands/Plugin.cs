@@ -39,7 +39,6 @@ namespace ChatCommands
         internal static bool AllowHostCommands = false;
         internal static bool enableGod;
         internal static bool EnableInfiniteCredits = false;
-        internal static int CustomDeadline = int.MinValue;
         internal static bool usingTerminal = false;
         internal static PlayerControllerB playerRef;
         internal static bool isHost;
@@ -77,6 +76,7 @@ namespace ChatCommands
             harmony.PatchAll(typeof(ChatCommands));
             harmony.PatchAll(typeof(Patches.Patches));
             harmony.PatchAll(typeof(CommandController));
+            harmony.PatchAll(typeof(SetCustomDeadline));
             harmony.PatchAll(typeof(ccmdGUI));
             //CCMDNetworking newCMDNW = new CCMDNetworking();
             ccmdGUI = new ccmdGUI().InitMenu(instance);
@@ -190,10 +190,6 @@ namespace ChatCommands
                 case "getscrap":
                     oldCommands.GetScrap();
                     break;
-                case "spawnscrap":
-                case "spwscr":
-                    oldCommands.SpawnScrapFunc(command);
-                    break;
                 case "spawnitem":
                 case "spwitm":
                     oldCommands.SpawnItemFunc(command);
@@ -217,13 +213,6 @@ namespace ChatCommands
                     msgtitle = "Speed hack";
                     msgbody = "Speed hack set to: " + ToggleSpeedHack();
                     SendHostCommand(command);
-                    break;
-                case "deadline":
-                case "dl":
-                    oldCommands.SetCustomDeadline(command);
-                    break;
-                case "tp":
-                    oldCommands.Teleport(command);
                     break;
                 case "money":
                     EnableInfiniteCredits = !EnableInfiniteCredits;

@@ -23,6 +23,11 @@ namespace ChatCommands.Commands
                 return false;
             }
 
+            if (this.IsHostCommand && !ChatCommands.isHost){
+                Utils.DisplayChatError("You must be the host to use this command.");
+                return false;
+            }
+
             // Execute command
             this.Execute(command);
             return true;

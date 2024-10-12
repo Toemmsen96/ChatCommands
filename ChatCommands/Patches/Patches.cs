@@ -116,22 +116,6 @@ namespace ChatCommands.Patches
             return true;
         }
 
-        [HarmonyPatch(typeof(TimeOfDay), "SetNewProfitQuota")]
-        [HarmonyPostfix]
-        private static void PatchDeadline(TimeOfDay __instance)
-        {
-
-            if (ChatCommands.isHost && ChatCommands.CustomDeadline != int.MinValue)
-            {
-                __instance.quotaVariables.deadlineDaysAmount = ChatCommands.CustomDeadline;
-                __instance.timeUntilDeadline = (float)(__instance.quotaVariables.deadlineDaysAmount + ChatCommands.CustomDeadline) * __instance.totalTime;
-
-                TimeOfDay.Instance.timeUntilDeadline = (int)(TimeOfDay.Instance.totalTime * (float)TimeOfDay.Instance.quotaVariables.deadlineDaysAmount);
-                TimeOfDay.Instance.SyncTimeClientRpc(__instance.globalTime, (int)__instance.timeUntilDeadline);
-                StartOfRound.Instance.deadlineMonitorText.text = "DEADLINE:\n " + TimeOfDay.Instance.daysUntilDeadline;
-            }
-        }
-
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPrefix]

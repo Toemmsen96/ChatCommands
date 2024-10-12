@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using BepInEx;
 using HarmonyLib;
 using static ChatCommands.Utils;
 
@@ -8,6 +9,9 @@ namespace ChatCommands.Commands
     {
         public static List<CustomChatCommand> Commands { get; } = new List<CustomChatCommand> {
             new SpawnEnemyCommand(),
+            new SetCustomDeadline(),
+            new SpawnScrapCommand(),
+            new TeleportCommand(),
         };
 
         private static string nullChatMessage = "";
@@ -87,6 +91,9 @@ namespace ChatCommands.Commands
 
 
         private static bool CheckForCommand(string message){
+            if (message.IsNullOrWhiteSpace()){
+                return false;
+            }
             foreach (var command in Commands){
                 if (command.Handle(message)){
                     return true;

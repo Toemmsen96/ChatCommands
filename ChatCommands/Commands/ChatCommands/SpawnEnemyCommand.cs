@@ -11,10 +11,10 @@ namespace ChatCommands.Commands
 
         public override string Name => "Spawn Enemy";
 
-        public override string Description => "Spawns an enemy at the specified location. Either use the player's position or specify a position.";
+        public override string Description => "Spawns an enemy at the specified location. Either use the player's position or specify a position. Position, state and amount are optional. Use them with the following format: position=@(playername/me) amount=(number) state=(alive/dead)";
 
-        public override string Format => "/spawnenemy [p=@me] [enemy] [amount]";
-        public override string AltFormat => "/spweny [enemy] [amount]";
+        public override string Format => "/spawnenemy [enemyname] ([position]) ([amount]) ([state])";
+        public override string AltFormat => "/spweny [enemyname] ([amount]) ([state]) ([position])";
         public override bool IsHostCommand => true;
 
         public override void Execute(CommandInput message)
