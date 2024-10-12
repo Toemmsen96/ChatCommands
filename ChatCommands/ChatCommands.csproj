@@ -34,59 +34,72 @@
     <Reference Include="0Harmony">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\0Harmony.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\0Harmony.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\0Harmony.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\0Harmony.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\0Harmony.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\BepInEx.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\BepInEx.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx.Harmony, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Harmony.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Harmony.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Harmony.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Harmony.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Harmony.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Harmony.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx.Preloader">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Preloader.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Preloader.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Preloader.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Preloader.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Preloader.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.Preloader.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Steamworks.Win64">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Facepunch.Steamworks.Win64.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Facepunch.Steamworks.Win64.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Facepunch.Steamworks.Win64.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
     </Reference>
     <Reference Include="HarmonyXInterop, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\HarmonyXInterop.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\HarmonyXInterop.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\HarmonyXInterop.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\HarmonyXInterop.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\HarmonyXInterop.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\HarmonyXInterop.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil, Version=0.10.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Mdb">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Mdb.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Mdb.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Mdb.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Mdb.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Mdb.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Mdb.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Pdb">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Pdb.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Pdb.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Pdb.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Pdb.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Pdb.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Pdb.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Rocks">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Rocks.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Rocks.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Rocks.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Rocks.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Rocks.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Rocks.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.RuntimeDetour, Version=22.1.29.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\MonoMod.RuntimeDetour.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\MonoMod.RuntimeDetour.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\MonoMod.RuntimeDetour.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.Utils, Version=22.1.29.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\MonoMod.Utils.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\MonoMod.Utils.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\MonoMod.Utils.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\BepInEx\core\MonoMod.Utils.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\MonoMod.Utils.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\BepInEx\core\MonoMod.Utils.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -99,70 +112,98 @@
     <Reference Include="Unity.Netcode.Components">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Components.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Components.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Components.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Components.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Components.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Components.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Netcode.Runtime">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Networking.Transport">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Networking.Transport.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Networking.Transport.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Networking.Transport.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Networking.Transport.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Networking.Transport.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Networking.Transport.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Services.Core.Networking">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Services.Core.Networking.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Services.Core.Networking.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Services.Core.Networking.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Services.Core.Networking.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Services.Core.Networking.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Services.Core.Networking.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.TextMeshPro.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.TextMeshPro.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.TextMeshPro.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.TextMeshPro.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AIModule.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AIModule.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AIModule.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AIModule.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AIModule.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AudioModule.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AudioModule.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AudioModule.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.CoreModule.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.CoreModule.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.CoreModule.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputModule">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputModule.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputModule.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputModule.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputModule.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputModule.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.ParticleSystemModule.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.ParticleSystemModule.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.ParticleSystemModule.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.PhysicsModule.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.PhysicsModule.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.PhysicsModule.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestAudioModule">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestModule">
       <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestModule.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
       <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestModule.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestModule.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath Condition="Exists('..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.IMGUIModule.dll')">..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath Condition="Exists('$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.IMGUIModule.dll')">$(HOME)\.steam\debian-installation\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath Condition="Exists('\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.IMGUIModule.dll')">\home\tom\.local\share\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\Commands.cs" />
+    <Compile Include="Commands\*.cs" />
+    <Compile Include="Commands\ChatCommands\*.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="Networking\Networking.cs" />
     <Compile Include="Patches\Patches.cs" />
     <Compile Include="Plugin.cs" />
+    <Compile Include="GUI\ccmdGUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

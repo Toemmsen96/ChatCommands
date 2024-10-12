@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
-using ChatCommands;
+using static ChatCommands.Utils;
 namespace Networking
 {
     public class CCMDNetworking : NetworkBehaviour
@@ -48,7 +48,7 @@ namespace Networking
             // Construct the full command to send to clients
             string commandToClients = instance.netHostCommandPrefix + commandInput + instance.netCommandPostfix;
 
-            ChatCommands.ChatCommands.DisplayChatMessage("Host Command: " + commandInput+"\nsending to clients via RPC");
+            DisplayChatMessage("Host Command: " + commandInput+"\nsending to clients via RPC");
 
             // Call an RPC to execute the command on all clients
             instance.RpcExecuteCommandOnClients(commandToClients);
@@ -59,7 +59,7 @@ namespace Networking
         void RpcExecuteCommandOnClients(string command)
         {
             // Assuming you have a method to handle processing the host command on clients
-            ChatCommands.ChatCommands.DisplayChatMessage("Client Command: " + command);
+            DisplayChatMessage("Client Command: " + command);
             ChatCommands.ChatCommands.ProcessNetHostCommand(command);
         }
 

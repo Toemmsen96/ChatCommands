@@ -1,23 +1,14 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using BepInEx.Configuration;
 using GameNetcodeStuff;
 using Unity.Netcode;
-using TMPro;
-using ChatCommands.Patches;
-using HarmonyLib.Tools;
-using System.Linq;
-using static Steamworks.InventoryItem;
-using System.Security;
-using System.Net;
-using static System.Net.Mime.MediaTypeNames;
-using System.Xml.Linq;
-using System.Text.RegularExpressions;
-using Networking;
+using ChatCommands.Commands;
+using static ChatCommands.Utils;
+
 
 namespace ChatCommands
 {
@@ -26,9 +17,10 @@ namespace ChatCommands
     {
         private const string modGUID = "toemmsen.ChatCommands";
         private const string modName = "ChatCommands";
-        private const string modVersion = "1.1.92";
+        private const string modVersion = "1.2.0";
         private readonly Harmony harmony = new Harmony(modGUID);
         private static ChatCommands instance;
+        private static ccmdGUI ccmdGUI;
         internal static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
         public static Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>> levelEnemySpawns;
         public static Dictionary<SpawnableEnemyWithRarity, int> enemyRaritys;
@@ -39,6 +31,7 @@ namespace ChatCommands
         internal static bool EnableInfiniteAmmo = false;
         internal static ConfigEntry<string> PrefixSetting;
         internal static ConfigEntry<bool> HostSetting;
+        internal static ConfigEntry<bool> LogToChatSetting;
         internal static ConfigEntry<bool> SendHostCommandsSetting;
         internal static ConfigEntry<bool> OverrideSpawnsSetting;
         internal static ConfigEntry<bool> EnableDebugModeSetting;
@@ -73,6 +66,7 @@ namespace ChatCommands
             SendHostCommandsSetting = instance.Config.Bind<bool>("Command Settings", "Send Host Commands", true, "(for server host only): determines if commands get sent to the clients, so for example god mode is enabled for them too");
             OverrideSpawnsSetting = instance.Config.Bind<bool>("Command Settings", "Override Spawns", true, "(for server host only): determines if the spawn command overrides the default spawns. If enabled there can be spawned more than one girl etc. Can be toggled ingame by using /override command.");
             EnableDebugModeSetting = instance.Config.Bind<bool>("Command Settings", "Enable Debug Mode", true, "Enables Unity Debug mode");
+            LogToChatSetting = instance.Config.Bind<bool>("Command Settings", "Log To Chat", true, "Enables logging to (local) chat");
             OverrideSpawns = OverrideSpawnsSetting.Value;
             AllowHostCommands = HostSetting.Value;
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
@@ -82,7 +76,10 @@ namespace ChatCommands
             enableGod = false;
             harmony.PatchAll(typeof(ChatCommands));
             harmony.PatchAll(typeof(Patches.Patches));
+            harmony.PatchAll(typeof(CommandController));
+            harmony.PatchAll(typeof(ccmdGUI));
             //CCMDNetworking newCMDNW = new CCMDNetworking();
+            ccmdGUI = new ccmdGUI().InitMenu(instance);
             mls.LogWarning((object)"\n" +
                 "  ______                                                                                                       \n"+
                 " /_  __/  ____   ___    ____ ___    ____ ___    _____  ___    ____    _____                                    \n"+
@@ -94,6 +91,14 @@ namespace ChatCommands
                 "/ /___    / / / // /_/ / / /_         / /___   / /_/ / / / / / / / / / / / / // /_/ /  / / / // /_/ /   (__  ) \n"+
                 "\\____/   /_/ /_/ \\__,_/  \\__/         \\____/   \\____/ /_/ /_/ /_/ /_/ /_/ /_/ \\__,_/  /_/ /_/ \\__,_/   /____/  \n");
             mls.LogInfo("ChatCommands loaded");
+        }
+
+        private void Update(){
+            ccmdGUI.Update();
+        }
+
+        private void OnGUI(){
+            ccmdGUI.OnGUI();
         }
 
 
@@ -124,76 +129,6 @@ namespace ChatCommands
 			obj.GetComponent<NetworkObject>().Spawn();
         }
 
-        internal static void SpawnEnemy(SpawnableEnemyWithRarity enemy, int amount, bool inside, Vector3 location)
-        {
-            if (!isHost)
-            {
-                return;
-            }
-            if (location.x != 0f && location.y != 0f && location.z != 0f && inside)
-            {
-                try
-                {
-                    for (int i = 0; i < amount; i++)
-                    {
-                        currentRound.SpawnEnemyOnServer(location,0.0f, currentLevel.Enemies.IndexOf(enemy));
-                    }
-                    return;
-                }
-                catch
-                {
-                    mls.LogInfo("Failed to spawn enemies, check your command.");
-                    return;
-                }
-            }
-            if (location.x != 0f && location.y != 0f && location.z != 0f && !inside)
-            {
-                try
-                {
-                    int i = 0;
-                    for (; i < amount; i++)
-                    {
-                        UnityEngine.Object.Instantiate<GameObject>(currentLevel.OutsideEnemies[currentLevel.OutsideEnemies.IndexOf(enemy)].enemyType.enemyPrefab, location, Quaternion.Euler(Vector3.zero)).gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
-                    }
-                    mls.LogInfo($"You wanted to spawn: {amount} enemies");
-                    mls.LogInfo("Spawned an enemy. Total Spawned: " + i + "at position:" + location);
-                    return;
-                }
-                catch
-                {
-                    mls.LogInfo("Failed to spawn enemies, check your command.");
-                    return;
-                }
-            }
-            if (inside)
-            {
-                try
-                {
-                    int i = 0;
-                    for (; i < amount; i++)
-                    {
-                        currentRound.SpawnEnemyOnServer(currentRound.allEnemyVents[UnityEngine.Random.Range(0, currentRound.allEnemyVents.Length)].floorNode.position, currentRound.allEnemyVents[i].floorNode.eulerAngles.y, currentLevel.Enemies.IndexOf(enemy));
-                        
-                    }
-                    mls.LogInfo($"You wanted to spawn: {amount} enemies");
-                    mls.LogInfo(("Total Spawned: " + i));
-                    return;
-                }
-                catch
-                {
-                    mls.LogInfo("Failed to spawn enemies, check your command.");
-                    return;
-                }
-            }
-            int j = 0;
-            for (; j < amount; j++)
-            {
-                
-                UnityEngine.Object.Instantiate<GameObject>(currentLevel.OutsideEnemies[currentLevel.OutsideEnemies.IndexOf(enemy)].enemyType.enemyPrefab, GameObject.FindGameObjectsWithTag("OutsideAINode")[UnityEngine.Random.Range(0, GameObject.FindGameObjectsWithTag("OutsideAINode").Length - 1)].transform.position, Quaternion.Euler(Vector3.zero)).gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
-            }
-            mls.LogInfo($"You wanted to spawn: {amount} enemies");
-            mls.LogInfo(("Total Spawned: " + j));
-        }
 
         internal static bool NonHostCommands(string command)
         {
@@ -202,23 +137,23 @@ namespace ChatCommands
             {
 
                 case "help":
-                    Commands.GetHelp();
+                    oldCommands.GetHelp();
                     break;
                 case "pos":
                 case "position":
-                    Commands.GetPos();
+                    oldCommands.GetPos();
                     break;
                 case "morehelp":
-                    Commands.GetMoreHelp();
+                    oldCommands.GetMoreHelp();
                     break;
                 case "credits":
-                    Commands.GetCredits();
+                    oldCommands.GetCredits();
                     break;
                 case "cheats":
-                    Commands.GetCheats();
+                    oldCommands.GetCheats();
                     break;
                 case "spawn":
-                    Commands.GetSpawn();
+                    oldCommands.GetSpawn();
                     break;
                 default:
                     IsNonHostCommand = false;
@@ -250,31 +185,27 @@ namespace ChatCommands
             switch (commandarguments[0])
             {
                 case "enemies":
-                    Commands.GetEnemies();
+                    oldCommands.GetEnemies();
                     break;
                 case "getscrap":
-                    Commands.GetScrap();
-                    break;
-                case "spawnenemy":
-                case "spweny":
-                    Commands.SpawnEnemyFunc(command);
+                    oldCommands.GetScrap();
                     break;
                 case "spawnscrap":
                 case "spwscr":
-                    Commands.SpawnScrapFunc(command);
+                    oldCommands.SpawnScrapFunc(command);
                     break;
                 case "spawnitem":
                 case "spwitm":
-                    Commands.SpawnItemFunc(command);
+                    oldCommands.SpawnItemFunc(command);
                     break;
                 case "weather":
-                    Commands.ChangeWeather(command);
+                    oldCommands.ChangeWeather(command);
                     break;
                 case "togglelights":
-                    Commands.ToggleLights();
+                    oldCommands.ToggleLights();
                     break;
                 case "buy":
-                    Commands.BuyFunc(command);
+                    oldCommands.BuyFunc(command);
                     break;
                 case "god":
                     msgtitle = "God Mode";
@@ -289,10 +220,10 @@ namespace ChatCommands
                     break;
                 case "deadline":
                 case "dl":
-                    Commands.SetCustomDeadline(command);
+                    oldCommands.SetCustomDeadline(command);
                     break;
                 case "tp":
-                    Commands.Teleport(command);
+                    oldCommands.Teleport(command);
                     break;
                 case "money":
                     EnableInfiniteCredits = !EnableInfiniteCredits;
@@ -308,11 +239,11 @@ namespace ChatCommands
                     break;
                 case "term":
                 case "terminal":
-                    Commands.TerminalFunc();
+                    oldCommands.TerminalFunc();
                     break;
                 case "hostcmd":
                 case "cohost":
-                    Commands.SetHostCmds(commandarguments[1]);
+                    oldCommands.SetHostCmds(commandarguments[1]);
                     break;
                 case "togglehostcmd":
                 case "thcmd":
@@ -320,11 +251,11 @@ namespace ChatCommands
                     break;
                 case "spawnmapobj":
                 case "spwobj":
-                    Commands.SpawnMapObj(command);
+                    oldCommands.SpawnMapObj(command);
                     break;
                 case "ovr":
                 case "override":
-                    Commands.ToggleOverrideSpawns();
+                    oldCommands.ToggleOverrideSpawns();
                     msgtitle = "Override Spawns";
                     msgbody = "Override Spawns set to: " + OverrideSpawns;
                     break;
@@ -335,7 +266,7 @@ namespace ChatCommands
                 default:
                     msgtitle = "Command";
                     msgbody = "Unknown command: " + commandarguments[0];
-                    ChatCommands.DisplayChatError(msgbody);
+                    DisplayChatError(msgbody);
                     break;
             }
             HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
@@ -381,40 +312,6 @@ namespace ChatCommands
             HUDManager.Instance.DisplayTip(ChatCommands.msgtitle, ChatCommands.msgbody, false, false, "LC_Tip1");
         }
 
-        public TextMeshProUGUI chatText;
-
-        public static void DisplayChatMessage(string chatMessage)
-        {
-            string formattedMessage =
-                $"<color=#FF00FF>ChatCommands</color>: <color=#FFFF00>{chatMessage}</color>";
-
-            HUDManager.Instance.ChatMessageHistory.Add(formattedMessage);
-
-            UpdateChatText();
-        }
-        public static void DisplayChatError(string errorMessage)
-        {
-            string formattedMessage =
-                $"<color=#FF0000>CCMD: ERROR</color>: <color=#FF0000>{errorMessage}</color>";
-
-            HUDManager.Instance.ChatMessageHistory.Add(formattedMessage);
-
-            UpdateChatText();
-        }
-
-        private static void UpdateChatText()
-        {
-            HUDManager.Instance.chatText.text = string.Join("\n", HUDManager.Instance.ChatMessageHistory);
-        }
-
-        internal static string ConvertPlayername(string name)
-        {
-            ChatCommands.mls.LogInfo("Converting name: " + name);
-            string convname = new string(name.Where((char c) => char.IsLetter(c)).ToArray());
-            convname = (Regex.Replace(convname, "[^\\w\\._]", ""));
-            ChatCommands.mls.LogInfo("Converted name: " + convname);
-            return convname;
-        }
 
     }
     internal class AllowedHostPlayer

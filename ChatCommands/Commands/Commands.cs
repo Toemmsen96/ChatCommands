@@ -1,27 +1,14 @@
-﻿using BepInEx;
-using BepInEx.Logging;
-using HarmonyLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using BepInEx.Configuration;
 using GameNetcodeStuff;
 using Unity.Netcode;
-using TMPro;
-using ChatCommands.Patches;
-using HarmonyLib.Tools;
 using System.Linq;
-using static Steamworks.InventoryItem;
-using System.Security;
-using System.Net;
-using static System.Net.Mime.MediaTypeNames;
-using System.Xml.Linq;
-using System.Collections;
 using UnityEngine.AI;
-
+using static ChatCommands.Utils;
 namespace ChatCommands
 {
-    public class Commands
+    public class oldCommands
     {
         public static string SetCustomDeadline(string text)
         {
@@ -93,7 +80,7 @@ namespace ChatCommands
                 else
                 {
                     string tpname = arguments[1].ToLower();
-                    tpname = ChatCommands.ConvertPlayername(tpname);
+                    tpname = ConvertPlayername(tpname);
 
                     PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
                     foreach (PlayerControllerB testedplayer in allPlayerScripts)
@@ -123,132 +110,7 @@ namespace ChatCommands
             }
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
-        public static string SpawnEnemyFunc(string text)
-        {
-
-            ChatCommands.msgtitle = "Spawned Enemies";
-            string[] array = text.Split(' ');
-            if (ChatCommands.currentLevel == null || ChatCommands.levelEnemySpawns == null || ChatCommands.currentLevel.Enemies == null)
-            {
-                ChatCommands.msgtitle = "Command";
-                ChatCommands.msgbody = (ChatCommands.currentLevel == null ? "Unable to send command since currentLevel is null." : "Unable to send command since levelEnemySpawns is null.");
-                ChatCommands.DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
-                return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
-            }
-            if (array.Length < 2)
-            {
-                ChatCommands.msgtitle = "Command Error";
-                ChatCommands.msgbody = "Missing Arguments For Spawn\n'/spawnenemy <name> (amount=<amount>) (state=<state>) (position={random, @me, @<playername>})";
-                ChatCommands.DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
-                ChatCommands.mls.LogWarning("Missing Arguments For Spawn\n'/spawnenemy <name> (amount=<amount>) (state=<state>) (position={random, @me, @<playername>})");
-                return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
-            }
-            int amount = 1;
-            string vstate = "alive";
-            Vector3 position = Vector3.zero;
-            string sposition = "random";
-            var args = array.Skip(2);
-
-            foreach (string arg in args)
-            {
-                string[] darg = arg.Split('=');
-                switch (darg[0])
-                {
-                    case "a":
-                    case "amount":
-                        amount = int.Parse(darg[1]);
-                        ChatCommands.mls.LogInfo($"{amount}");
-                        break;
-                    case "s":
-                    case "state":
-                        vstate = darg[1];
-                        ChatCommands.mls.LogInfo(vstate);
-                        break;
-                    case "p":
-                    case "position":
-                        sposition = darg[1];
-                        ChatCommands.mls.LogInfo(sposition);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (sposition != "random")
-            {
-                position = CalculateSpawnPosition(sposition);
-                if (position == Vector3.zero && sposition != "random")
-                {
-                    ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
-                    sposition = "random";
-                }
-            }
-
-            if (array.Length > 1)
-            {
-                bool flag = false;
-                string enemyName = "";
-                foreach (SpawnableEnemyWithRarity enemy in ChatCommands.currentLevel.Enemies)
-                {
-                    if (enemy.enemyType.enemyName.ToLower().Contains(array[1].ToLower()))
-                    {
-                        try
-                        {
-                            flag = true;
-                            enemyName = enemy.enemyType.enemyName;
-                            if (sposition == "random")
-                            {
-                                ChatCommands.SpawnEnemy(enemy, amount, inside: true, location: new Vector3(0f, 0f, 0f));
-                            }
-                            else
-                            {
-                                ChatCommands.SpawnEnemy(enemy, amount, inside: true, location: position);
-                            }
-                            ChatCommands.mls.LogInfo((object)("Spawned " + enemy.enemyType.enemyName));
-                        }
-                        catch
-                        {
-                            ChatCommands.mls.LogInfo((object)"Could not spawn enemy");
-                        }
-                        ChatCommands.msgbody = "Spawned: " + enemyName;
-                        break;
-                    }
-                }
-                if (!flag)
-                {
-                    foreach (SpawnableEnemyWithRarity outsideEnemy in ChatCommands.currentLevel.OutsideEnemies)
-                    {
-                        if (outsideEnemy.enemyType.enemyName.ToLower().Contains(array[1].ToLower()))
-                        {
-                            try
-                            {
-                                flag = true;
-                                enemyName = outsideEnemy.enemyType.enemyName;
-                                ChatCommands.mls.LogInfo(outsideEnemy.enemyType.enemyName);
-                                ChatCommands.mls.LogInfo(("The index of " + outsideEnemy.enemyType.enemyName + " is " + ChatCommands.currentLevel.OutsideEnemies.IndexOf(outsideEnemy)));
-                                if (sposition == "random")
-                                {
-                                    ChatCommands.SpawnEnemy(outsideEnemy, amount, inside: false, location: new Vector3(0f, 0f, 0f));
-                                }
-                                else
-                                {
-                                    ChatCommands.SpawnEnemy(outsideEnemy, amount, inside: false, location: position);
-                                }
-                                ChatCommands.mls.LogInfo(("Spawned " + outsideEnemy.enemyType.enemyName));
-                            }
-                            catch (Exception ex)
-                            {
-                                ChatCommands.mls.LogInfo("Could not spawn enemy");
-                                ChatCommands.mls.LogInfo(("The game tossed an error: " + ex.Message));
-                            }
-                            ChatCommands.msgbody = "Spawned " + amount + " " + enemyName + (amount > 1 ? "s" : "");
-                            break;
-                        }
-                    }
-                }
-            }
-            return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
-        }
+        
         public static string ToggleLights()
         {
             BreakerBox breakerBox = UnityEngine.Object.FindObjectOfType<BreakerBox>();
@@ -278,7 +140,7 @@ namespace ChatCommands
                 ChatCommands.mls.LogWarning("Unable to send command since currentLevel or spawnableMapObjects is null.");
                 ChatCommands.msgtitle = "Command Error";
                 ChatCommands.msgbody = "Unable to send command since currentLevel or spawnableMapObjects is null.";
-                ChatCommands.DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
+                DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
 
@@ -288,7 +150,7 @@ namespace ChatCommands
                 ChatCommands.mls.LogWarning("Missing Arguments For Spawn\n'/spawnmapobj <name> (amount=<amount>) (position={random, @me, @<playername>})");
                 ChatCommands.msgtitle = "Command Error";
                 ChatCommands.msgbody = "Missing Arguments For Spawn\n'/spawnmapobj <name> (amount=<amount>) (position={random, @me, @<playername>})";
-                ChatCommands.DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
+                DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
             string toSpawn = segments[1].ToLower();
@@ -383,7 +245,7 @@ namespace ChatCommands
                 ChatCommands.mls.LogWarning("Unable to send command since currentLevel is null.");
                 ChatCommands.msgtitle = "Command Error";
                 ChatCommands.msgbody = "Unable to send command since currentLevel is null.";
-                ChatCommands.DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
+                DisplayChatError(ChatCommands.msgtitle + "\n" + ChatCommands.msgbody);
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
 
@@ -691,7 +553,7 @@ namespace ChatCommands
                         if (!int.TryParse(array3[2], out var result2))
                         {
                             ChatCommands.mls.LogInfo(("Couldn't parse command [ " + array3[2] + " ]"));
-                            ChatCommands.DisplayChatError("Couldn't parse command [ " + array3[2] + " ]");
+                            DisplayChatError("Couldn't parse command [ " + array3[2] + " ]");
                             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
                         }
                         foreach (string item in list)
@@ -712,7 +574,7 @@ namespace ChatCommands
                         if (!flag3)
                         {
                             ChatCommands.mls.LogInfo(("Couldn't figure out what [ " + array3[1] + " ] was."));
-                            ChatCommands.DisplayChatError("Couldn't figure out what [ " + array3[1] + " ] was.");
+                            DisplayChatError("Couldn't figure out what [ " + array3[1] + " ] was.");
                             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
                         }
                     }
@@ -736,7 +598,7 @@ namespace ChatCommands
                         if (!int.TryParse(array3[1], out var result3))
                         {
                             ChatCommands.mls.LogInfo(("Couldn't figure out what [ " + array3[1] + " ] was. Int parser failed, please try again."));
-                            ChatCommands.DisplayChatError("Couldn't figure out what [ " + array3[1] + " ] was. Int parser failed, please try again.");
+                            DisplayChatError("Couldn't figure out what [ " + array3[1] + " ] was. Int parser failed, please try again.");
                             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
                         }
                         int[] array5 = new int[1] { result3 };
@@ -755,7 +617,7 @@ namespace ChatCommands
             ChatCommands.msgtitle = "Enemies:";
             if (newLevel == null)
             {
-                ChatCommands.DisplayChatError("Level is null.");
+                DisplayChatError("Level is null.");
                 Debug.LogError("newLevel is null.");
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
@@ -763,7 +625,7 @@ namespace ChatCommands
             // Check if levelEnemySpawns is null
             if (ChatCommands.levelEnemySpawns == null)
             {
-                ChatCommands.DisplayChatError("levelEnemySpawns is null.");
+                DisplayChatError("levelEnemySpawns is null.");
                 Debug.LogError("levelEnemySpawns is null.");
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
@@ -808,7 +670,7 @@ namespace ChatCommands
                     }
                 }
 
-                ChatCommands.DisplayChatMessage(textToDisplay);
+                DisplayChatMessage(textToDisplay);
             }
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
@@ -817,7 +679,7 @@ namespace ChatCommands
             SelectableLevel newLevel = ChatCommands.currentLevel;
             if (newLevel == null)
             {
-                ChatCommands.DisplayChatError("Level is null.");
+                DisplayChatError("Level is null.");
                 Debug.LogError("Current Level is null.");
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
             }
@@ -832,7 +694,7 @@ namespace ChatCommands
             //HUDManager.Instance.DisplayTip("Spawnable Scrap", output);
             ChatCommands.msgtitle = "Spawnable Scrap";
             ChatCommands.msgbody = "listed in chat";
-            ChatCommands.DisplayChatMessage("Spawnable Scrap: " + output);
+            DisplayChatMessage("Spawnable Scrap: " + output);
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
 
@@ -851,7 +713,7 @@ namespace ChatCommands
             if (!found)
             {
                 ChatCommands.mls.LogWarning("Player not found");
-                ChatCommands.DisplayChatError("Player "+playername+" not found!!!");
+                DisplayChatError("Player "+playername+" not found!!!");
                 ChatCommands.msgtitle = "Set Host Command allowance";
                 ChatCommands.msgbody = "Player not found! Check your command";
                 return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
@@ -883,21 +745,21 @@ namespace ChatCommands
         {
             ChatCommands.msgtitle = "Available Commands";
             ChatCommands.msgbody = "/buy item - Buy an item \n /togglelights - Toggle lights inside building \n /spawn - help for spawning \n /morehelp - see more commands \n /credits - List credits";
-            ChatCommands.DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
+            DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
         public static string GetMoreHelp()
         {
             ChatCommands.msgtitle = "More Commands";
             ChatCommands.msgbody = "/enemies - See all enemies available to spawn. \n /weather weatherName - Attempt to change weather \n /cheats - list cheat commands \n /override - Override Enemy spawns";
-            ChatCommands.DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
+            DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
         public static string GetCredits()
         {
             ChatCommands.msgtitle = "Credits";
             ChatCommands.msgbody = "ChatCommands by Toemmsen96 and Chrigi";
-            ChatCommands.DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
+            DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
 
@@ -905,7 +767,7 @@ namespace ChatCommands
         {
             ChatCommands.msgtitle = "Cheats";
             ChatCommands.msgbody = "/god - Toggle GodMode \n /speed - Toggle SpeedHack \n /togglelights - Toggle lights inside building \n /tp - Teleports you to the terminal in your ship, keeping all items on you! \n /tp <playername> teleports you to that player";
-            ChatCommands.DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
+            DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
 
@@ -919,7 +781,7 @@ namespace ChatCommands
                     "options: a=<num> or amount=<num> for how many to spawn\n" +
                     "p=<pos> or position=<pos> for position where to spawn\n" +
                     "<pos> can be either @me for your coordinates, @playername for coords of player with specific name or random";
-            ChatCommands.DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
+            DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
 
@@ -927,7 +789,7 @@ namespace ChatCommands
         {
             ChatCommands.msgtitle = "Position";
             ChatCommands.msgbody = "Your Position is: " + ChatCommands.playerRef.transform.position;
-            ChatCommands.DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
+            DisplayChatMessage("<color=#FF00FF>" + ChatCommands.msgtitle + "</color>\n" + ChatCommands.msgbody);
             return ChatCommands.msgbody + "/" + ChatCommands.msgtitle;
         }
 
@@ -946,74 +808,7 @@ namespace ChatCommands
             return true;
         }
 
-        private static Vector3 CalculateSpawnPosition(string sposition)
-        {
-            Vector3 position = Vector3.zero;
-            if (sposition == "random")
-            {
-                return position;
-            }
-            if (sposition.StartsWith("@"))
-            {
-                if (sposition == "@me")
-                {
-                    PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                    foreach (PlayerControllerB testedPlayer in allPlayerScripts)
-                    {
-                        ChatCommands.mls.LogInfo($"Checking Playername {testedPlayer.playerUsername}");
-                        if (testedPlayer.playerUsername.Replace(" ","").ToLower().Contains(ChatCommands.playerwhocalled.ToLower()))
-                        {
-                            ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
-                            position = testedPlayer.transform.position;
-                            ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    string origplayername = sposition.Substring(1);
-                    string playername = ChatCommands.ConvertPlayername(origplayername);
-                    PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-                    bool found = false;
-                    ChatCommands.mls.LogInfo($"Looking for Playername {playername} or Playername {origplayername}...");
-                    foreach (PlayerControllerB testedPlayer in allPlayerScripts)
-                    {
-                        ChatCommands.mls.LogInfo($"Checking Playername {testedPlayer.playerUsername.Replace(" ","")}");
-                        if (testedPlayer.playerUsername.Replace(" ", "").ToLower().Contains(playername.ToLower()) || testedPlayer.playerUsername.Replace(" ", "").ToLower().Contains(origplayername.ToLower()))
-                        {
-                            position = testedPlayer.transform.position;
-                            ChatCommands.msgbody += "@" + testedPlayer.playerUsername;
-                            found = true;
-                            ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
-                            break;
-                        }
-                    }
-                    if (!found)
-                    {
-                        ChatCommands.mls.LogWarning("Player not found");
-                        ChatCommands.DisplayChatMessage("Player not found, spawning in random position");
-                    }
-
-                }
-
-            }
-            else
-            {
-                string[] pos = sposition.Split(',');
-                if (pos.Length == 3)
-                {
-                    position = new Vector3(float.Parse(pos[0]), float.Parse(pos[1]), float.Parse(pos[2]));
-                    ChatCommands.msgbody += "position: " + position;
-                }
-                else
-                {
-                    ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
-                    ChatCommands.msgbody += "position: " + "random";
-                }
-            }
-            return position;
-        }
+        
 
         public static void ToggleOverrideSpawns()
         {
