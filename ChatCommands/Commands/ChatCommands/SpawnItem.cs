@@ -41,6 +41,11 @@ namespace ChatCommands.Commands
                         sposition = darg[1];
                         ChatCommands.mls.LogInfo(sposition);
                         break;
+                    case "v":
+                    case "value":
+                        value = int.Parse(darg[1]);
+                        ChatCommands.mls.LogInfo($"Value {value}");
+                        break;
                     default:
                         break;
                 }
@@ -54,10 +59,6 @@ namespace ChatCommands.Commands
                     sposition = "random";
                 }
             }
-            while (amount > 0)
-            {
-                ChatCommands.SpawnItems(position, 1);
-                amount--;
-            }
+            ChatCommands.SpawnItems(position, toSpawn, value, amount);
             DisplayChatMessage("Spawned " + amount + " " + toSpawn + (amount > 1 ? "s" : "") + " with value of:" + value + "\n at position: " + position);
         }}}

@@ -116,7 +116,7 @@ namespace ChatCommands.Commands
                     if (ra)
                     {
                         source = UnityEngine.Object.FindObjectsOfType<RandomScrapSpawn>();
-                        list4 = ((scrap.spawnPositionTypes != null && scrap.spawnPositionTypes.Count != 0) ? source.Where((RandomScrapSpawn x) => scrap.spawnPositionTypes.Contains(x.spawnableItems) && !x.spawnUsed).ToList() : source.ToList());
+                        list4 = (scrap.spawnPositionTypes != null && scrap.spawnPositionTypes.Count != 0) ? source.Where((RandomScrapSpawn x) => scrap.spawnPositionTypes.Contains(x.spawnableItems) && !x.spawnUsed).ToList() : source.ToList();
                     }
 
                     LogInfo("Spawning " + amount + " " + objToSpawn.name + (amount > 1 ? "s" : ""));

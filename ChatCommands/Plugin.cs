@@ -91,7 +91,7 @@ namespace ChatCommands
             mls.LogInfo("ChatCommands loaded");
         }
 
-
+        
 
         private static bool ToggleGodMode()
         {
@@ -112,12 +112,24 @@ namespace ChatCommands
             return speedHack;
         }
 
-        internal static void SpawnItems(Vector3 location, int itemToSpawnId){
-            DisplayChatMessage("Spawning items");
-            DisplayChatMessage(StartOfRound.Instance.allItemsList.itemsList.ToString());
-            GameObject obj = UnityEngine.Object.Instantiate(StartOfRound.Instance.allItemsList.itemsList[itemToSpawnId].spawnPrefab, location, Quaternion.identity, StartOfRound.Instance.propsContainer);
-			obj.GetComponent<GrabbableObject>().fallTime = 0f;
-			obj.GetComponent<NetworkObject>().Spawn();
+        internal static void SpawnItems(Vector3 location, string itemToSpawn, int value, int amount){
+            DisplayChatMessage("Trying to spawn: " + itemToSpawn);
+            foreach (var x in StartOfRound.Instance.allItemsList.itemsList)
+            {
+                if (x.name.ToLower().StartsWith(itemToSpawn))
+                {
+                    for (int i = 0; i < amount; i++)
+                    {
+                        GameObject obj = UnityEngine.Object.Instantiate(x.spawnPrefab, location, Quaternion.identity, StartOfRound.Instance.propsContainer);
+                        obj.GetComponent<GrabbableObject>().fallTime = 0f;
+                        obj.GetComponent<GrabbableObject>().SetScrapValue(value);
+                        obj.GetComponent<NetworkObject>().Spawn();
+                    }
+                    return;
+                }
+                
+            }
+            DisplayChatError("Could not spawn: " + itemToSpawn);
         }
 
 
