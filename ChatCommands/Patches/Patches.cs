@@ -11,7 +11,7 @@ namespace ChatCommands.Patches
     internal class Patches
     {
 
-        private static float defaultJumpForce;
+        internal static float defaultJumpForce;
 
         [HarmonyPatch(typeof(RoundManager), "EnemyCannotBeSpawned")]
         [HarmonyPrefix]
@@ -159,22 +159,7 @@ namespace ChatCommands.Patches
             }
         }
 
-        [HarmonyPatch(typeof(PlayerControllerB), "Update")]
-        [HarmonyPostfix]
-        private static void SpeedHackFunc(ref float ___jumpForce, ref float ___sprintMeter, ref float ___sprintMultiplier, ref bool ___isSprinting)
-        {
-            if (ChatCommands.speedHack)
-            {
-                ___jumpForce = 25f;
-                ___sprintMeter = 1f;
-                if (___isSprinting) ___sprintMultiplier = 10f;
-            }
-            else
-            {
-                ___jumpForce = defaultJumpForce;
-            }
 
-        }
 
         [HarmonyPatch(typeof(PlayerControllerB), "Start")]
         [HarmonyPrefix]

@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using BepInEx;
 using HarmonyLib;
 using static ChatCommands.Utils;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
 
 namespace ChatCommands.Commands
 {
@@ -22,11 +25,14 @@ namespace ChatCommands.Commands
             new GetScrap(),
             new CoHost(),
             new GodMode(),
+            new GetAlivePlayers(),
+            new RevivePlayers(),
+            new SpeedHack(),
+            new SpawnTruck(),
             //new InfiniteAmmo(),
             //new GetPosition(),
             //new SetMoney(),
             //new SpawnMapObject(),
-            //new SpeedHack(),
             //new TerminalCommand(),
             //new ToggleHostCmd(),
             //new ToggleOverrideSpawns(),
@@ -48,6 +54,11 @@ namespace ChatCommands.Commands
 
             if(CheckForCommand(text)){
                 __instance.chatTextField.text = nullChatMessage;
+                GameNetworkManager.Instance.localPlayerController.isTypingChat = false;
+                EventSystem.current.SetSelectedGameObject(null);
+                HUDManager.Instance.PingHUDElement(HUDManager.Instance.Chat);
+                HUDManager.Instance.chatTextField.text = "";
+                HUDManager.Instance.typingIndicator.enabled = false;
                 return false;
             }
             return true;

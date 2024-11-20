@@ -12,7 +12,7 @@ namespace ChatCommands.Commands
 
         public override string Format => "/godmode";
         public override string AltFormat => "/god";
-        public override bool IsHostCommand => true;
+        public override bool IsHostCommand => false;
 
         public override void Execute(CommandInput message)
         {

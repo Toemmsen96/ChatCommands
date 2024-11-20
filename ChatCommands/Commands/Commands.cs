@@ -137,12 +137,6 @@ namespace ChatCommands
         //
         //    return msgbody + "/" + msgtitle;
         //}
-
-        public static string SpawnItemFunc(string text){
-            
-            return msgbody + "/" + msgtitle;
-        }
-
         public static string TerminalFunc()
         {
             ChatCommands.usingTerminal = !ChatCommands.usingTerminal;

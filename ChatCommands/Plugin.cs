@@ -75,6 +75,8 @@ namespace ChatCommands
             harmony.PatchAll(typeof(Patches.Patches));
             harmony.PatchAll(typeof(CommandController));
             harmony.PatchAll(typeof(SetCustomDeadline));
+            harmony.PatchAll(typeof(SpeedHack));
+            harmony.PatchAll(typeof(SpawnTruck));
             harmony.PatchAll(typeof(ccmdGUI));
             //CCMDNetworking newCMDNW = new CCMDNetworking();
             ccmdGUI = new ccmdGUI().InitMenu(instance);
@@ -89,27 +91,6 @@ namespace ChatCommands
                 "/ /___    / / / // /_/ / / /_         / /___   / /_/ / / / / / / / / / / / / // /_/ /  / / / // /_/ /   (__  ) \n"+
                 "\\____/   /_/ /_/ \\__,_/  \\__/         \\____/   \\____/ /_/ /_/ /_/ /_/ /_/ /_/ \\__,_/  /_/ /_/ \\__,_/   /____/  \n");
             mls.LogInfo("ChatCommands loaded");
-        }
-
-        
-
-        private static bool ToggleGodMode()
-        {
-            if (isHost)
-            {
-                enableGod = !enableGod;
-            }
-            return enableGod;
-        }
-
-        private static bool ToggleSpeedHack()
-        {
-            if (isHost)
-            {
-                speedHack = !playerRef.isSpeedCheating;
-                playerRef.isSpeedCheating = speedHack;
-            }
-            return speedHack;
         }
 
         internal static void SpawnItems(Vector3 location, string itemToSpawn, int value, int amount){
@@ -187,21 +168,6 @@ namespace ChatCommands
 
             switch (commandarguments[0])
             {
-                case "spawnitem":
-                case "spwitm":
-                    oldCommands.SpawnItemFunc(command);
-                    break;
-                case "god":
-                    msgtitle = "God Mode";
-                    msgbody = "God Mode set to: " + ToggleGodMode();
-                    SendHostCommand(command);
-                    //CCMDNetworking.SendHostCommand(command);
-                    break;
-                case "speed":
-                    msgtitle = "Speed hack";
-                    msgbody = "Speed hack set to: " + ToggleSpeedHack();
-                    SendHostCommand(command);
-                    break;
                 case "money":
                     EnableInfiniteCredits = !EnableInfiniteCredits;
                     msgtitle = "Infinite Credits";
