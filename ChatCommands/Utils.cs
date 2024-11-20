@@ -201,5 +201,11 @@ namespace ChatCommands
             HUDManager.Instance.AddTextToChatOnServer(commandToClients, -1);
         }
 
+        internal static void SendCommandToServer(string commandInput)
+        {
+            string commandToServer = ConvertToNetCommand(commandInput);
+            HUDManager.Instance.AddTextToChatOnServer(commandToServer, -1);
+        }
+
     }
 }

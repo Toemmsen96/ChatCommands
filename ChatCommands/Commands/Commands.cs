@@ -178,54 +178,6 @@ namespace ChatCommands
             return msgbody + "/" + msgtitle;
         }
 
-        public static string GetScrap()
-        {
-
-            return msgbody + "/" + msgtitle;
-        }
-
-        public static string SetHostCmds(string playername)
-        {
-            PlayerControllerB[] allPlayerScripts = StartOfRound.Instance.allPlayerScripts;
-            bool found = false;
-            foreach (PlayerControllerB val3 in allPlayerScripts)
-            {
-                if (val3.playerUsername.ToLower().Contains(playername.ToLower()))
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                ChatCommands.mls.LogWarning("Player not found");
-                DisplayChatError("Player "+playername+" not found!!!");
-                msgtitle = "Set Host Command allowance";
-                msgbody = "Player not found! Check your command";
-                return msgbody + "/" + msgtitle;
-            }
-            else
-            {
-                bool foundinlist = false;
-                msgtitle = "Set Host Command allowance";
-                foreach (AllowedHostPlayer player in ChatCommands.AllowedHostPlayers)
-                {
-                    if (player.Name.ToLower().Contains(playername.ToLower()))
-                    {
-                        player.AllowHostCMD = !player.AllowHostCMD;
-                        msgbody = "Host Commands for " + playername + " set to" + player.AllowHostCMD;
-                        foundinlist = true;
-                        break;
-                    }
-                }
-                if (!foundinlist)
-                {
-                    ChatCommands.AllowedHostPlayers.Add(new AllowedHostPlayer(playername, true));
-                    msgbody = "Host Commands for " + playername + " set to true";
-                }
-            }
-            return msgbody + "/" + msgtitle;
-        }
 
         public static string GetHelp()
         {

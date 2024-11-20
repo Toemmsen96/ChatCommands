@@ -218,10 +218,6 @@ namespace ChatCommands
                 case "terminal":
                     oldCommands.TerminalFunc();
                     break;
-                case "hostcmd":
-                case "cohost":
-                    oldCommands.SetHostCmds(commandarguments[1]);
-                    break;
                 case "togglehostcmd":
                 case "thcmd":
                     AllowHostCommands = !AllowHostCommands;
