@@ -19,7 +19,7 @@ namespace ChatCommands.Commands
 
         public override string Format => "/speed ([speed]) ([jumpforce])";
         public override string AltFormat => "/speedhack ([speed]) ([jumpforce])";
-        public override bool IsHostCommand => true;
+        public override bool IsHostCommand => false;
 
         public override void Execute(CommandInput message)
         {

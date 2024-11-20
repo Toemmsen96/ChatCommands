@@ -34,20 +34,6 @@ namespace ChatCommands.Patches
             LogInfo("Attempting to spawn an enemy");
         }
 
-
-        
-
-        [HarmonyPatch(typeof(ShotgunItem), "ItemActivate")]
-        [HarmonyPrefix]
-        static void ItemActivateGunPatch(ref ShotgunItem __instance)
-        {
-            if (ChatCommands.EnableInfiniteAmmo)
-            {
-                __instance.shellsLoaded = 2;
-            }
-            
-        }
-
         [HarmonyPatch(typeof(RoundManager), "LoadNewLevel")]
         [HarmonyPostfix]
         private static void UpdateNewInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
@@ -149,15 +135,7 @@ namespace ChatCommands.Patches
 
 
 
-        [HarmonyPatch(typeof(Terminal), "RunTerminalEvents")]
-        [HarmonyPostfix]
-        private static void InfiniteCredits(ref int ___groupCredits)
-        {
-            if (ChatCommands.isHost && ChatCommands.EnableInfiniteCredits)
-            {
-                ___groupCredits = 50000;
-            }
-        }
+
 
 
 

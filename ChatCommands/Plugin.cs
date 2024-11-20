@@ -17,7 +17,7 @@ namespace ChatCommands
     {
         private const string modGUID = "toemmsen.ChatCommands";
         private const string modName = "ChatCommands";
-        private const string modVersion = "1.2.0";
+        private const string modVersion = "2.0.0";
         private readonly Harmony harmony = new Harmony(modGUID);
         private static ChatCommands instance;
         private static ccmdGUI ccmdGUI;
@@ -77,6 +77,7 @@ namespace ChatCommands
             harmony.PatchAll(typeof(SetCustomDeadline));
             harmony.PatchAll(typeof(SpeedHack));
             harmony.PatchAll(typeof(SpawnTruck));
+            harmony.PatchAll(typeof(InfiniteAmmo));
             harmony.PatchAll(typeof(ccmdGUI));
             //CCMDNetworking newCMDNW = new CCMDNetworking();
             ccmdGUI = new ccmdGUI().InitMenu(instance);
@@ -168,11 +169,6 @@ namespace ChatCommands
 
             switch (commandarguments[0])
             {
-                case "money":
-                    EnableInfiniteCredits = !EnableInfiniteCredits;
-                    msgtitle = "Infinite Credits";
-                    msgbody = "Infinite Credits: " + EnableInfiniteCredits;
-                    break;
                 case "ammo":
                 case "infammo":
                     EnableInfiniteAmmo = !EnableInfiniteAmmo;
