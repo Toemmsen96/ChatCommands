@@ -12,6 +12,7 @@ namespace ChatCommands.Commands
     {
         private static GameObject minePrefab = null;
         private static GameObject turretPrefab = null;
+        private static GameObject spikeRoofPrefab = null;
 
         public override string Name => "Spawn Map Object";
 
@@ -124,6 +125,37 @@ namespace ChatCommands.Commands
                     DisplayChatMessage("Spawned turret at position:" + position);
                 }
                     
+            }
+            else if (toSpawn == "spikeroof" || toSpawn == "spike" || toSpawn=="trap")
+            {
+                if (spikeRoofPrefab == null)
+                {
+                    LogWarning("Spike Roof not found");
+                    return;
+                }
+                for (int i = 0; i < amount; i++)
+                {
+                    if (sposition == "random")
+                    {
+                        if (UnityEngine.Random.value > 0.5f)
+                        {
+                            position = GetCurrentRound().allEnemyVents[UnityEngine.Random.Range(0, GetCurrentRound().allEnemyVents.Length)].floorNode.position;
+                        }
+                        else
+                        {
+                            position = GameObject.FindGameObjectsWithTag("OutsideAINode")[UnityEngine.Random.Range(0, GameObject.FindGameObjectsWithTag("OutsideAINode").Length)].transform.position;
+                        }
+                    }
+                    LogInfo("Spawning spike roof at position:" + position);
+                    GameObject gameObject = UnityEngine.Object.Instantiate(spikeRoofPrefab, position, Quaternion.identity, GetCurrentRound().mapPropsContainer.transform);
+                    gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
+                    DisplayChatMessage("Spawned spike roof at position:" + position);
+                }
+            }
+            else
+            {
+                LogWarning("Object not found");
+                DisplayChatError("Object not found");
             }}
             public void AddToSpawnableMapObjects(SpawnableMapObject newObject)
             {
@@ -166,6 +198,11 @@ namespace ChatCommands.Commands
                     {
                         minePrefab = obj.prefabToSpawn;
                         LogInfo("Found Mine");
+                    }
+                    if (obj.prefabToSpawn.name.ToLower().Contains("spikeroof"))
+                    {
+                        spikeRoofPrefab = obj.prefabToSpawn;
+                        LogInfo("Found Spike Roof");
                     }
                 }
             }
