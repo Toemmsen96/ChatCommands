@@ -15,8 +15,7 @@ To install either use a mod Manager or just drag the ChatCommands.dll into your 
 Install NiceChat Plugin alongside this, provides nicer Navigation etc to the chat and a better layout.  
 
 ## Commands  
-Spawn Enemy: Format: /spawnenemy [enemyname] ([p=position]) ([a=amount]) ([s=state]) - Alt: /spweny [enemyname] ([a=amount]) ([s=state]) ([p=position])
-Description: Spawns an enemy at the specified location. Either use the player's position or specify a position. Position, state and amount are optional. Use them with the following format: position=@(playername/me) amount=(number) state=(alive/dead), For Host only  
+- Spawn Enemy: Format: /spawnenemy [enemyname] ([p=position]) ([a=amount]) ([s=state]) - Alt: /spweny [enemyname] ([a=amount]) ([s=state]) ([p=position]) Description: Spawns an enemy at the specified location. Either use the player's position or specify a position. Position, state and amount are optional. Use them with the following format: position=@(playername/me) amount=(number) state=(alive/dead), For Host only  
   
 Set Custom Deadline: Format: /deadline [days] - Alt: /dl [days]
 Description: Sets a custom deadline for the game. If no argument is provided, the custom deadline will be toggled., For Host only  
