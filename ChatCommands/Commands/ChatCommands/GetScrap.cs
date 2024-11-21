@@ -16,19 +16,19 @@ namespace ChatCommands.Commands
 
         public override void Execute(CommandInput message)
         {
-            SelectableLevel newLevel = ChatCommands.currentLevel;
+            SelectableLevel newLevel = GetCurrentLevel();
             if (newLevel == null)
             {
                 DisplayChatError("Level is null.");
                 return;
             }
-            int len = ChatCommands.currentRound.currentLevel.spawnableScrap.Count;
-            string output = ChatCommands.currentRound.currentLevel.spawnableScrap[0].spawnableItem.spawnPrefab.name;
+            int len = GetCurrentLevel().spawnableScrap.Count;
+            string output = GetCurrentLevel().spawnableScrap[0].spawnableItem.spawnPrefab.name;
 
             for (int i = 1; i < len; i++)
             {
                 output += ", ";
-                output += ChatCommands.currentRound.currentLevel.spawnableScrap[i].spawnableItem.spawnPrefab.name;
+                output += GetCurrentLevel().spawnableScrap[i].spawnableItem.spawnPrefab.name;
             }
             HUDManager.Instance.DisplayTip("Spawnable Scrap", output);
             DisplayChatMessage("Spawnable Scrap: " + output);

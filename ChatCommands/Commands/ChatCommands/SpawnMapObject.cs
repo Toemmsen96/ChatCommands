@@ -20,7 +20,7 @@ namespace ChatCommands.Commands
 
         public override void Execute(CommandInput message)
         {
-            if (ChatCommands.currentLevel == null|| ChatCommands.currentRound.currentLevel.spawnableMapObjects == null)
+            if (GetCurrentLevel() == null|| GetCurrentLevel().spawnableMapObjects == null)
             {
                 LogError("Unable to send command since currentLevel or spawnableMapObjects is null.");
                 DisplayChatError("Unable to send command since currentLevel or spawnableMapObjects is null.");
@@ -81,7 +81,7 @@ namespace ChatCommands.Commands
                     {
                         if (UnityEngine.Random.value > 0.5f)
                         {
-                            position = ChatCommands.currentRound.allEnemyVents[UnityEngine.Random.Range(0, ChatCommands.currentRound.allEnemyVents.Length)].floorNode.position;
+                            position = GetCurrentRound().allEnemyVents[UnityEngine.Random.Range(0, GetCurrentRound().allEnemyVents.Length)].floorNode.position;
                         }
                         else
                         {
@@ -90,7 +90,7 @@ namespace ChatCommands.Commands
                     }
                     
                     ChatCommands.mls.LogInfo("Spawning mine at position:" + position);
-                    GameObject gameObject = UnityEngine.Object.Instantiate(Patches.Patches.minePrefab, position, Quaternion.identity, ChatCommands.currentRound.mapPropsContainer.transform);
+                    GameObject gameObject = UnityEngine.Object.Instantiate(Patches.Patches.minePrefab, position, Quaternion.identity, GetCurrentRound().mapPropsContainer.transform);
                     gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
                     DisplayChatMessage("Spawned mine at position:" + position);
                 } 
@@ -109,14 +109,14 @@ namespace ChatCommands.Commands
 
                         if (UnityEngine.Random.value > 0.5f)
                         {
-                            position = ChatCommands.currentRound.allEnemyVents[UnityEngine.Random.Range(0, ChatCommands.currentRound.allEnemyVents.Length)].floorNode.position;
+                            position = GetCurrentRound().allEnemyVents[UnityEngine.Random.Range(0, GetCurrentRound().allEnemyVents.Length)].floorNode.position;
                         }
                         else
                         {
                             position = GameObject.FindGameObjectsWithTag("OutsideAINode")[UnityEngine.Random.Range(0, GameObject.FindGameObjectsWithTag("OutsideAINode").Length)].transform.position;
                         }}
                     LogInfo("Spawning turret at position:" + position);
-                    GameObject gameObject = UnityEngine.Object.Instantiate(Patches.Patches.turretPrefab, position, Quaternion.identity, ChatCommands.currentRound.mapPropsContainer.transform);
+                    GameObject gameObject = UnityEngine.Object.Instantiate(Patches.Patches.turretPrefab, position, Quaternion.identity, GetCurrentRound().mapPropsContainer.transform);
                     gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
                     DisplayChatMessage("Spawned turret at position:" + position);
                 }

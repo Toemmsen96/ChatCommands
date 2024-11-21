@@ -22,7 +22,7 @@ namespace ChatCommands.Commands
         {
             string msgtitle = "";
             string msgbody = "";
-            if (ChatCommands.currentLevel == null)
+            if (GetCurrentLevel() == null)
             {
                 DisplayChatError("Unable to send command since currentLevel is null.");
                 return;
@@ -78,18 +78,18 @@ namespace ChatCommands.Commands
 
             if (toSpawn == "gun")
             {
-                for (int i = 0; i < ChatCommands.currentRound.currentLevel.Enemies.Count(); i++)
+                for (int i = 0; i < GetCurrentLevel().Enemies.Count(); i++)
                 {
-                    if (ChatCommands.currentRound.currentLevel.Enemies[i].enemyType.name == "Nutcracker")
+                    if (GetCurrentLevel().Enemies[i].enemyType.name == "Nutcracker")
                     {
-                        GameObject nutcra = UnityEngine.Object.Instantiate(ChatCommands.currentRound.currentLevel.Enemies[i].enemyType.enemyPrefab, new Vector3(float.MinValue, float.MinValue, float.MinValue), Quaternion.identity);
+                        GameObject nutcra = UnityEngine.Object.Instantiate(GetCurrentLevel().Enemies[i].enemyType.enemyPrefab, new Vector3(float.MinValue, float.MinValue, float.MinValue), Quaternion.identity);
                         NutcrackerEnemyAI nutcracomponent = nutcra.GetComponent<NutcrackerEnemyAI>();
 
                         LogInfo("Spawning " + amount + " gun" + (amount > 1 ? "s" : ""));
 
                         for (int j = 0; j < amount; j++)
                         {
-                            GameObject gameObject = UnityEngine.Object.Instantiate(nutcracomponent.gunPrefab, position, Quaternion.identity, ChatCommands.currentRound.spawnedScrapContainer);
+                            GameObject gameObject = UnityEngine.Object.Instantiate(nutcracomponent.gunPrefab, position, Quaternion.identity, GetCurrentRound().spawnedScrapContainer);
                             GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
                             component.startFallingPosition = position;
                             component.targetFloorPosition = component.GetItemFloorPosition(position);
@@ -102,11 +102,11 @@ namespace ChatCommands.Commands
                     }
                 }
             }
-            int len = ChatCommands.currentRound.currentLevel.spawnableScrap.Count();
+            int len = GetCurrentLevel().spawnableScrap.Count();
             bool spawnable = false;
             for (int i = 0; i < len; i++)
             {
-                Item scrap = ChatCommands.currentRound.currentLevel.spawnableScrap[i].spawnableItem;
+                Item scrap = GetCurrentLevel().spawnableScrap[i].spawnableItem;
                 if (scrap.spawnPrefab.name.ToLower() == toSpawn)
                 {
                     GameObject objToSpawn = scrap.spawnPrefab;
@@ -124,10 +124,10 @@ namespace ChatCommands.Commands
                     {
                         if (ra)
                         {
-                            RandomScrapSpawn randomScrapSpawn = list4[ChatCommands.currentRound.AnomalyRandom.Next(0, list4.Count)];
-                            position = ChatCommands.currentRound.GetRandomNavMeshPositionInRadiusSpherical(randomScrapSpawn.transform.position, randomScrapSpawn.itemSpawnRange, ChatCommands.currentRound.navHit) + Vector3.up * scrap.verticalOffset;
+                            RandomScrapSpawn randomScrapSpawn = list4[GetCurrentRound().AnomalyRandom.Next(0, list4.Count)];
+                            position = GetCurrentRound().GetRandomNavMeshPositionInRadiusSpherical(randomScrapSpawn.transform.position, randomScrapSpawn.itemSpawnRange, GetCurrentRound().navHit) + Vector3.up * scrap.verticalOffset;
                         }
-                        GameObject gameObject = UnityEngine.Object.Instantiate(objToSpawn, position, Quaternion.identity, ChatCommands.currentRound.spawnedScrapContainer);
+                        GameObject gameObject = UnityEngine.Object.Instantiate(objToSpawn, position, Quaternion.identity, GetCurrentRound().spawnedScrapContainer);
                         GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
                         component.startFallingPosition = position;
                         component.targetFloorPosition = component.GetItemFloorPosition(position);

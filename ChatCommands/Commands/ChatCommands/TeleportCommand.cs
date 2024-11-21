@@ -16,9 +16,6 @@ namespace ChatCommands.Commands
         public override string Format => "/teleport [position=(random/@<playername>/@me)]";
         public override string AltFormat => "/tp [position=(random/@<playername>/@me)]";
         public override bool IsHostCommand => true;
-
-        private static int CustomDeadline = int.MinValue;
-
         public override void Execute(CommandInput message)
         {
             string msgtitle = "";
@@ -42,7 +39,7 @@ namespace ChatCommands.Commands
                     }
                     if (sposition == "random")
                     {
-                        if (ChatCommands.currentRound != null && ChatCommands.currentLevel != null)
+                        if (GetCurrentRound() != null && GetCurrentLevel() != null)
                         {
                             System.Random shipTeleporterSeed;
                             shipTeleporterSeed = new System.Random(StartOfRound.Instance.randomMapSeed + 17 + (int)GameNetworkManager.Instance.localPlayerController.playerClientId);

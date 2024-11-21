@@ -20,7 +20,6 @@ namespace ChatCommands.Commands
             DisplayChatMessage("Infinite Ammo: " + (EnableInfiniteAmmo ? "Enabled" : "Disabled"));
         }
       
-      
         [HarmonyPatch(typeof(ShotgunItem), "ItemActivate")]
         [HarmonyPrefix]
         static void ItemActivateGunPatch(ref ShotgunItem __instance)

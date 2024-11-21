@@ -20,7 +20,7 @@ namespace ChatCommands.Commands
         public override void Execute(CommandInput message)
         {
             string textToDisplay = "";
-            SelectableLevel newLevel = ChatCommands.currentLevel;
+            SelectableLevel newLevel = GetCurrentLevel();
             string msgtitle = "Enemies:";
             string msgbody = "";
             if (newLevel == null)

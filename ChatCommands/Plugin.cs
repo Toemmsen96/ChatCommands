@@ -20,14 +20,10 @@ namespace ChatCommands
         private const string modVersion = "2.0.0";
         private readonly Harmony harmony = new Harmony(modGUID);
         private static ChatCommands instance;
-        private static ccmdGUI ccmdGUI;
         internal static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
         public static Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>> levelEnemySpawns;
         public static Dictionary<SpawnableEnemyWithRarity, int> enemyRaritys;
         public static Dictionary<SpawnableEnemyWithRarity, AnimationCurve> enemyPropCurves;
-        internal static SelectableLevel currentLevel;
-        internal static EnemyVent[] currentLevelVents;
-        internal static RoundManager currentRound;
         internal static bool EnableInfiniteAmmo = false;
         internal static ConfigEntry<string> PrefixSetting;
         internal static ConfigEntry<bool> HostSetting;
@@ -39,17 +35,11 @@ namespace ChatCommands
         internal static bool AllowHostCommands = false;
         internal static bool enableGod;
         internal static bool EnableInfiniteCredits = false;
-        internal static bool usingTerminal = false;
         internal static PlayerControllerB playerRef;
         internal static bool isHost;
         internal static bool speedHack;
         internal static string playerwhocalled;
         internal static List<AllowedHostPlayer> AllowedHostPlayers = new List<AllowedHostPlayer>();
-        internal static int mine = -1;
-        internal static int turret = -1;
-        private static string msgtitle = ""; //TODO: remove
-        private static string msgbody = ""; //TODO: remove
-        
         private void Awake()
         {
             if (instance == null)
@@ -78,9 +68,7 @@ namespace ChatCommands
             harmony.PatchAll(typeof(SpeedHack));
             harmony.PatchAll(typeof(SpawnTruck));
             harmony.PatchAll(typeof(InfiniteAmmo));
-            harmony.PatchAll(typeof(ccmdGUI));
             //CCMDNetworking newCMDNW = new CCMDNetworking();
-            ccmdGUI = new ccmdGUI().InitMenu(instance);
             mls.LogWarning((object)"\n" +
                 "  ______                                                                                                       \n"+
                 " /_  __/  ____   ___    ____ ___    ____ ___    _____  ___    ____    _____                                    \n"+
@@ -114,105 +102,7 @@ namespace ChatCommands
             }
             DisplayChatError("Could not spawn: " + itemToSpawn);
         }
-
-
-        internal static bool NonHostCommands(string command)
-        {
-            bool IsNonHostCommand = true;
-            switch (command.ToLower())
-            {
-
-                case "help":
-                    oldCommands.GetHelp();
-                    break;
-                case "pos":
-                case "position":
-                    oldCommands.GetPos();
-                    break;
-                case "morehelp":
-                    oldCommands.GetMoreHelp();
-                    break;
-                case "credits":
-                    oldCommands.GetCredits();
-                    break;
-                case "cheats":
-                    oldCommands.GetCheats();
-                    break;
-                case "spawn":
-                    oldCommands.GetSpawn();
-                    break;
-                default:
-                    IsNonHostCommand = false;
-                    break;
-            }
-            return IsNonHostCommand;
-        }
-
-        internal static void ProcessCommandInput(string command)
-        {
-            msgtitle = "default";
-            msgbody = "<color=#FF0000>ERR</color>: unknown";
-            string[] commandarguments = command.Split(' ');
-
-            if (NonHostCommands(command))
-            {
-                HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
-                return;
-            }
-
-            if (!isHost)
-            {
-                msgtitle = "Command";
-                msgbody = "Unable to send command since you are not host.";
-                HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
-                return;
-            }
-
-            switch (commandarguments[0])
-            {
-                /*
-                case "ammo":
-                case "infammo":
-                    EnableInfiniteAmmo = !EnableInfiniteAmmo;
-                    msgtitle = "Infinite Ammo";
-                    msgbody = "Infinite Ammo: " + EnableInfiniteAmmo;
-                    SendHostCommand(command);
-                    break;
-                case "term":
-                case "terminal":
-                    oldCommands.TerminalFunc();
-                    break;
-                case "spawnmapobj":
-                case "spwobj":
-                    oldCommands.SpawnMapObj(command);
-                    break;
-                case "ovr":
-                case "override":
-                    oldCommands.ToggleOverrideSpawns();
-                    msgtitle = "Override Spawns";
-                    msgbody = "Override Spawns set to: " + OverrideSpawns;
-                    break;
-                case "spawnhive":
-                case "spwhive":
-                    //Commands.SpawnHive(command);
-                    //break;
-                    */
-                default:
-                    msgtitle = "Command";
-                    msgbody = "Unknown command: " + commandarguments[0];
-                    DisplayChatError(msgbody);
-                    break;
-            }
-            HUDManager.Instance.DisplayTip(msgtitle, msgbody, false, false, "LC_Tip1");
-        }
-
-
-
-        
-
     }
-
-
 
     internal class AllowedHostPlayer
     {

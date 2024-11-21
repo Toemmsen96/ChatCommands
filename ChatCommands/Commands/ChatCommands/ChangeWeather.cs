@@ -29,24 +29,24 @@ namespace ChatCommands.Commands
                 switch (message.Args[0].ToLower())
                 {
                     case "rain":
-                        ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)1;
+                        GetCurrentRound().timeScript.currentLevelWeather = (LevelWeatherType)1;
                         break;
                     case "eclipse":
-                        ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)5;
+                        GetCurrentRound().timeScript.currentLevelWeather = (LevelWeatherType)5;
                         break;
                     case "flood":
-                        ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)4;
+                        GetCurrentRound().timeScript.currentLevelWeather = (LevelWeatherType)4;
                         break;
                     case "dust":
                     case "fog":
                     case "mist":
-                        ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)0;
+                        GetCurrentRound().timeScript.currentLevelWeather = (LevelWeatherType)0;
                         break;
                     case "storm":
-                        ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)2;
+                        GetCurrentRound().timeScript.currentLevelWeather = (LevelWeatherType)2;
                         break;
                     case "none":
-                        ChatCommands.currentRound.timeScript.currentLevelWeather = (LevelWeatherType)(-1);
+                        GetCurrentRound().timeScript.currentLevelWeather = (LevelWeatherType)(-1);
                         break;
                     default:
                         LogInfo("Couldn't figure out what [ " + message.Args[1] + " ] was.");

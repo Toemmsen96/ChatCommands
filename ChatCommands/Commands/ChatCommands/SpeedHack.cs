@@ -29,6 +29,7 @@ namespace ChatCommands.Commands
                 {
                     moddedSprintSpeed = speed;
                     speedHack = true;
+                    DisplayChatMessage("Speed Hack enabled with speed: " + moddedSprintSpeed);
                     //ChatCommands.playerRef.isSpeedCheating = speedHack;
                     return;
                 }
@@ -47,6 +48,7 @@ namespace ChatCommands.Commands
                     {
                         moddedJumpForce = jumpForce;
                         speedHack = true;
+                        DisplayChatMessage("Speed Hack enabled with speed: " + moddedSprintSpeed + " and jump force: " + moddedJumpForce);
                         //ChatCommands.playerRef.isSpeedCheating = speedHack;
                         return;
                     }
@@ -75,6 +77,7 @@ namespace ChatCommands.Commands
                     moddedSprintSpeed = 0f;
                     moddedJumpForce = defaultJumpForce;
                 }
+                DisplayChatMessage("Speed Hack: " + (speedHack ? "Enabled" : "Disabled"));
                 //ChatCommands.playerRef.isSpeedCheating = speedHack;
             }
             

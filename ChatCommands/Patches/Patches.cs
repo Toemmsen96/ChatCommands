@@ -40,18 +40,7 @@ namespace ChatCommands.Patches
         [HarmonyPostfix]
         private static void UpdateNewInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
         {
-            ChatCommands.currentLevel = ___currentLevel;
-            ChatCommands.currentLevelVents = ___allEnemyVents;
             HUDManager.Instance.chatTextField.characterLimit = 999;
-        }
-
-
-        [HarmonyPatch(typeof(RoundManager), "AdvanceHourAndSpawnNewBatchOfEnemies")]
-        [HarmonyPrefix]
-        private static void UpdateCurrentLevelInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
-        {
-            ChatCommands.currentLevel = ___currentLevel;
-            ChatCommands.currentLevelVents = ___allEnemyVents;
         }
 
 
@@ -59,7 +48,6 @@ namespace ChatCommands.Patches
         [HarmonyPrefix]
         private static bool ModifyLevel(ref SelectableLevel newLevel)
         {
-            ChatCommands.currentRound = RoundManager.Instance;
             if (!ChatCommands.levelEnemySpawns.ContainsKey(newLevel))
             {
                 List<SpawnableEnemyWithRarity> list = new List<SpawnableEnemyWithRarity>();
@@ -104,7 +92,6 @@ namespace ChatCommands.Patches
             return true;
         }
 
-
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPrefix]
         private static void SetIsHost()
@@ -134,12 +121,6 @@ namespace ChatCommands.Patches
         {
             return !ChatCommands.enableGod;
         }
-
-
-
-
-
-
 
         [HarmonyPatch(typeof(PlayerControllerB), "Start")]
         [HarmonyPrefix]
@@ -175,29 +156,6 @@ namespace ChatCommands.Patches
                         LogInfo("Found Mine");
                     }
                 }
-                /*
-                for (int i = 0; i < array.Count(); i++)
-                {
-                    foreach (var prefab in array[i].spawnablePrefabs)
-                    {
-                        if (prefab.name == "Landmine")
-                        {
-                            LogInfo("Found Mine Index: " + i);
-                            ChatCommands.mine = i;
-                            break;
-                        }
-                        if (prefab.name == "Turret")
-                        {
-                            LogInfo("Found Turret Index: " + i);
-                            ChatCommands.turret = i;
-                            break;
-                        }
-                        else
-                        {
-                            LogInfo("Found: " + prefab.name);
-                        }
-                    }
-                }*/
             }
             
         }
@@ -210,8 +168,5 @@ namespace ChatCommands.Patches
             __result = ChatCommands.EnableDebugModeSetting.Value;
             return;
         }
-
-
-        
     }
 }

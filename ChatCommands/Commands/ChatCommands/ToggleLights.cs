@@ -21,14 +21,14 @@ namespace ChatCommands.Commands
                 
                 if (breakerBox.isPowerOn)
                 {
-                    ChatCommands.currentRound.TurnBreakerSwitchesOff();
-                    ChatCommands.currentRound.TurnOnAllLights(false);
+                    GetCurrentRound().TurnBreakerSwitchesOff();
+                    GetCurrentRound().TurnOnAllLights(false);
                     breakerBox.isPowerOn = false;
                     DisplayChatMessage("Turned the lights off");
                 }
                 else
                 {
-                    ChatCommands.currentRound.PowerSwitchOnClientRpc();
+                    GetCurrentRound().PowerSwitchOnClientRpc();
                     DisplayChatMessage("Turned the lights on");
                 }
             }

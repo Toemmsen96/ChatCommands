@@ -14,11 +14,10 @@ namespace ChatCommands
         private static string NetCommandPrefix = "<size=0>CCMD:";
         private static string NetHostCommandPrefix = "<size=0>CHCMD:";
         private static string NetCommandPostfix = ":CCMD</size>";
+        internal static bool DisplayAsTooltip = false;
 
         public static Vector3 CalculateSpawnPosition(string sposition)
         {
-            string msgtitle = "";
-            string msgbody = "";
             Vector3 position = Vector3.zero;
             if (sposition == "random")
             {
@@ -44,7 +43,6 @@ namespace ChatCommands
                         {
                             ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
                             position = testedPlayer.transform.position;
-                            msgbody += "@" + testedPlayer.playerUsername;
                             break;
                         }
                     }
@@ -61,7 +59,6 @@ namespace ChatCommands
                         if (testedPlayer.playerUsername.Replace(" ", "").ToLower().Contains(playername.ToLower()) || testedPlayer.playerUsername.Replace(" ", "").ToLower().Contains(origplayername.ToLower()))
                         {
                             position = testedPlayer.transform.position;
-                            msgbody += "@" + testedPlayer.playerUsername;
                             found = true;
                             ChatCommands.mls.LogInfo($"Found player {testedPlayer.playerUsername}");
                             break;
@@ -82,12 +79,10 @@ namespace ChatCommands
                 if (pos.Length == 3)
                 {
                     position = new Vector3(float.Parse(pos[0]), float.Parse(pos[1]), float.Parse(pos[2]));
-                    msgbody += "position: " + position;
                 }
                 else
                 {
                     ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
-                    msgbody += "position: " + "random";
                 }
             }
             return position;
@@ -128,6 +123,10 @@ namespace ChatCommands
             catch (Exception e){
                 ChatCommands.mls.LogError("Error displaying chat message: " + e);
             }
+            if (DisplayAsTooltip)
+            {
+                HUDManager.Instance.DisplayTip("ChatCommands", chatMessage, true, false, "LC_Tip1");
+            }
         }
         public static void DisplayChatError(string errorMessage)
         {
@@ -139,6 +138,10 @@ namespace ChatCommands
 
             UpdateChatText();}catch (Exception e){
                 ChatCommands.mls.LogError("Error displaying chat error: " + e);
+            }
+            if (DisplayAsTooltip)
+            {
+                HUDManager.Instance.DisplayTip("ChatCommands", errorMessage, true, false, "LC_Tip1");
             }
         }
 
@@ -213,6 +216,16 @@ namespace ChatCommands
         {
             string commandToServer = ConvertToNetCommand(commandInput);
             HUDManager.Instance.AddTextToChatOnServer(commandToServer, -1);
+        }
+
+        internal static SelectableLevel GetCurrentLevel()
+        {
+            return RoundManager.Instance.currentLevel;
+        }
+
+        internal static RoundManager GetCurrentRound()
+        {
+            return RoundManager.Instance;
         }
 
     }

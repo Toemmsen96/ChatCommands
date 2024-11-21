@@ -22,10 +22,10 @@ namespace ChatCommands.Commands
 
             string msgtitle = "Spawned Enemies";
             string msgbody = "";
-            if (ChatCommands.currentLevel == null || ChatCommands.levelEnemySpawns == null || ChatCommands.currentLevel.Enemies == null)
+            if (GetCurrentLevel() == null || ChatCommands.levelEnemySpawns == null || GetCurrentLevel().Enemies == null)
             {
                 msgtitle = "Command";
-                msgbody = ChatCommands.currentLevel == null ? "Unable to send command since currentLevel is null." : "Unable to send command since levelEnemySpawns is null.";
+                msgbody = GetCurrentLevel() == null ? "Unable to send command since currentLevel is null." : "Unable to send command since levelEnemySpawns is null.";
                 DisplayChatError(msgtitle + "\n" + msgbody);
             }
             if (message.Args.Count < 1)
@@ -79,7 +79,7 @@ namespace ChatCommands.Commands
             {
                 bool flag = false;
                 string enemyName = "";
-                foreach (SpawnableEnemyWithRarity enemy in ChatCommands.currentLevel.Enemies)
+                foreach (SpawnableEnemyWithRarity enemy in GetCurrentLevel().Enemies)
                 {
                     if (enemy.enemyType.enemyName.ToLower().Contains(inputName.ToLower()))
                     {
@@ -107,7 +107,7 @@ namespace ChatCommands.Commands
                 }
                 if (!flag)
                 {
-                    foreach (SpawnableEnemyWithRarity outsideEnemy in ChatCommands.currentLevel.OutsideEnemies)
+                    foreach (SpawnableEnemyWithRarity outsideEnemy in GetCurrentLevel().OutsideEnemies)
                     {
                         if (outsideEnemy.enemyType.enemyName.ToLower().Contains(inputName.ToLower()))
                         {
@@ -116,7 +116,7 @@ namespace ChatCommands.Commands
                                 flag = true;
                                 enemyName = outsideEnemy.enemyType.enemyName;
                                 LogInfo(outsideEnemy.enemyType.enemyName);
-                                LogInfo("The index of " + outsideEnemy.enemyType.enemyName + " is " + ChatCommands.currentLevel.OutsideEnemies.IndexOf(outsideEnemy));
+                                LogInfo("The index of " + outsideEnemy.enemyType.enemyName + " is " + GetCurrentLevel().OutsideEnemies.IndexOf(outsideEnemy));
                                 if (sposition == "random")
                                 {
                                     SpawnEnemy(outsideEnemy, amount, inside: false, location: new Vector3(0f, 0f, 0f));
@@ -152,7 +152,7 @@ namespace ChatCommands.Commands
                 {
                     for (int i = 0; i < amount; i++)
                     {
-                        ChatCommands.currentRound.SpawnEnemyOnServer(location,0.0f, ChatCommands.currentLevel.Enemies.IndexOf(enemy));
+                        GetCurrentRound().SpawnEnemyOnServer(location,0.0f, GetCurrentLevel().Enemies.IndexOf(enemy));
                     }
                     return;
                 }
@@ -169,7 +169,7 @@ namespace ChatCommands.Commands
                     int i = 0;
                     for (; i < amount; i++)
                     {
-                        UnityEngine.Object.Instantiate<GameObject>(ChatCommands.currentLevel.OutsideEnemies[ChatCommands.currentLevel.OutsideEnemies.IndexOf(enemy)].enemyType.enemyPrefab, location, Quaternion.Euler(Vector3.zero)).gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
+                        UnityEngine.Object.Instantiate<GameObject>(GetCurrentLevel().OutsideEnemies[GetCurrentLevel().OutsideEnemies.IndexOf(enemy)].enemyType.enemyPrefab, location, Quaternion.Euler(Vector3.zero)).gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
                     }
                     LogInfo($"You wanted to spawn: {amount} enemies");
                     LogInfo("Spawned an enemy. Total Spawned: " + i + "at position:" + location);
@@ -188,7 +188,7 @@ namespace ChatCommands.Commands
                     int i = 0;
                     for (; i < amount; i++)
                     {
-                        ChatCommands.currentRound.SpawnEnemyOnServer(ChatCommands.currentRound.allEnemyVents[UnityEngine.Random.Range(0, ChatCommands.currentRound.allEnemyVents.Length)].floorNode.position, ChatCommands.currentRound.allEnemyVents[i].floorNode.eulerAngles.y, ChatCommands.currentLevel.Enemies.IndexOf(enemy));
+                        GetCurrentRound().SpawnEnemyOnServer(GetCurrentRound().allEnemyVents[UnityEngine.Random.Range(0, GetCurrentRound().allEnemyVents.Length)].floorNode.position, GetCurrentRound().allEnemyVents[i].floorNode.eulerAngles.y, GetCurrentLevel().Enemies.IndexOf(enemy));
                         
                     }
                     LogInfo($"You wanted to spawn: {amount} enemies");
@@ -205,7 +205,7 @@ namespace ChatCommands.Commands
             for (; j < amount; j++)
             {
                 
-                UnityEngine.Object.Instantiate<GameObject>(ChatCommands.currentLevel.OutsideEnemies[ChatCommands.currentLevel.OutsideEnemies.IndexOf(enemy)].enemyType.enemyPrefab, GameObject.FindGameObjectsWithTag("OutsideAINode")[UnityEngine.Random.Range(0, GameObject.FindGameObjectsWithTag("OutsideAINode").Length - 1)].transform.position, Quaternion.Euler(Vector3.zero)).gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
+                UnityEngine.Object.Instantiate<GameObject>(GetCurrentLevel().OutsideEnemies[GetCurrentLevel().OutsideEnemies.IndexOf(enemy)].enemyType.enemyPrefab, GameObject.FindGameObjectsWithTag("OutsideAINode")[UnityEngine.Random.Range(0, GameObject.FindGameObjectsWithTag("OutsideAINode").Length - 1)].transform.position, Quaternion.Euler(Vector3.zero)).gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
             }
             LogInfo($"You wanted to spawn: {amount} enemies");
             LogInfo("Total Spawned: " + j);
