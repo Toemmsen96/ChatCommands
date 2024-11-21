@@ -12,7 +12,7 @@ namespace ChatCommands.Commands
 
         public override string Name => "Buy Stuff";
 
-        public override string Description => "Buy stuff from the shop. Gets delivered normally.";
+        public override string Description => "Buy stuff from the shop. Gets delivered via DropShip. (old function, you better use /term buy [itemname] instead)";
 
         public override string Format => "/buy [itemname]";
         public override string AltFormat => "/buyitem [itemname]";

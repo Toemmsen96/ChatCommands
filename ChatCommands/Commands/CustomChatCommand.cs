@@ -24,8 +24,9 @@ namespace ChatCommands.Commands
             }
 
             if (this.IsHostCommand && !ChatCommands.isHost){
-                Utils.DisplayChatError("You must be the host to use this command.");
-                return false;
+                Utils.DisplayChatError("You must be the host to use this command. Trying to send this command to the host.");
+                Utils.SendCommandToServer(message);
+                return true;
             }
 
             // Execute command

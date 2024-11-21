@@ -15,11 +15,9 @@ namespace ChatCommands.Commands
 
         public override string Format => "/teleport [position=(random/@<playername>/@me)]";
         public override string AltFormat => "/tp [position=(random/@<playername>/@me)]";
-        public override bool IsHostCommand => true;
+        public override bool IsHostCommand => false;
         public override void Execute(CommandInput message)
         {
-            string msgtitle = "";
-            string msgbody = "";
             Vector3 position = Vector3.zero;
             string posArg = message.Args.Count > 0 ? message.Args[0] : "";
             string sposition = "random";
@@ -54,8 +52,8 @@ namespace ChatCommands.Commands
                     GameNetworkManager.Instance.localPlayerController.beamUpParticle.Play();
                     GameNetworkManager.Instance.localPlayerController.beamOutBuildupParticle.Play();
                     GameNetworkManager.Instance.localPlayerController.TeleportPlayer(position, false, 0f, false, true);
-                    msgtitle = "Teleported";
-                    msgbody = "Teleported to " + sposition;
+                    DisplayChatMessage("Teleported to " + sposition);
+                    return;
                     
                 }
                 else
@@ -71,8 +69,8 @@ namespace ChatCommands.Commands
                             GameNetworkManager.Instance.localPlayerController.beamUpParticle.Play();
                             GameNetworkManager.Instance.localPlayerController.beamOutBuildupParticle.Play();
                             GameNetworkManager.Instance.localPlayerController.TeleportPlayer(testedplayer.transform.position, false, 0f, false, true);
-                            msgtitle = "Teleported";
-                            msgbody = "Teleported to Player:" + testedplayer.playerUsername;
+                            DisplayChatMessage("Teleported to " + testedplayer.playerUsername);
+                            return;
                         }
                     }
                 }
@@ -85,11 +83,10 @@ namespace ChatCommands.Commands
                     GameNetworkManager.Instance.localPlayerController.beamUpParticle.Play();
                     GameNetworkManager.Instance.localPlayerController.beamOutBuildupParticle.Play();
                     GameNetworkManager.Instance.localPlayerController.TeleportPlayer(term.transform.position, false, 0f, false, true);
-                    msgtitle = "Teleported";
-                    msgbody = "Teleported to Terminal";
+                    DisplayChatMessage("Teleported to Terminal");
+                    return;
                 }
             }
-            DisplayChatMessage(msgtitle + "\n" + msgbody);
         }
     }
 }

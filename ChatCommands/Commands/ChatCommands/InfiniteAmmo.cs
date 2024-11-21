@@ -18,6 +18,10 @@ namespace ChatCommands.Commands
         {      
             EnableInfiniteAmmo = !EnableInfiniteAmmo;
             DisplayChatMessage("Infinite Ammo: " + (EnableInfiniteAmmo ? "Enabled" : "Disabled"));
+            if (ChatCommands.isHost)
+            {
+                SendHostCommand(message.Command);
+            }
         }
       
         [HarmonyPatch(typeof(ShotgunItem), "ItemActivate")]

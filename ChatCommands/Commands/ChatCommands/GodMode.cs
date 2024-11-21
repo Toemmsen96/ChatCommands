@@ -22,12 +22,12 @@ namespace ChatCommands.Commands
             if (ChatCommands.isHost)
             {
                 isGod = !isGod;
-                SendHostCommand("god");
+                SendHostCommand(message.Command);
             }
             else
             {
                 isGod = !isGod;
-                SendCommandToServer("god");
+                //SendCommandToServer("god");
             }
             Utils.DisplayChatMessage("God Mode: " + (isGod ? "Enabled" : "Disabled"));
         }

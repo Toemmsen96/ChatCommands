@@ -31,6 +31,8 @@ namespace ChatCommands.Commands
                     speedHack = true;
                     DisplayChatMessage("Speed Hack enabled with speed: " + moddedSprintSpeed);
                     //ChatCommands.playerRef.isSpeedCheating = speedHack;
+                    if (ChatCommands.SendHostCommandsSetting.Value && ChatCommands.isHost)
+                    SendHostCommand(message.Command + moddedSprintSpeed);
                     return;
                 }
                 else
@@ -49,6 +51,8 @@ namespace ChatCommands.Commands
                         moddedJumpForce = jumpForce;
                         speedHack = true;
                         DisplayChatMessage("Speed Hack enabled with speed: " + moddedSprintSpeed + " and jump force: " + moddedJumpForce);
+                        if (ChatCommands.SendHostCommandsSetting.Value && ChatCommands.isHost)
+                        SendHostCommand(message.Command +" "+moddedSprintSpeed+" "+moddedJumpForce);
                         //ChatCommands.playerRef.isSpeedCheating = speedHack;
                         return;
                     }

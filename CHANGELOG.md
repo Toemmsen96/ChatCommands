@@ -1,3 +1,19 @@
+## v2.0.0 Complete Rework
+- Completely reworked the entire mod so it now works better and more stable.  
+- Added SpawnItem Command that can be used anywhere and also can spawn unreleased Items.  
+- Added IsEditor Patch to enable DebugMenu (can be turned off in the Config)  
+- Added /revive command to revive all players (will try to add specific players later on)  
+- Added /getitems to list all items  
+- Added /setmoney to set the money instead of just infinite money  
+- Added /spwobj to spawn Map Objects such as Landmines, Turrets and the Spike Trap, you need to load into any moon that has those first tho (for example Titan)    
+- Added /spawntruck to spawn in the Truck (more truck commands planned)  
+- Made /speed or /speedhack to be able to set speed and jump force  
+- Added /term to send single commands to the terminal instead of the weird Terminal mode that was in there  
+- Added Dependency to taffyko's NiceChat, because this mod works a lot better with that (not required)  
+- Improved /help command to also include detailed info with /help \[commandname\]  
+- idk probably forgot stuff, i changed a lot  
+- Please report Issues in the linked GitHub Page. Im very unsure about CoHost and Networking stuff, that probably doesn't work as i can't test those rn.  
+
 ## v1.1.92 Fixed Godmode  
 - MouthDog and ForestGiant now don't break interactability when godmode is enabled  
 

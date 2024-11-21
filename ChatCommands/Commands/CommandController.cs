@@ -98,7 +98,7 @@ namespace ChatCommands.Commands
                     }
                     LogInfo("Host, trying to handle command: " + command);
                     DisplayChatMessage(nameOfUserWhoTyped + " sent command: "+ ChatCommands.PrefixSetting.Value + command);
-                    if (CheckForCommand(command)){
+                    if (CheckForCommand(ConvertFromNetCommand(command))){
                         //ChatCommands.ProcessCommandInput(command);
                         chatMessage = nullChatMessage;
                         return false;
@@ -118,7 +118,7 @@ namespace ChatCommands.Commands
                 LogInfo("Recieved command from Host, trying to handle command: " + command);
                 //TODO: need to rework / adjust
                 ProcessNetHostCommand(command); //currently empty, see below
-                if (CheckForCommand(command)){
+                if (CheckForCommand(ConvertFromNetHostCommand(command))){
                     chatMessage = nullChatMessage;
                     return false;
                 }

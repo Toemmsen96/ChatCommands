@@ -15,64 +15,88 @@ To install either use a mod Manager or just drag the ChatCommands.dll into your 
 Install NiceChat Plugin alongside this, provides nicer Navigation etc to the chat and a better layout.  
 
 ## NonHost functionality
-This can be used as Host and also as NonHost if the Host has the mod and enabled nonhost commands in the Config file.  
-The config file gets created on first startup of the mod. The setting is turned on by default  
-Infocommands can always be used as a NonHost, these are:  
+Spawn Enemy: Format: /spawnenemy [enemyname] ([position]) ([amount]) ([state]) - Alt: /spweny [enemyname] ([amount]) ([state]) ([position])
+Description: Spawns an enemy at the specified location. Either use the player's position or specify a position. Position, state and amount are optional. Use them with the following format: position=@(playername/me) amount=(number) state=(alive/dead), For Host only  
   
-/position or /pos -> get your own current position displayed  
+Set Custom Deadline: Format: /deadline [days] - Alt: /dl [days]
+Description: Sets a custom deadline for the game. If no argument is provided, the custom deadline will be toggled., For Host only  
+  
+Spawn Scrap: Format: /spawnscrap [scrapname] ([position]) ([amount]) ([value]) - Alt: /spwscr [scrapname] ([amount]) ([value]) ([position])
+Description: Spawns Scrap at the specified location. Either use the player's position or specify a position. Position, value and amount are optional. Use them with the following format: position=@(playername/me) amount=(number) value=(number), For Host only
+  
+Teleport: Format: /teleport [position=(random/@<playername>/@me)] - Alt: /tp [position=(random/@<playername>/@me)]
+Description: Teleport to where you want. Use the following format: position=@(playername/me) or position=(random) or without arguments to teleport to the terminal., Host and Client
+  
+View Help: Format: /help ([command]) - Alt: /h ([command])  
+Description: Displays a list of available commands with their format. Use <color=#00FFFF>/help [command]</color> to get more information about a specific command., Host and Client  
+  
+Toggle Lights: Format: /togglelights - Alt: /toglig  
+Description: Toggles the lights on and off., For Host only  
+  
+Get Spawnable Enemies: Format: /getenemies - Alt: /enemies  
+Description: Gets the spawnable enemies for the current level., For Host only  
+  
+Buy Stuff: Format: /buy [itemname] - Alt: /buyitem [itemname]  
+Description: Buy stuff from the shop. Gets delivered via DropShip. (old function, you better use /term buy [itemname] instead) For Host only  
+  
+Change Weather: Format: /changeweather [weathername] - Alt: /chwe [weathername]  
+Description: Change Weather to a specific type., For Host only  
+  
+Spawn Item: Format: /spawnitem [itemname] ([position]) ([amount]) ([state]) ([value]) - Alt: /spwitm [itemname] ([amount]) ([state]) ([position]) ([value])  
+Description: Spawns Items at a specified position or at a random position. Args are optional, use them like this: p=@me a=5 v=1234.  
+Note: Value doesnt work for everything., For Host only  
+  
+Get Spawnable Enemies: Format: /getenemies - Alt: /enemies  
+Description: Gets the spawnable enemies for the current level., For Host only  
+  
+Get Spawnable Scrap Items: Format: /getscrap - Alt: /scrap  
+Description: Gets the spawnable scrap items for the current level., For Host only  
+  
+Give Co-Host to a player: Format: /cohost [playername] - Alt: /hostcmd [playername]  
+Description: Gives co-host to a player, which allows them to use host commands, when you turned them off for everyone else., For Host only  
+  
+Toggle God Mode: Format: /godmode - Alt: /god  
+Description: Toggles if invincibility is enabled., Host and Client  
+  
+Get Alive Players: Format: /getalive - Alt: /getap  
+Description: Returns a list of all players and if they are alive or dead., For Host only  
+  
+Revive all players: Format: /revive - Alt: /rev  
+Description: Revives everyone., For Host only  
+  
+Speed Hack: Format: /speed ([speed]) ([jumpforce]) - Alt: /speedhack ([speed]) ([jumpforce])  
+Description: Toggles Speed Hack, if speed is provided it will set the speed to that value.  
+If jump force is provided it will set the jump force to that value., Host and Client  
+  
+Spawn Truck: Format: /spawntruck ([p=position]) - Alt: /spwtrk ([p=position])  
+Description: Spawns the Truck, either at the default position or at a specified position., For Host only  
+  
+Get ALL Spawnable Items: Format: /getitems - Alt: /items  
+Description: Gets the spawnable items you can spawn with /spawnitem or /spwitm., Host and Client  
+  
+Infinite Ammo: Format: /infammo - Alt: /ammo  
+Description: Toggle Infinite Ammo., Host and Client  
+  
+Get your current Position: Format: /getposition - Alt: /getpos  
+Description: Returns your current position., Host and Client  
+  
+Set Money: Format: /setmoney ([value]) - Alt: /money ([value])  
+Description: Set Terminal Money to defined value, or without value to toggle infinite money., For Host only  
 
-/spawn -> lists what spawn commands you can use  
+Spawn Map Object: Format: /spawnobject [objectname] ([position]) ([amount]) - Alt: /spwobj [objectname] ([amount]) ([position])  
+Description: Spawns Map Object at the specified location. Either use the player's position or specify a position. Position and amount are optional. Use them with the following format: position=@(playername/me) amount=(number), For Host only  
   
-/help -> see what commands you can use  
+Send Terminal Command: Format: /term [terminalcommand] - Alt: /terminal [terminalcommand]  
+Description: Send a terminal commmand to the terminal and receive a response., Host and Client  
   
-/morehelp -> more commands to use get listed  
+Toggle Host Commands: Format: /togglehostcmd - Alt: /thcmd  
+Description: Toggle if connecting clients can use host commands., For Host only  
   
-/cheats -> list cheat commands  
+Toggle Overrride Spawns: Format: /override - Alt: /ovr  
+Description: Toggles if Monster Spawns are overriden or not. This affects how many monsters spawn with the spawn command and natural spawns., For Host only  
   
-/credits -> list credits for mod  
-  
-## Host functionality
-Host only commands to use (require Host to have setting enabled if wanted to be used as NonHost):  
-/enemies -> lists spawnable enemies on current map (currently only for host, will try to fix for nonhost)  
-  
-/getscrap -> lists spawnable scrap on curent map (currently only for host, will try to fix for nonhost)  
-
-/spawnscrap or /spwscr "scrapname" (a="amount") (p="position") (v="value") -> spawn scrap, amount, position and value arguments are optional, use the optional stuff without ()-Brackets  
-position can be random, @me or @"playername" or a vector using just 3 floating point numbers separated by a comma eg: 2.1,3,2 ,  
-amount sets how many items will be spawned (without it defaults to 1),  
-value sets how much it is worth (default:1000)  
-with gun as scrapname you can spawn a shotgun (gun is broken at the moment, please dont use for now)  
-  
-/spawnenemy or /spweny "enemyname" (a="amount") (p="position") -> spawn enemy, amount and position are optional, use the optional stuff without ()-Brackets  
-position can be random, @me or @"playername" or a vector using just 3 floating point numbers separated by a comma eg: 2.1,3,2 ,  
-amount sets how many enemies will be spawned (without it defaults to 1),  
-  
-/infammo or /ammo -> enable infinite ammo on shotgun  
-  
-/speed -> toggles speed and jump hack for faster travelling  
-  
-/god -> toggles godmode  
-  
-/tp ("playername") -> teleport back to ship or if  stated to a player  
-  
-/buy "item" ("count") -> buy items from shop  
-  
-/money -> enables infinite money cheat  
-  
-/togglelights -> toggles lights of facility  
-  
-/weather -> change weather of current planet (not working properly rn)  
-  
-/dl "days" or /deadline "days" -> set amount of days until deadline, gets applied after quota is reached and new one is presented, so reaching the quota once is required. leaving blank after the command will reset to default  
-  
-/term -> use Terminal from anywhere. On exiting input you need to type /term again to enable walking again  
-  
-/hostcmd "playername" or /cohost "playername" -> give host commands to specific users if you turned off hostcommands for everyone in the cfg  
-
-/togglehostcmd or /thcmd -> toggle allowing host commands for everyone  
-  
-/override or /ovr -> toggle overriding enemy spawns. If set to true there can be more than one girl spawned automatically etc.  
-If set to false, enemies spawned using /spawnenemy might not spawn. Default can be set in cfg.  
+View Credits: Format: /getcredits - Alt: /credits  
+Description: Shows the credits for the ChatCommands mod., Host and Client  
 
 ### Legend:  
 "arg" -> argument for command you have to enter (without the "")  

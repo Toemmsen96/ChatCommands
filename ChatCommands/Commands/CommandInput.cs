@@ -16,7 +16,7 @@ namespace ChatCommands.Commands
         public static CommandInput Parse(string input)
         {
             // Check for command and args
-            Regex regex = new Regex(@"/(\S+)(?:\s+(""([^""]+)""|\S+))*");
+            Regex regex = new Regex($@"{ChatCommands.PrefixSetting.Value}(\S+)(?:\s+(""([^""]+)""|\S+))*");
             Match match = regex.Match(input);
 
             if (!match.Success)

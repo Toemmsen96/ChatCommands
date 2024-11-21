@@ -14,7 +14,7 @@ namespace ChatCommands
         private static string NetCommandPrefix = "<size=0>CCMD:";
         private static string NetHostCommandPrefix = "<size=0>CHCMD:";
         private static string NetCommandPostfix = ":CCMD</size>";
-        internal static bool DisplayAsTooltip = false;
+        internal static bool DisplayAsTooltip = ChatCommands.DisplayChatMessagesAsPopupSetting.Value;
 
         public static Vector3 CalculateSpawnPosition(string sposition)
         {
@@ -125,7 +125,7 @@ namespace ChatCommands
             }
             if (DisplayAsTooltip)
             {
-                HUDManager.Instance.DisplayTip("ChatCommands", chatMessage, true, false, "LC_Tip1");
+                HUDManager.Instance.DisplayTip("ChatCommands", chatMessage, false, false, "LC_Tip1");
             }
         }
         public static void DisplayChatError(string errorMessage)
@@ -176,6 +176,7 @@ namespace ChatCommands
             }
             convertedCommand = convertedCommand.Substring(NetCommandPrefix.Length);
             convertedCommand = convertedCommand.Substring(0, convertedCommand.Length - NetCommandPostfix.Length);
+            convertedCommand = ChatCommands.PrefixSetting.Value + convertedCommand;
         
             LogInfo("Converted command: " + convertedCommand);
             return convertedCommand;
@@ -190,15 +191,23 @@ namespace ChatCommands
             }
             convertedCommand = convertedCommand.Substring(NetHostCommandPrefix.Length);
             convertedCommand = convertedCommand.Substring(0, convertedCommand.Length - NetCommandPostfix.Length);
-        
+            convertedCommand = ChatCommands.PrefixSetting.Value + convertedCommand;
             LogInfo("Converted command: " + convertedCommand);
             return convertedCommand;
         }
 
         internal static string ConvertToNetCommand(string command){
+            if (command.StartsWith(ChatCommands.PrefixSetting.Value))
+            command = command.Substring(ChatCommands.PrefixSetting.Value.Length);
+            LogInfo("Converting to NetCommand: " + command);
+            LogInfo("Converted to NetCommand: " + NetCommandPrefix + command + NetCommandPostfix);
             return NetCommandPrefix + command + NetCommandPostfix;
         }
         internal static string ConvertToNetHostCommand(string command){
+            if (command.StartsWith(ChatCommands.PrefixSetting.Value))
+            command = command.Substring(ChatCommands.PrefixSetting.Value.Length);
+            LogInfo("Converting to NetHostCommand: " + command);
+            LogInfo("Converted to NetHostCommand: " + NetHostCommandPrefix + command + NetCommandPostfix);
             return NetHostCommandPrefix + command + NetCommandPostfix;
         }
 
@@ -209,12 +218,14 @@ namespace ChatCommands
                 return;
             }
             string commandToClients = ConvertToNetHostCommand(commandInput);
+            LogInfo("Sending command to clients: " + commandToClients);
             HUDManager.Instance.AddTextToChatOnServer(commandToClients, -1);
         }
 
         internal static void SendCommandToServer(string commandInput)
         {
             string commandToServer = ConvertToNetCommand(commandInput);
+            LogInfo("Sending command to server: " + commandToServer);
             HUDManager.Instance.AddTextToChatOnServer(commandToServer, -1);
         }
 
