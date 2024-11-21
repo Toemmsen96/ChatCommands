@@ -4,11 +4,14 @@ using System.Linq;
 using System;
 using Unity.Netcode;
 using System.Collections.Generic;
+using HarmonyLib;
 
 namespace ChatCommands.Commands
 {
     internal class SpawnMapObject : CustomChatCommand
     {
+        private static GameObject minePrefab = null;
+        private static GameObject turretPrefab = null;
 
         public override string Name => "Spawn Map Object";
 
@@ -47,12 +50,12 @@ namespace ChatCommands.Commands
                     case "a":
                     case "amount":
                         amount = int.Parse(darg[1]);
-                        ChatCommands.mls.LogInfo($"Amount {amount}");
+                        LogInfo($"Amount {amount}");
                         break;
                     case "p":
                     case "position":
                         sposition = darg[1];
-                        ChatCommands.mls.LogInfo(sposition);
+                        LogInfo(sposition);
                         break;
                     default:
                         break;
@@ -63,16 +66,16 @@ namespace ChatCommands.Commands
                 position = CalculateSpawnPosition(sposition);
                 if (position == Vector3.zero && sposition != "random")
                 {
-                    ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
+                    LogWarning("Position Invalid, Using Default 'random'");
                     sposition = "random";
                 }
             }
 
             if (toSpawn == "mine" || toSpawn == "landmine")
             {
-                if (Patches.Patches.minePrefab == null)
+                if (minePrefab == null)
                 {
-                    ChatCommands.mls.LogWarning("Mine not found");
+                    LogWarning("Mine not found");
                     return;
                 }
                 for (int i = 0; i < amount; i++)
@@ -89,15 +92,15 @@ namespace ChatCommands.Commands
                         }
                     }
                     
-                    ChatCommands.mls.LogInfo("Spawning mine at position:" + position);
-                    GameObject gameObject = UnityEngine.Object.Instantiate(Patches.Patches.minePrefab, position, Quaternion.identity, GetCurrentRound().mapPropsContainer.transform);
+                    LogInfo("Spawning mine at position:" + position);
+                    GameObject gameObject = UnityEngine.Object.Instantiate(minePrefab, position, Quaternion.identity, GetCurrentRound().mapPropsContainer.transform);
                     gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
                     DisplayChatMessage("Spawned mine at position:" + position);
                 } 
             }
             else if (toSpawn == "turret")
             {
-                if (Patches.Patches.turretPrefab == null)
+                if (turretPrefab == null)
                 {
                     LogWarning("Turret not found");
                     return;
@@ -116,7 +119,7 @@ namespace ChatCommands.Commands
                             position = GameObject.FindGameObjectsWithTag("OutsideAINode")[UnityEngine.Random.Range(0, GameObject.FindGameObjectsWithTag("OutsideAINode").Length)].transform.position;
                         }}
                     LogInfo("Spawning turret at position:" + position);
-                    GameObject gameObject = UnityEngine.Object.Instantiate(Patches.Patches.turretPrefab, position, Quaternion.identity, GetCurrentRound().mapPropsContainer.transform);
+                    GameObject gameObject = UnityEngine.Object.Instantiate(turretPrefab, position, Quaternion.identity, GetCurrentRound().mapPropsContainer.transform);
                     gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
                     DisplayChatMessage("Spawned turret at position:" + position);
                 }
@@ -139,4 +142,33 @@ namespace ChatCommands.Commands
                 // Point the old array to the new array
                 RoundManager.Instance.currentLevel.spawnableMapObjects = newArray;
             }
+
+                    [HarmonyPatch(typeof(RoundManager), "FinishGeneratingNewLevelClientRpc")]
+        [HarmonyPrefix]
+        private static void GetRoundManagerRef(ref RoundManager __instance)
+        {
+            if (ChatCommands.isHost)
+            {
+                LogInfo("Host, getting mine ref...");
+                Landmine[] mines = UnityEngine.Object.FindObjectsOfType<Landmine>();
+                LogInfo("Found: " + mines.Count() + " Mines on this level");
+                Turret[] turrets = UnityEngine.Object.FindObjectsOfType<Turret>();
+                LogInfo("Found: " + turrets.Count() + " Turrets on this level");
+                foreach (SpawnableMapObject obj in __instance.currentLevel.spawnableMapObjects)
+                {
+                    LogInfo("Found: " + obj.prefabToSpawn.ToString());
+                    if (obj.prefabToSpawn.name.ToLower().Contains("turret"))
+                    {
+                        turretPrefab = obj.prefabToSpawn;
+                        LogInfo("Found Turret");
+                    }
+                    if (obj.prefabToSpawn.name.ToLower().Contains("mine"))
+                    {
+                        minePrefab = obj.prefabToSpawn;
+                        LogInfo("Found Mine");
+                    }
+                }
+            }
+            
+        }
 }}

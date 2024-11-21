@@ -37,7 +37,7 @@ namespace ChatCommands.Commands
             new TerminalCommand(),
             new ToggleHostCmd(),
             new ToggleOverrideSpawns(),
-            //new ViewCredits(),
+            new GetCredits(),
         };
 
         private static string nullChatMessage = "";

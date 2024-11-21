@@ -12,22 +12,6 @@ namespace ChatCommands.Patches
     {
 
         internal static float defaultJumpForce;
-        internal static GameObject minePrefab = null;
-        internal static GameObject turretPrefab = null;
-
-        [HarmonyPatch(typeof(RoundManager), "EnemyCannotBeSpawned")]
-        [HarmonyPrefix]
-        private static bool OverrideCannotSpawn()
-        {
-            if (ChatCommands.OverrideSpawns)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
 
         [HarmonyPatch(typeof(RoundManager), "SpawnEnemyFromVent")]
         [HarmonyPrefix]
@@ -101,64 +85,17 @@ namespace ChatCommands.Patches
            
         }
 
-        [HarmonyPatch(typeof(PlayerControllerB), "AllowPlayerDeath")]
-        [HarmonyPrefix]
-        private static bool OverrideDeath()
-        {
-            return !ChatCommands.enableGod;
-        }
 
-        [HarmonyPatch(typeof(MouthDogAI), "OnCollideWithPlayer")]
-        [HarmonyPrefix]
-        private static bool OverrideDeath2()
-        {
-            return !ChatCommands.enableGod;
-        }
-
-        [HarmonyPatch(typeof(ForestGiantAI), "GrabPlayerServerRpc")]
-        [HarmonyPrefix]
-        private static bool OverrideDeath3()
-        {
-            return !ChatCommands.enableGod;
-        }
 
         [HarmonyPatch(typeof(PlayerControllerB), "Start")]
         [HarmonyPrefix]
-        private static void GetPlayerRef(ref PlayerControllerB __instance)
+        private static void SetDefaultJumpForce(ref PlayerControllerB __instance)
         {
-            ChatCommands.playerRef = __instance;
             defaultJumpForce = __instance.jumpForce;
             LogInfo("Default Jump Force: " + defaultJumpForce);
         }
 
-        [HarmonyPatch(typeof(RoundManager), "FinishGeneratingNewLevelClientRpc")]
-        [HarmonyPrefix]
-        private static void GetRoundManagerRef(ref RoundManager __instance)
-        {
-            if (ChatCommands.isHost)
-            {
-                LogInfo("Host, getting mine ref...");
-                Landmine[] mines = UnityEngine.Object.FindObjectsOfType<Landmine>();
-                LogInfo("Found: " + mines.Count() + " Mines on this level");
-                Turret[] turrets = UnityEngine.Object.FindObjectsOfType<Turret>();
-                LogInfo("Found: " + turrets.Count() + " Turrets on this level");
-                foreach (SpawnableMapObject obj in __instance.currentLevel.spawnableMapObjects)
-                {
-                    LogInfo("Found: " + obj.prefabToSpawn.ToString());
-                    if (obj.prefabToSpawn.name.ToLower().Contains("turret"))
-                    {
-                        turretPrefab = obj.prefabToSpawn;
-                        LogInfo("Found Turret");
-                    }
-                    if (obj.prefabToSpawn.name.ToLower().Contains("mine"))
-                    {
-                        minePrefab = obj.prefabToSpawn;
-                        LogInfo("Found Mine");
-                    }
-                }
-            }
-            
-        }
+
 
         // Patch game to think its in Unity Editor
         [HarmonyPatch(typeof(Application), "get_isEditor")]

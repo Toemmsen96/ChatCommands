@@ -1,4 +1,6 @@
 using static ChatCommands.Utils;
+using HarmonyLib;
+using GameNetcodeStuff;
 
 
 namespace ChatCommands.Commands
@@ -6,6 +8,7 @@ namespace ChatCommands.Commands
     internal class GodMode : CustomChatCommand
     {
 
+        private static bool isGod = false;
         public override string Name => "Toggle God Mode";
 
         public override string Description => "Toggles if invincibility is enabled.";
@@ -18,13 +21,33 @@ namespace ChatCommands.Commands
         {
             if (ChatCommands.isHost)
             {
-                ChatCommands.enableGod = !ChatCommands.enableGod;
+                isGod = !isGod;
                 SendHostCommand("god");
             }
             else
             {
-                ChatCommands.enableGod = !ChatCommands.enableGod;
+                isGod = !isGod;
                 SendCommandToServer("god");
             }
-            Utils.DisplayChatMessage("God Mode: " + (ChatCommands.enableGod ? "Enabled" : "Disabled"));
+            Utils.DisplayChatMessage("God Mode: " + (isGod ? "Enabled" : "Disabled"));
+        }
+        [HarmonyPatch(typeof(PlayerControllerB), "AllowPlayerDeath")]
+        [HarmonyPrefix]
+        private static bool OverrideDeath()
+        {
+            return !isGod;
+        }
+
+        [HarmonyPatch(typeof(MouthDogAI), "OnCollideWithPlayer")]
+        [HarmonyPrefix]
+        private static bool OverrideDeath2()
+        {
+            return !isGod;
+        }
+
+        [HarmonyPatch(typeof(ForestGiantAI), "GrabPlayerServerRpc")]
+        [HarmonyPrefix]
+        private static bool OverrideDeath3()
+        {
+            return !isGod;
         }}}

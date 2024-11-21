@@ -24,7 +24,6 @@ namespace ChatCommands
         public static Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>> levelEnemySpawns;
         public static Dictionary<SpawnableEnemyWithRarity, int> enemyRaritys;
         public static Dictionary<SpawnableEnemyWithRarity, AnimationCurve> enemyPropCurves;
-        internal static bool EnableInfiniteAmmo = false;
         internal static ConfigEntry<string> PrefixSetting;
         internal static ConfigEntry<bool> HostSetting;
         internal static ConfigEntry<bool> LogToChatSetting;
@@ -33,11 +32,7 @@ namespace ChatCommands
         internal static ConfigEntry<bool> EnableDebugModeSetting;
         internal static bool OverrideSpawns = false;
         internal static bool AllowHostCommands = false;
-        internal static bool enableGod;
-        internal static bool EnableInfiniteCredits = false;
-        internal static PlayerControllerB playerRef;
         internal static bool isHost;
-        internal static bool speedHack;
         internal static string playerwhocalled;
         internal static List<AllowedHostPlayer> AllowedHostPlayers = new List<AllowedHostPlayer>();
         private void Awake()
@@ -59,8 +54,6 @@ namespace ChatCommands
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
             levelEnemySpawns = new Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>>();
             enemyPropCurves = new Dictionary<SpawnableEnemyWithRarity, AnimationCurve>();
-            speedHack = false;
-            enableGod = false;
             harmony.PatchAll(typeof(ChatCommands));
             harmony.PatchAll(typeof(Patches.Patches));
             harmony.PatchAll(typeof(CommandController));
@@ -68,6 +61,10 @@ namespace ChatCommands
             harmony.PatchAll(typeof(SpeedHack));
             harmony.PatchAll(typeof(SpawnTruck));
             harmony.PatchAll(typeof(InfiniteAmmo));
+            harmony.PatchAll(typeof(GodMode));
+            harmony.PatchAll(typeof(SetMoney));
+            harmony.PatchAll(typeof(SpawnMapObject));
+            harmony.PatchAll(typeof(ToggleOverrideSpawns));
             //CCMDNetworking newCMDNW = new CCMDNetworking();
             mls.LogWarning((object)"\n" +
                 "  ______                                                                                                       \n"+
