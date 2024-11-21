@@ -60,5 +60,4 @@ namespace ChatCommands.Commands
                 }
             }
             ChatCommands.SpawnItems(position, toSpawn, value, amount);
-            DisplayChatMessage("Spawned " + amount + " " + toSpawn + (amount > 1 ? "s" : "") + " with value of:" + value + "\n at position: " + position);
         }}}

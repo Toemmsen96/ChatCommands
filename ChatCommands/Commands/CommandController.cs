@@ -33,10 +33,10 @@ namespace ChatCommands.Commands
             new InfiniteAmmo(),
             new GetPosition(),
             new SetMoney(),
-            //new SpawnMapObject(),
-            //new TerminalCommand(),
-            //new ToggleHostCmd(),
-            //new ToggleOverrideSpawns(),
+            new SpawnMapObject(),
+            new TerminalCommand(),
+            new ToggleHostCmd(),
+            new ToggleOverrideSpawns(),
             //new ViewCredits(),
         };
 
@@ -47,6 +47,10 @@ namespace ChatCommands.Commands
         private static bool ChatCommandsSubmitted(HUDManager __instance)
         {
             string text = __instance.chatTextField.text;
+            if (text.IsNullOrWhiteSpace())
+            {
+                return true;
+            }
             string localPlayer = GameNetworkManager.Instance.username;
             ChatCommands.playerwhocalled = ConvertPlayername(localPlayer);
 
@@ -137,6 +141,7 @@ namespace ChatCommands.Commands
             else{
                 LogWarning($"Command {message} not found. Sending to host.");
                 // TODO: Send command to host
+                SendCommandToServer(message);
             }
             return false;
         }

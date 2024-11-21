@@ -107,6 +107,14 @@ namespace ChatCommands
                 DisplayChatError(message);
             }
         }
+
+        public static void LogError(string message)
+        {
+            ChatCommands.mls.LogError(message);
+            if (logToChat){
+                DisplayChatError(message);
+            }
+        }
         public static void DisplayChatMessage(string chatMessage)
         {
             try{

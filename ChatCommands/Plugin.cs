@@ -107,6 +107,7 @@ namespace ChatCommands
                         obj.GetComponent<GrabbableObject>().SetScrapValue(value);
                         obj.GetComponent<NetworkObject>().Spawn();
                     }
+                    DisplayChatMessage("Spawned " + amount + " " + itemToSpawn + (amount > 1 ? "s" : "") + " with value of:" + value + "\n at position: " + location);
                     return;
                 }
                 
@@ -169,6 +170,7 @@ namespace ChatCommands
 
             switch (commandarguments[0])
             {
+                /*
                 case "ammo":
                 case "infammo":
                     EnableInfiniteAmmo = !EnableInfiniteAmmo;
@@ -179,10 +181,6 @@ namespace ChatCommands
                 case "term":
                 case "terminal":
                     oldCommands.TerminalFunc();
-                    break;
-                case "togglehostcmd":
-                case "thcmd":
-                    AllowHostCommands = !AllowHostCommands;
                     break;
                 case "spawnmapobj":
                 case "spwobj":
@@ -198,6 +196,7 @@ namespace ChatCommands
                 case "spwhive":
                     //Commands.SpawnHive(command);
                     //break;
+                    */
                 default:
                     msgtitle = "Command";
                     msgbody = "Unknown command: " + commandarguments[0];

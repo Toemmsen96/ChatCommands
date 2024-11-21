@@ -15,106 +15,7 @@ namespace ChatCommands
 
         public static string SpawnMapObj(string text)
         {
-            if (ChatCommands.currentLevel == null|| ChatCommands.currentRound.currentLevel.spawnableMapObjects == null)
-            {
-                ChatCommands.mls.LogWarning("Unable to send command since currentLevel or spawnableMapObjects is null.");
-                msgtitle = "Command Error";
-                msgbody = "Unable to send command since currentLevel or spawnableMapObjects is null.";
-                DisplayChatError(msgtitle + "\n" + msgbody);
-                return msgbody + "/" + msgtitle;
-            }
-
-            string[] segments = (text.Substring(1)).Split(' ');
-            if (segments.Length < 2)
-            {
-                ChatCommands.mls.LogWarning("Missing Arguments For Spawn\n'/spawnmapobj <name> (amount=<amount>) (position={random, @me, @<playername>})");
-                msgtitle = "Command Error";
-                msgbody = "Missing Arguments For Spawn\n'/spawnmapobj <name> (amount=<amount>) (position={random, @me, @<playername>})";
-                DisplayChatError(msgtitle + "\n" + msgbody);
-                return msgbody + "/" + msgtitle;
-            }
-            string toSpawn = segments[1].ToLower();
-            int amount = 1;
-            Vector3 position = Vector3.zero;
-            string sposition = "random";
-            var args = segments.Skip(2);
-
-            foreach (string arg in args)
-            {
-                string[] darg = arg.Split('=');
-                switch (darg[0])
-                {
-                    case "a":
-                    case "amount":
-                        amount = int.Parse(darg[1]);
-                        ChatCommands.mls.LogInfo($"Amount {amount}");
-                        break;
-                    case "p":
-                    case "position":
-                        sposition = darg[1];
-                        ChatCommands.mls.LogInfo(sposition);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if (sposition != "random")
-            {
-                position = CalculateSpawnPosition(sposition);
-                if (position == Vector3.zero && sposition != "random")
-                {
-                    ChatCommands.mls.LogWarning("Position Invalid, Using Default 'random'");
-                    sposition = "random";
-                }
-            }
-
-            if (toSpawn == "mine")
-            {
-                if (ChatCommands.mine == -1)
-                {
-                    ChatCommands.mls.LogWarning("Mine not found");
-                    msgtitle = "Command Error";
-                    msgbody = "Mine not spawnable on map";
-                    return msgbody + "/" + msgtitle;
-                }
-                for (int i = 0; i < amount; i++)
-                {
-                    if (sposition == "random")
-                    {
-                        //need to implement
-                        // position = 
-                    }
-                    ChatCommands.mls.LogInfo("Spawning mine at position:" + position);
-                    GameObject gameObject = UnityEngine.Object.Instantiate(ChatCommands.currentRound.currentLevel.spawnableMapObjects[ChatCommands.mine].prefabToSpawn, position, Quaternion.identity, ChatCommands.currentRound.mapPropsContainer.transform);
-                    gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
-                    msgtitle = "Spawned mine";
-                    msgbody = "Spawned mine at position:" + position;
-                } 
-            }
-            else if (toSpawn == "turret")
-            {
-                if (ChatCommands.turret == -1)
-                {
-                    ChatCommands.mls.LogWarning("Turret not found");
-                    msgtitle = "Command Error";
-                    msgbody = "Turret not spawnable on map";
-                    return msgbody + "/" + msgtitle;
-                }
-                for (int i = 0; i < amount; i++)
-                {
-                    if (sposition == "random")
-                    {
-                        //need to implement
-                        // position = 
-                    }
-                    ChatCommands.mls.LogInfo("Spawning turret at position:" + position);
-                    GameObject gameObject = UnityEngine.Object.Instantiate(ChatCommands.currentRound.currentLevel.spawnableMapObjects[ChatCommands.turret].prefabToSpawn, position, Quaternion.identity, ChatCommands.currentRound.mapPropsContainer.transform);
-                    gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
-                    msgtitle = "Spawned turret";
-                    msgbody = "Spawned turret at position:" + position;
-                }
-                    
-            }
+            
             return msgtitle + "/" + msgbody;
         }
 
@@ -137,40 +38,7 @@ namespace ChatCommands
         //
         //    return msgbody + "/" + msgtitle;
         //}
-        public static string TerminalFunc()
-        {
-            ChatCommands.usingTerminal = !ChatCommands.usingTerminal;
-            if (ChatCommands.usingTerminal)
-            {
-                msgtitle = "Began Using Terminal";
-                msgbody = " ";
-                Terminal val5 = ChatCommands.FindObjectOfType<Terminal>();
-                if (val5 == null)
-                {
-                    return msgbody + "/" + msgtitle;
-                }
-                if (!val5.terminalInUse)
-                {
-                    val5.BeginUsingTerminal();
-                    HUDManager.Instance.ChangeControlTip(0, string.Empty, true);
-                    GameNetworkManager.Instance.localPlayerController.inSpecialInteractAnimation = true;
-                }
-            }
-            else
-            {
-                Terminal val5 = ChatCommands.FindObjectOfType<Terminal>();
-                if (val5 == null)
-                {
-                    return msgbody + "/" + msgtitle; ;
-                }
-                val5.QuitTerminal();
-                GameNetworkManager.Instance.localPlayerController.inSpecialInteractAnimation = false;
-                msgtitle = "Stopped using terminal";
-                msgbody = " ";
 
-            }
-            return msgbody + "/" + msgtitle;
-        }
 
 
         public static string GetHelp()

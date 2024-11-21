@@ -12,6 +12,8 @@ namespace ChatCommands.Patches
     {
 
         internal static float defaultJumpForce;
+        internal static GameObject minePrefab = null;
+        internal static GameObject turretPrefab = null;
 
         [HarmonyPatch(typeof(RoundManager), "EnemyCannotBeSpawned")]
         [HarmonyPrefix]
@@ -155,22 +157,47 @@ namespace ChatCommands.Patches
             if (ChatCommands.isHost)
             {
                 LogInfo("Host, getting mine ref...");
-                int len = ChatCommands.currentRound.currentLevel.spawnableMapObjects.Count();
-                for (int i = 0; i < len; i++)
+                Landmine[] mines = UnityEngine.Object.FindObjectsOfType<Landmine>();
+                LogInfo("Found: " + mines.Count() + " Mines on this level");
+                Turret[] turrets = UnityEngine.Object.FindObjectsOfType<Turret>();
+                LogInfo("Found: " + turrets.Count() + " Turrets on this level");
+                foreach (SpawnableMapObject obj in __instance.currentLevel.spawnableMapObjects)
                 {
-                    if (ChatCommands.currentRound.currentLevel.spawnableMapObjects[i].prefabToSpawn.name == "Landmine")
+                    LogInfo("Found: " + obj.prefabToSpawn.ToString());
+                    if (obj.prefabToSpawn.name.ToLower().Contains("turret"))
                     {
-                        LogInfo("Found Mine Index: " + i);
-                        ChatCommands.mine = i;
-                        break;
+                        turretPrefab = obj.prefabToSpawn;
+                        LogInfo("Found Turret");
                     }
-                    if (ChatCommands.currentRound.currentLevel.spawnableMapObjects[i].prefabToSpawn.name == "Turret")
+                    if (obj.prefabToSpawn.name.ToLower().Contains("mine"))
                     {
-                        LogInfo("Found Turret Index: " + i);
-                        ChatCommands.turret = i;
-                        break;
+                        minePrefab = obj.prefabToSpawn;
+                        LogInfo("Found Mine");
                     }
                 }
+                /*
+                for (int i = 0; i < array.Count(); i++)
+                {
+                    foreach (var prefab in array[i].spawnablePrefabs)
+                    {
+                        if (prefab.name == "Landmine")
+                        {
+                            LogInfo("Found Mine Index: " + i);
+                            ChatCommands.mine = i;
+                            break;
+                        }
+                        if (prefab.name == "Turret")
+                        {
+                            LogInfo("Found Turret Index: " + i);
+                            ChatCommands.turret = i;
+                            break;
+                        }
+                        else
+                        {
+                            LogInfo("Found: " + prefab.name);
+                        }
+                    }
+                }*/
             }
             
         }
