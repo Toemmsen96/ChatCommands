@@ -14,17 +14,17 @@ To install either use a mod Manager or just drag the ChatCommands.dll into your 
 ### Recommendation
 Install NiceChat Plugin alongside this, provides nicer Navigation etc to the chat and a better layout.  
 
-## NonHost functionality
-Spawn Enemy: Format: /spawnenemy [enemyname] ([position]) ([amount]) ([state]) - Alt: /spweny [enemyname] ([amount]) ([state]) ([position])
+## Commands  
+Spawn Enemy: Format: /spawnenemy [enemyname] ([p=position]) ([a=amount]) ([s=state]) - Alt: /spweny [enemyname] ([a=amount]) ([s=state]) ([p=position])
 Description: Spawns an enemy at the specified location. Either use the player's position or specify a position. Position, state and amount are optional. Use them with the following format: position=@(playername/me) amount=(number) state=(alive/dead), For Host only  
   
 Set Custom Deadline: Format: /deadline [days] - Alt: /dl [days]
 Description: Sets a custom deadline for the game. If no argument is provided, the custom deadline will be toggled., For Host only  
   
-Spawn Scrap: Format: /spawnscrap [scrapname] ([position]) ([amount]) ([value]) - Alt: /spwscr [scrapname] ([amount]) ([value]) ([position])
+Spawn Scrap: Format: /spawnscrap [scrapname] ([p=position]) ([a=amount]) ([v=value]) - Alt: /spwscr [scrapname] ([a=amount]) ([v=value]) ([p=position])
 Description: Spawns Scrap at the specified location. Either use the player's position or specify a position. Position, value and amount are optional. Use them with the following format: position=@(playername/me) amount=(number) value=(number), For Host only
   
-Teleport: Format: /teleport [position=(random/@<playername>/@me)] - Alt: /tp [position=(random/@<playername>/@me)]
+Teleport: Format: /teleport ([position=(random/@<playername>/@me/Vector3)]) - Alt: /tp ([position=(random/@<playername>/@me/Vector3)])
 Description: Teleport to where you want. Use the following format: position=@(playername/me) or position=(random) or without arguments to teleport to the terminal., Host and Client
   
 View Help: Format: /help ([command]) - Alt: /h ([command])  
@@ -42,7 +42,7 @@ Description: Buy stuff from the shop. Gets delivered via DropShip. (old function
 Change Weather: Format: /changeweather [weathername] - Alt: /chwe [weathername]  
 Description: Change Weather to a specific type., For Host only  
   
-Spawn Item: Format: /spawnitem [itemname] ([position]) ([amount]) ([state]) ([value]) - Alt: /spwitm [itemname] ([amount]) ([state]) ([position]) ([value])  
+Spawn Item: Format: /spawnitem [itemname] ([p=position]) ([a=amount]) ([v=value]) - Alt: /spwitm [itemname] ([a=amount]) ([p=position]) ([v=value])  
 Description: Spawns Items at a specified position or at a random position. Args are optional, use them like this: p=@me a=5 v=1234.  
 Note: Value doesnt work for everything., For Host only  
   
@@ -83,7 +83,7 @@ Description: Returns your current position., Host and Client
 Set Money: Format: /setmoney ([value]) - Alt: /money ([value])  
 Description: Set Terminal Money to defined value, or without value to toggle infinite money., For Host only  
 
-Spawn Map Object: Format: /spawnobject [objectname] ([position]) ([amount]) - Alt: /spwobj [objectname] ([amount]) ([position])  
+Spawn Map Object: Format: /spawnobject [objectname] ([p=position]) ([a=amount]) - Alt: /spwobj [objectname] ([a=amount]) ([p=position])  
 Description: Spawns Map Object at the specified location. Either use the player's position or specify a position. Position and amount are optional. Use them with the following format: position=@(playername/me) amount=(number), For Host only  
   
 Send Terminal Command: Format: /term [terminalcommand] - Alt: /terminal [terminalcommand]  
@@ -98,12 +98,24 @@ Description: Toggles if Monster Spawns are overriden or not. This affects how ma
 View Credits: Format: /getcredits - Alt: /credits  
 Description: Shows the credits for the ChatCommands mod., Host and Client  
 
+## Config
+- Customize Prefix -> default: /
+- Display Messages as Popup -> Determines if chat messages are displayed as popup messages. default: false
+- Has to be Host -> (for server host only): determines if clients can also use the host commands. default: true
+- Send Host Commands -> (for server host only): determines if commands get sent to the clients, so for example god mode is enabled for them too. default: true
+- Override Spawns -> (for server host only): determines if the spawn command overrides the default spawns. If enabled there can be spawned more than one girl etc. Can be toggled ingame by using /override command. default: false
+- Enable Debug Mode -> Enables Unity Debug mode and with it the Debug modmenu ingame. default: true
+- Log To Chat -> Enables logging to (local) chat. default: false  
+
 ### Legend:  
-"arg" -> argument for command you have to enter (without the "")  
-(x="arg") -> optional argument you have to write with the x= in front and without the () so it knows what type of argument it is  
+[arg] -> argument for command you have to enter (without the [])  
+([arg]) -> optional argument for a command you can enter (without ([]) around it)  
+arg -> placeholder for stuff like position, amount, value, playername etc. in this example  
+#### Disclaimer for Spawn commands and Position arguments:
+- Use for example like this: /spwitem cog v=1232 p=@me a=3 -> Spawns 3 "Cog" Items with the value 1232 at your location.
 
 
 ## Additional Credits:  
 Toemmsen96 - Making most of the mod  
-Chrigi - Spawn Scrap and gun functionality with position parameters and stuff  
+Chrigi - old Spawn Scrap and gun functionality with position parameters and stuff  
 GameMaster Team - some parts of the code that were used as a base  
