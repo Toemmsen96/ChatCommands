@@ -47,7 +47,7 @@ namespace ChatCommands
             PrefixSetting = instance.Config.Bind<string>("Command Settings", "Command Prefix", "/", "An optional prefix for chat commands");
             HostSetting = instance.Config.Bind<bool>("Command Settings", "Has to be Host", true, "(for server host only): determines if clients can also use the host commands");
             SendHostCommandsSetting = instance.Config.Bind<bool>("Command Settings", "Send Host Commands", true, "(for server host only): determines if commands get sent to the clients, so for example god mode is enabled for them too");
-            OverrideSpawnsSetting = instance.Config.Bind<bool>("Command Settings", "Override Spawns", true, "(for server host only): determines if the spawn command overrides the default spawns. If enabled there can be spawned more than one girl etc. Can be toggled ingame by using /override command.");
+            OverrideSpawnsSetting = instance.Config.Bind<bool>("Command Settings", "Override Spawns", false, "(for server host only): determines if the spawn command overrides the default spawns. If enabled there can be spawned more than one girl etc. Can be toggled ingame by using /override command.");
             EnableDebugModeSetting = instance.Config.Bind<bool>("Command Settings", "Enable Debug Mode", true, "Enables Unity Debug mode");
             LogToChatSetting = instance.Config.Bind<bool>("Command Settings", "Log To Chat", false, "Enables logging to (local) chat");
             OverrideSpawns = OverrideSpawnsSetting.Value;

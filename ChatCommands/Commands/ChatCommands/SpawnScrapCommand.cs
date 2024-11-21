@@ -14,8 +14,8 @@ namespace ChatCommands.Commands
 
         public override string Description => "Spawns Scrap at the specified location. Either use the player's position or specify a position. Position, value and amount are optional. Use them with the following format: position=@(playername/me) amount=(number) value=(number)";
 
-        public override string Format => "/spawnscrap [scrapname] ([position]) ([amount]) ([value])";
-        public override string AltFormat => "/spwscr [scrapname] ([amount]) ([value]) ([position])";
+        public override string Format => "/spawnscrap [scrapname] ([p=position]) ([a=amount]) ([v=value])";
+        public override string AltFormat => "/spwscr [scrapname] ([a=amount]) ([v=value]) ([p=position])";
         public override bool IsHostCommand => true;
 
         public override void Execute(CommandInput message)

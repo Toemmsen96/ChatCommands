@@ -13,8 +13,8 @@ namespace ChatCommands.Commands
 
         public override string Description => "Spawns Items at a specified position or at a random position. Args are optional, use them like this: p=@me a=5 v=1234.\n Note: Value doesnt work for everything.";
 
-        public override string Format => "/spawnitem [itemname] ([position]) ([amount]) ([state]) ([value])";
-        public override string AltFormat => "/spwitm [itemname] ([amount]) ([state]) ([position]) ([value])";
+        public override string Format => "/spawnitem [itemname] ([p=position]) ([a=amount]) ([v=value])";
+        public override string AltFormat => "/spwitm [itemname] ([a=amount]) ([p=position]) ([v=value])";
         public override bool IsHostCommand => true;
 
         public override void Execute(CommandInput message)

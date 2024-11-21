@@ -18,8 +18,8 @@ namespace ChatCommands.Commands
 
         public override string Description => "Spawns Map Object at the specified location. Either use the player's position or specify a position. Position and amount are optional. Use them with the following format: position=@(playername/me) amount=(number)";
 
-        public override string Format => "/spawnobject [objectname] ([position]) ([amount])";
-        public override string AltFormat => "/spwobj [objectname] ([amount]) ([position])";
+        public override string Format => "/spawnobject [objectname] ([p=position]) ([a=amount])";
+        public override string AltFormat => "/spwobj [objectname] ([a=amount]) ([p=position])";
         public override bool IsHostCommand => true;
 
         public override void Execute(CommandInput message)
